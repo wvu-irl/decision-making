@@ -1,0 +1,3 @@
+[submodule "belief_functions"]
+	path = belief_functions
+	url = git@github.com:TheBeardedOn3/belief_functions.git
