@@ -1,0 +1,35 @@
+#### TODO
+
+## Documentation
+
+## States
+
+Define State class
+    hash
+    add child
+    how to implement distribution augmentation.
+        Likely just pass state into compute_Q (optimizer)
+        Allow action to record upper and lower bound, then compute Q can extract if it wants
+Define Action Class
+
+
+## Solvers
+
+Write AVI
+Write AMCGS
+Write UCT
+Write MCGS
+Write bounds computation class
+
+
+## BF
+
+Test Base Code
+Write Class for Arbitration techniques
+May need to extend to take in an ID, value, and mass 
+
+
+## Testing
+
+Select Real and Virtual test scenarios
+Develop testing assay
