@@ -13,11 +13,15 @@ class Bounds(ABC):
         super(Bounds, self).__init__()
 
     @abstractmethod
-    def get_lower(self): 
+    def update_lower(self, _s): 
         pass
     
     @abstractmethod
-    def get_upper(self):
+    def update_upper(self, _s):
+        pass
+
+    @abstractmethod
+    def update_bounds(self, _s):
         pass
 
 class RmaxBound(Bounds):
@@ -29,9 +33,13 @@ class RmaxBound(Bounds):
         self.g_ = _gamma
 
     @abstractmethod
-    def get_lower(self): 
-        return self.l_
+    def update_lower(self, _s): 
+        pass
     
     @abstractmethod
-    def get_upper(self):
-        return self.u_
+    def update_upper(self, _s):
+        pass
+
+    @abstractmethod
+    def update_bounds(self, _s):
+        pass

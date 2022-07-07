@@ -38,7 +38,7 @@ class PignisticBellman(Optimizer):
     def __init__(_self, _problem, *_params):
         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s, _a, _gamma, _Q):
+    def compute_Q(_self, _s):
         
         spm, t = _self.problem_.get_transition_model( _s, _a, True)
         
@@ -49,65 +49,95 @@ class PignisticBellman(Optimizer):
 
         return Q
 
-#######################################################################################
-class Bellman(Optimizer):
-    def __init__(_self, _problem, *_params):
-        super().__init__(_problem, _params)
+# class Bellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s, _a, _gamma, _Q):
-        #print("Compute Q")
-        spm, t = _self.problem_.get_transition_model( _s, _a, False)
-        # print(t)
-        # print("--------")
-        Q = 0
-        for i in range(len(spm)):
-            sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
-            Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
-        return Q
+#     def compute_Q(_self, _s):
+#         #print("Compute Q")
+#         spm, t = _self.problem_.get_transition_model( _s, _a, False)
+#         # print(t)
+#         # print("--------")
+#         Q = 0
+#         for i in range(len(spm)):
+#             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
+#             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
+#         return Q
     
-class PignisticBellman(Optimizer):
-    def __init__(_self, _problem, *_params):
-        super().__init__(_problem, _params)
+# class PignisticBellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s, _a, _gamma, _Q):
+#     def compute_Q(_self, _s, _a, _gamma, _Q):
         
-        spm, t = _self.problem_.get_transition_model( _s, _a, True)
+#         spm, t = _self.problem_.get_transition_model( _s, _a, True)
         
-        Q = 0
-        for i in range(len(spm)):
-            sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
-            Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
+#         Q = 0
+#         for i in range(len(spm)):
+#             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
+#             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
 
-        return Q
+#         return Q
 
-
-class Bellman(Optimizer):
-    def __init__(_self, _problem, *_params):
-        super(Optimizer, _self).__init(_problem, _params)
+# #######################################################################################
+# class Bellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super().__init__(_problem, _params)
             
-    @abstractmethod
-    def get_value(_self, _s, _actions, _s_prime):
-        unique_a = []
-        V = np.zeros([len(unique_a),1])
-        for i in range(len(_actions)):
-            a_idx = [a for a in unique_a if _actions[i] == a]
-            T = _self.problem_.transition_prob(_s,_actions[i], _s_prime[i])
-            V[a_idx] += T* (_self.problem_.reward(_s,_actions[i], _s_prime[i]) + _self.problem_.gamma*_s_prime[i].V)
+#     def compute_Q(_self, _s, _a, _gamma, _Q):
+#         #print("Compute Q")
+#         spm, t = _self.problem_.get_transition_model( _s, _a, False)
+#         # print(t)
+#         # print("--------")
+#         Q = 0
+#         for i in range(len(spm)):
+#             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
+#             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
+#         return Q
+    
+# class PignisticBellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super().__init__(_problem, _params)
+            
+#     def compute_Q(_self, _s, _a, _gamma, _Q):
+        
+#         spm, t = _self.problem_.get_transition_model( _s, _a, True)
+        
+#         Q = 0
+#         for i in range(len(spm)):
+#             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
+#             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
 
-        return max(V), unique_a(argmax(V))
+#         return Q
+
+
+# class Bellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super(Optimizer, _self).__init(_problem, _params)
+            
+#     @abstractmethod
+#     def get_value(_self, _s, _actions, _s_prime):
+#         unique_a = []
+#         V = np.zeros([len(unique_a),1])
+#         for i in range(len(_actions)):
+#             a_idx = [a for a in unique_a if _actions[i] == a]
+#             T = _self.problem_.transition_prob(_s,_actions[i], _s_prime[i])
+#             V[a_idx] += T* (_self.problem_.reward(_s,_actions[i], _s_prime[i]) + _self.problem_.gamma*_s_prime[i].V)
+
+#         return max(V), unique_a(argmax(V))
     
 
-class PignisticBellman(Optimizer):
-    def __init__(_self, _problem, *_params):
-        super(Optimizer, _self).__init(_problem, _params)
+# class PignisticBellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super(Optimizer, _self).__init(_problem, _params)
             
-    @abstractmethod
-    def optimize(_self, _s, _actions, _s_prime):
-        unique_a = []
-        V = np.zeros([len(unique_a),1])
-        for i in range(len(_actions)):
-            a_idx = [a for a in unique_a if _actions[i] == a]
-            T = _self.problem_.transition_prob(_s,_actions[i], _s_prime[i])
-            V[a_idx] += T* (_self.problem_.reward(_s,_actions[i], _s_prime[i]) + _self.problem_.gamma*_s_prime[i].V)
+#     @abstractmethod
+#     def optimize(_self, _s, _actions, _s_prime):
+#         unique_a = []
+#         V = np.zeros([len(unique_a),1])
+#         for i in range(len(_actions)):
+#             a_idx = [a for a in unique_a if _actions[i] == a]
+#             T = _self.problem_.transition_prob(_s,_actions[i], _s_prime[i])
+#             V[a_idx] += T* (_self.problem_.reward(_s,_actions[i], _s_prime[i]) + _self.problem_.gamma*_s_prime[i].V)
 
-        return max(V)
+#         return max(V)

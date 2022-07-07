@@ -58,20 +58,21 @@ class State():
         """
         pass
     
-    def add_child(self, _a, _s_p):
+    def add_child(self, _a, _s_p, _r):
         """
         Adds child action to state
 
         Args:
             _a (int): action id 
             _s_p (int): hash key for transition state
+            _r (float): reward
         """
         
         pass
     
     def get_transition(self, _a):
         """
-        Gets transition model associated with state
+        Gets transition model associated with state-action
 
         Returns:
             list(tuple): transition model associated with state
@@ -111,6 +112,9 @@ class Action():
         _gamma (float): temporal discount factor
     """
     def __init__(self, _action, _alpha = 0.9, _gamma):
+        """
+        Constructor
+        """
         super(Action, self).__init__()
 
         self.a_ = _action
@@ -121,6 +125,13 @@ class Action():
         self.N_ = 0
     
     def add_child(self, _s, _r):
+        """
+        Adds child state to action
+
+        Args: 
+            _s_p (int): hash key for transition state
+            _r (float): reward
+        """
         # if state already added
             #increment n and add count to r
         # else 
@@ -128,6 +139,12 @@ class Action():
         self.N_ += 1
     
     def get_transition_model(self):
+        """
+        Gets transition model associated with action
+
+        Returns:
+            list(tuple): transition model associated with state
+        """
         dist = []
         # get values, compute r + gamma*V
         t = self.n_ / self.N_
