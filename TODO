@@ -5,12 +5,17 @@
 ## States
 
 Define State class
+    copy, equal
     hash
-    add child
+    add child, parent
+    transition
     how to implement distribution augmentation.
         Likely just pass state into compute_Q (optimizer)
         Allow action to record upper and lower bound, then compute Q can extract if it wants
 Define Action Class
+    How to store r (just do learning rate or store all r for each s'? how does this affect upper bound?)
+    add_child
+    get_transition_mdoel
 
 
 ## Solvers
@@ -33,3 +38,12 @@ May need to extend to take in an ID, value, and mass
 
 Select Real and Virtual test scenarios
 Develop testing assay
+
+
+### Assorted notes
+
+For transition, we will assume it is a behavior of the solver to augment the model with upper and lower bounds. Actions will just treat outcomes as distributions
+
+For BF it assumes elements are hashable, I would assume I can just pass in the hashkeys themselves (i think strings are hashable)
+
+How to handle distributions and optimization... I think probably pass the state to the optimizer. Does python pass pointers? If so then I can pas the pointer to the solver and use to get states...

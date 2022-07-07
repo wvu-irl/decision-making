@@ -8,11 +8,12 @@ class State():
     User defines:
         _state (dict): dictionary consisting of substates
         _action (list(Action)): list of actions to take
+        _parent (string): Hash key for parent
         _V (float): Initial estimate of the value
         _is_terminal (bool): is true if state is terminal
         _policy (int): Action to select
     """
-    def __init__(self, _state, _action = None, _V = 0, _is_terminal = False, _policy = None):
+    def __init__(self, _state, _action = None, _parent = None, _V = 0, _is_terminal = False, _policy = None):
         """
         Constructor
         """
@@ -34,6 +35,11 @@ class State():
         else:
             self.a_ = []
 
+        if type(_parent) is list:
+            self.parent_ = _parent
+        else:
+            self.parent_ = []
+
     def __copy__(self):
         """
         copy function
@@ -52,12 +58,13 @@ class State():
         """
         pass
     
-    def add_child(self, _a):
+    def add_child(self, _a, _s_p):
         """
         Adds child action to state
 
         Args:
-            _a (Action): 
+            _a (int): action id 
+            _s_p (int): hash key for transition state
         """
         
         pass
@@ -72,24 +79,38 @@ class State():
         
         pass
 
+    def get_parent(self):
+        """
+        Gets parent states (in a graph, parents are considered as incoming nodes)
+
+        Returns:
+            list(string): gets hash key of parents
+        """
+        
+        pass
+
     @abstractmethod
     def __eq__(self, _s):
         """
-        Constructor, initializes MDP model
+        Checks if two states are equal
 
         Args:
-            self (VI_Adversary): Object to initialize
-            _epsilon (double): convergence criteria
-            _gamma (double): Discount factor
-            _num_actions (int): number of actions
+            _s (State): state to compare against
 
         Returns:
-            VI_Adversary: Q-value iteration object
+            bool: true if equal
         """
         return (self.s_ == _s.s_)
     
 class Action():
-    def __init__(self, _action, _gamma):
+    """
+    Description: A class for representing actions in MDPs. This includes resulting state hash keys and number of samples
+    User defines:
+        _action (int): id of action
+        _alpha (float): learning rate for reward
+        _gamma (float): temporal discount factor
+    """
+    def __init__(self, _action, _alpha = 0.9, _gamma):
         super(Action, self).__init__()
 
         self.a_ = _action
@@ -99,14 +120,14 @@ class Action():
         self.n_ = []
         self.N_ = 0
     
-    def add_child(self, _s):
+    def add_child(self, _s, _r):
         # if state already added
             #increment n and add count to r
         # else 
             # add s, r, n to list
         self.N_ += 1
     
-    def get_distribution(self):
+    def get_transition_model(self):
         dist = []
         # get values, compute r + gamma*V
         t = self.n_ / self.N_
@@ -114,77 +135,4 @@ class Action():
         return dist
         #assume upper and lower bound/DST will be done by optimizer
 
-
-    @abstractmethod
-    def __eq__(self, _s):
-        return (self.s_ == _s.s_)
     
-# class StateActionState():
-#     def __init__(self, _state, _V = 0, _policy = None, _is_terminal = False):
-#         super(State, self).__init__()
-
-#         self.V_ = _V
-#         self.policy_ = _policy
-#         self.is_terminal_ = _is_terminal
-
-#         self.s_ = _state
-
-#         if type(_state) is dict:
-#             self.s_ = _state
-#         else:
-#             self.s_ = {'x': _state}
-
-#     def __copy__(self):
-#         return State(self.s_, self.V_, self.policy_, self.is_terminal_)
-    
-#     def __hash__(self):
-#         pass
-
-#     @abstractmethod
-#     def __eq__(self, _s):
-#         return (self.s_ == _s.s_)    
-
-
-class StateSpace():
-    def __init__(self, _states: State):
-        super(StateSpace, self).__init__()
-
-        self.S_ = _states
-        self.N_ = len(self.S_)
-
-        self.rng_ = np.random.default_rng()
-        
-
-    def is_well_formed_state(self, _s):
-        return (self.S_.keys() == _s.keys())
-
-
-    @abstractmethod
-    def is_state(self, _s):
-        if self.is_well_formed_state(_s) and _s in self.S_:
-            return True
-        return False
-
-    @abstractmethod
-    def get_random_state(self):
-        return self.state_(self.rng_.choice(self.N_))
-        
-    @abstractmethod
-    def get_random_state(self):
-        pass
-
-    @abstractmethod
-    def enumerate_states(self):
-        pass
-
-    @abstractmethod
-    def state_2_ind(self, _s):
-        pass
-
-    @abstractmethod
-    def ind_2_state(self, _ind):
-        pass
-
-    @abstractmethod
-    def is_terminal(self, _s):
-        pass
