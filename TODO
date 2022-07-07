@@ -47,3 +47,9 @@ For transition, we will assume it is a behavior of the solver to augment the mod
 For BF it assumes elements are hashable, I would assume I can just pass in the hashkeys themselves (i think strings are hashable)
 
 How to handle distributions and optimization... I think probably pass the state to the optimizer. Does python pass pointers? If so then I can pas the pointer to the solver and use to get states...
+
+
+LET OPTIMIZER FORMULATE BF function, but the state-action just stores the basic number of samples and transition, etc. 
+    The only issue is if we need to extract reward obersvations to build a bigger distribution. 
+
+How to compute upper and lower bounds? Need to look at one paper
