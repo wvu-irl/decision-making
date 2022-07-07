@@ -38,6 +38,7 @@ May need to extend to take in an ID, value, and mass
 
 Select Real and Virtual test scenarios
 Develop testing assay
+Do a timed test on building a dict then overwriting keys and building a dict over time
 
 
 ### Assorted notes
@@ -53,3 +54,9 @@ LET OPTIMIZER FORMULATE BF function, but the state-action just stores the basic 
     The only issue is if we need to extract reward obersvations to build a bigger distribution. 
 
 How to compute upper and lower bounds? Need to look at one paper
+
+Need to think about how to incorporate value and reward. 
+
+It is expected that solvers will go hash -> ind -> obj
+    So dict captures hashes,
+    then list holds objects
