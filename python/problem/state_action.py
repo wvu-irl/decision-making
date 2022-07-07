@@ -111,7 +111,7 @@ class Action():
         _alpha (float): learning rate for reward
         _gamma (float): temporal discount factor
     """
-    def __init__(self, _action, _alpha = 0.9, _gamma):
+    def __init__(self, _action, _alpha = 0.9, _gamma = 0.95):
         """
         Constructor
         """
