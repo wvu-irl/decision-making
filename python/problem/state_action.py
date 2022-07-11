@@ -24,6 +24,7 @@ class State():
         self.is_terminal_ = _is_terminal
 
         self.s_ = _state
+        self.hash_ = ""
 
         if type(_state) is dict:
             self.s_ = _state
@@ -47,7 +48,7 @@ class State():
         Returns:
             State: copied state
         """
-        return State(self.s_, self.V_, self.policy_, self.is_terminal_)
+        return State(self.s_, self.a_, self.parent_, self.V_, self.is_terminal_, self.policy_)
     
     def __hash__(self):
         """
@@ -56,7 +57,12 @@ class State():
         Returns:
             string: hash key
         """
-        pass
+        if self.hash_ == "":
+            self.hash_ = ""
+            for el in self.s_:
+                self.hash_ += str(el)
+        else:
+            return self.hash_
     
     def add_child(self, _a, _s_p, _r):
         """
@@ -67,8 +73,15 @@ class State():
             _s_p (int): hash key for transition state
             _r (float): reward
         """
-        
-        pass
+        ind = -1
+        i = 0
+        while ind == -1:
+            if self.a_[i].id == _a:
+                ind = i
+        if ind == -1:
+            self.a_.append(Action(_a))
+            ind = len(self.a_)
+        self. a_[ind].add_child(_s_p, _r)
     
     def get_transition(self, _a):
         """
@@ -77,8 +90,9 @@ class State():
         Returns:
             list(tuple): transition model associated with state
         """
-        
-        pass
+        for a in self.a_:
+            if a.id == _a:
+                return a.get_transition_model()
 
     def get_parent(self):
         """
@@ -87,8 +101,7 @@ class State():
         Returns:
             list(string): gets hash key of parents
         """
-        
-        pass
+        return self.parent_
 
     @abstractmethod
     def __eq__(self, _s):
@@ -105,20 +118,17 @@ class State():
     
 class Action():
     """
-    Description: A class for representing actions in MDPs. This includes resulting state hash keys and number of samples
+    Description: A class for representing actions in MDPs. This includes resulting state hash keys and number of samples. Assumes reward is a weighted average of those received
     User defines:
         _action (int): id of action
-        _alpha (float): learning rate for reward
-        _gamma (float): temporal discount factor
     """
-    def __init__(self, _action, _alpha = 0.9, _gamma = 0.95):
+    def __init__(self, _action):
         """
         Constructor
         """
         super(Action, self).__init__()
 
         self.a_ = _action
-        self.gamma_ = _gamma
         self.s_prime_ = []
         self.r_ = []
         self.n_ = []
@@ -132,10 +142,14 @@ class Action():
             _s_p (int): hash key for transition state
             _r (float): reward
         """
-        # if state already added
-            #increment n and add count to r
-        # else 
-            # add s, r, n to list
+        if _s in self.s_prime_:
+            i = [x for x in range(len(self.s_prime_)) if _s == self.s_prime_[x]]
+            self.r_[i] = (self.n_[i]*self.r_[i] + _r)/(self.n_[i]+1)
+            self.n_[i] += 1
+        else:
+            self.s_prime_.append(_s)
+            self.r_.append(_r)
+            self.n_.append(1)
         self.N_ += 1
     
     def get_transition_model(self):
@@ -146,10 +160,10 @@ class Action():
             list(tuple): transition model associated with state
         """
         dist = []
-        # get values, compute r + gamma*V
-        t = self.n_ / self.N_
-        #generate pairs and add to dist
+        T = self.n_ / self.N_
+        for s, t, r in zip(self.s_prime_, T, self.r_):
+            dist.append((s,t,r))
         return dist
-        #assume upper and lower bound/DST will be done by optimizer
+        
 
     
