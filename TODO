@@ -2,21 +2,15 @@
 
 ## Documentation
 
-## States
+## states
 
-Define State class
-    copy, equal
-    hash
-    add child, parent
-    transition
-    how to implement distribution augmentation.
-        Likely just pass state into compute_Q (optimizer)
-        Allow action to record upper and lower bound, then compute Q can extract if it wants
-Define Action Class
-    How to store r (just do learning rate or store all r for each s'? how does this affect upper bound?)
-    add_child
-    get_transition_mdoel
+Need a get actions function
 
+
+## Actions
+
+Need to specify epsilon, delta bounds
+Need strategies for removing dominated actions
 
 ## Solvers
 

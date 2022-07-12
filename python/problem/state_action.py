@@ -157,13 +157,22 @@ class Action():
         Gets transition model associated with action
 
         Returns:
-            list(tuple): transition model associated with state
+            list(string): has keys for children
+            list(float): transition probabilities
+            list(float): rewards
         """
-        dist = []
         T = self.n_ / self.N_
-        for s, t, r in zip(self.s_prime_, T, self.r_):
-            dist.append((s,t,r))
-        return dist
+        return self.s_prime_, T, self.r_
+    
+    def model_confidence(self):
+        """
+        Computes model confidence based on Hoeffding's Inequality
+
+        Returns:
+            float: confidence in model (0-1)
+        """
+        
+        return 
         
 
     
