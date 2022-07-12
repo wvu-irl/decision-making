@@ -23,7 +23,7 @@ class Bellman(Optimizer):
     def __init__(_self, _problem, *_params):
         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s):
+    def compute_Q(_self, _s, _a):
         #print("Compute Q")
         spm, t = _self.problem_.get_transition_model( _s, _a, False)
         # print(t)
@@ -33,6 +33,9 @@ class Bellman(Optimizer):
             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
         return Q
+
+    def compute_V(_self, _s):
+        pass
     
 class PignisticBellman(Optimizer):
     def __init__(_self, _problem, *_params):

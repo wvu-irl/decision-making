@@ -54,3 +54,9 @@ Need to think about how to incorporate value and reward.
 It is expected that solvers will go hash -> ind -> obj
     So dict captures hashes,
     then list holds objects
+
+## Action Selection
+
+Add action selection classes and children
+
+https://stackoverflow.com/questions/1298636/how-to-set-initial-size-for-a-dictionary-in-python
