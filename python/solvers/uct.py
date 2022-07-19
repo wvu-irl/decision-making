@@ -3,7 +3,7 @@ from multiprocessing import parent_process
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-
+import actions as act
 import sys
 import os
 
@@ -22,7 +22,7 @@ class UCT():
     Perform Upper Confidence Tree Search 
     Description: User specifies problem and UCT solves for the policy
     """
-    def __init__(self, _opt : Optimizer, _env : gym.Env, _N : int = 5e3, _c : float = 0.5, _n_rollout : int = 50, _action_selection : ActionSelection = UCB1()):
+    def __init__(self, _opt : Optimizer, _env : gym.Env, _N : int = 5e3, _c : float = 0.5, _n_rollout : int = 50, _action_selection_select : act.action_selection, __action_selection_rollout: act.action_selection):
 
         """
          Constructor, initializes BMF-AST
@@ -32,14 +32,15 @@ class UCT():
              _env (Gym): Gym environment
              _N (int): Number of nodes to process in tree
              _c (double): exploration/exploitation term (0: total Exploitation, 1: Mostly Exploration)
-             _n_rollout (int): Maximum number of rollout iterations
+             _n_rollout (int): Maximum number of rollout iterations_select_action_selection_
          Returns:
              UCT: UCT object
          """
         super(UCT, self).__init__()
 
         self.opt_ = _opt
-        self.as_ = _action_selection
+        self.as_s_ = _action_selection_select
+        self.as_r_ = __action_selection_rollout
 
         self.N_ : int = int(_N)
         self.c_ : float = _c
@@ -156,10 +157,9 @@ class UCT():
 
         #return _v_i, is_leaf  
 
-    def simulate(self, _s, _a):
-        # reinit env to _s
-        # step
-        # return s, r (maybe it'll update tree)
+    def simulate(self, _a):
+        observation, reward, done, info = self._env.step(_a)
+        return reward
 
     # def fully_expanded(self, _v_i):
     #     sa = self.mdp_.get_viable_transitions(self.tree[_v_i].state)
@@ -210,7 +210,7 @@ class UCT():
     #     self.add_child(_v_i, a ,s)
     #     return self.n_vertices_
 
-    def rollout(self, _s, _n = -1):
+    def rollout(self, _s, _a,_param,_n = -1):
         """
         Performs rollout on UCT
         Args:
@@ -220,23 +220,19 @@ class UCT():
         Returns:
             r: Estimate of reward
         """
-
-        #randomly simulate until K or termination return approximate value
-
-        if _n != -1 or self.mdp_.is_terminal(_s):
-            a = self.mdp_.get_random_action()
-            _s_prime = self.mdp_.transition(_s,a)
-            r = self.mdp_.get_reward(_s, a, _s_prime)
-            return r + self.rollout(_s, _n-1)
+        if _n != -1:
+            a = self.as_r_.get_action(_s,_a,_param)
+            r = self.simulate(a)
+            return r + self.rollout(_s,_a,_param,_n-1)
         else:
-            return self.mdp_.approximate_value(_s)
+            return 0
 
-    def backpropagate(self, _v_i, _q):
+    def backpropagate(self, _v_i):
 
         # traverse up parents (using indices) call compute Q.
 
         self.tree_[_v_i].N_ += 1
-        self.tree_[_v_i].Q_ += _q
+        self.tree_[_v_i].Q_ += self.opt.compute_Q(self.tree[_v_i])
         if _v_i != 0:
             self.backpropagate(self.tree_[_v_i].parent_, _q)
     

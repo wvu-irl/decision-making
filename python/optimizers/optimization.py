@@ -23,7 +23,7 @@ class Bellman(Optimizer):
     def __init__(_self, _problem, *_params):
         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s, _a):
+    def compute_Q(_self, _s):
         #print("Compute Q")
         spm, t = _self.problem_.get_transition_model( _s, _a, False)
         # print(t)
