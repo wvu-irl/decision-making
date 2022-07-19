@@ -1,3 +1,6 @@
 [submodule "belief_functions"]
 	path = belief_functions
 	url = git@github.com:TheBeardedOn3/belief_functions.git
+[submodule "python/belief_functions"]
+	path = python/belief_functions
+	url = https://github.com/TheBeardedOn3/belief_functions
