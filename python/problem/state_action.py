@@ -22,9 +22,11 @@ class State():
         self.V_ = _V
         self.policy_ = _policy
         self.is_terminal_ = _is_terminal
-
+        
         self.s_ = _state
         self.hash_ = ""
+
+        self.N_ = 0
 
         if type(_state) is dict:
             self.s_ = _state
@@ -82,6 +84,13 @@ class State():
             self.a_.append(Action(_a))
             ind = len(self.a_)
         self. a_[ind].add_child(_s_p, _r)
+        self.N_ += 1
+    
+    # @abstractmethod 
+    # def get_N(self):
+    #     self.N_ = 0
+    #     for a in _self.a_:
+    #         self.N_ += a.N_
     
     def get_transition(self, _a):
         """
@@ -115,6 +124,8 @@ class State():
             bool: true if equal
         """
         return (self.s_ == _s.s_)
+    
+    
     
 class Action():
     """

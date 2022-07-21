@@ -4,6 +4,8 @@ from re import I
 import numpy as np
 import random
 
+
+
 def get_avg(_dist):
     n = 0
     avg = 0
@@ -115,26 +117,41 @@ for el in R:
 dist = [temp.copy] * num_a
 
 # True model 
-
+t_model = dist
 # dim-1, action, dim-2 outcomes
 
-
 # e-greedy model
-
+e_models = [dist] * num_el
 # ucb1 model
-
+ucb_models = [dist] * num_el
 # ambiguity model
+amb_models = [dist] * num_el
+
 
 ## Data
 e_greedy_r = np.zeros(num_trials,num_iter, num_el)
 ucb_r = np.zeros(num_trials,num_iter, num_el)
 amb_r = np.zeros(num_trials,num_iter, num_el)
 
+# e_greedy_r = np.zeros(num_trials,num_iter, num_el)
+# ucb_r = np.zeros(num_trials,num_iter, num_el)
+# amb_r = np.zeros(num_trials,num_iter, num_el)
+
 
 
 ##  Sample and select
 for i in list(range(num_trials)):
+    # Resample true model 
+    for j in range(len(t_model)):
+        temp = rng.choice(R, 1000)
+        side, count = np.unique(temp,return_counts=True)
+        p = count / len(temp)
+        for k in range(len(R)):
+            t_model[j][k][0] = p[k]
+            
+    ## Learn
     for j in list(range(num_iter)):
+        print ("Trial ", i, " | Iteration ", j)
         # sample all actions
 
         # update models

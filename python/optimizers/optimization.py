@@ -9,7 +9,7 @@ class Optimizer(ABC):
         _self.problem_ = _problem
             
     @abstractmethod
-    def compute_Q(_self, _s):
+    def get_action(_self, _s, _T):
         pass
 
     def get_unique(self, _lst):
@@ -22,35 +22,39 @@ class Optimizer(ABC):
 class Bellman(Optimizer):
     def __init__(_self, _problem, *_params):
         super().__init__(_problem, _params)
+        
+        _self.gamma_ = _params[0]
             
-    def compute_Q(_self, _s):
-        #print("Compute Q")
-        spm, t = _self.problem_.get_transition_model( _s, _a, False)
-        # print(t)
-        # print("--------")
-        Q = 0
-        for i in range(len(spm)):
-            sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
-            Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
-        return Q
+    def get_action(_self, _s, _T):
+        
+        a = 0
+        V = float('-inf')
+        for i in range(len(_s.a_)):
+            Q = 0
+            a = _s.a_[i]
+            for j in range(len(a.s_prime_)):
+                Q += a.n_[j]*(a.r_[j] + _self.gamma_*_T[a.s_prime_[j]].V)
+            Q /= a.N_
+            if Q > V:
+                a = 1;
+                V = Q
+        return a, V
 
-    def compute_V(_self, _s):
-        pass
     
-class PignisticBellman(Optimizer):
-    def __init__(_self, _problem, *_params):
-        super().__init__(_problem, _params)
+# class PignisticBellman(Optimizer):
+#     def __init__(_self, _problem, *_params):
+#         super().__init__(_problem, _params)
             
-    def compute_Q(_self, _s):
+#     def compute_Q(_self, _s):
         
-        spm, t = _self.problem_.get_transition_model( _s, _a, True)
+#         spm, t = _self.problem_.get_transition_model( _s, _a, True)
         
-        Q = 0
-        for i in range(len(spm)):
-            sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
-            Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
+#         Q = 0
+#         for i in range(len(spm)):
+#             sp = np.ravel_multi_index(spm[i], _self.problem_.get_num_states())
+#             Q += t[i]* (_self.problem_.get_reward(_s,_a, spm[i]) +_gamma*np.max(_Q[sp]))
 
-        return Q
+#         return Q
 
 # class Bellman(Optimizer):
 #     def __init__(_self, _problem, *_params):
