@@ -121,17 +121,18 @@ def upper_expectation(_bf):
 def get_action_epsilon_greedy(_actions, _e, _rng):
     n = _rng.random()
     if n < _e:
+        return _rng.choice(len(_actions))
+    else:
         Q_s = -inf
         ind = 0
         for i in range(len(_actions)):
             dist, N = count_2_dist(_actions[i])
             Q = get_avg(dist)
-            if Q > Q_s:
+            if Q > Q_s or Q == 0:
                 Q_s = Q
                 ind = i
         return ind
-    else:
-        return _rng.choice(len(_actions))
+        
 
         
 def get_action_ucb1(_actions, _c):
@@ -195,9 +196,9 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 # Assume we are using epsilon-greedy
 num_el = 10
 num_trials = 1e2
-num_iter = 1e2
+num_iter = 1e3
 num_a = 10
-num_outcomes = 10
+num_outcomes = 15
 L = -3
 U = 3
 rng = np.random.default_rng()
@@ -255,11 +256,13 @@ for i in list(range(int(num_trials))):
         for k in range(len(p)):
             temp[k] = (p[k], r[k])
         t_model[j] = temp
+        # print(temp)
         avg = get_avg(temp)
+        # print(avg)
         if avg > opt_r:
             opt_a = j
-            opr_r = avg
-        
+            opt_r = avg
+    # print(opt_a)
     
     # e-greedy model
     e_models = [None] * num_el
@@ -316,14 +319,14 @@ for i in list(range(int(num_trials))):
 e_greedy_avg = np.average(e_greedy_r,0)
 ucb_avg = np.average(ucb_r,0)
 amb_avg = np.average(amb_r,0)
-print(amb_avg[0])
-print(amb_avg[len(amb_avg[:][0])])
+# print(amb_avg[0])
+# print(amb_avg[len(amb_avg[:][0])])
 # avg rewards
 
 iter = list(range(int(num_iter)))
-print(np.shape(e_greedy_avg))
-print(np.shape(iter))
-print(np.shape(epsilon))
+# print(np.shape(e_greedy_avg))
+# print(np.shape(iter))
+# print(np.shape(epsilon))
 
 
 fig = plt.contourf(epsilon, iter, e_greedy_avg)
@@ -336,6 +339,21 @@ plt.colorbar()
 plt.savefig(prefix + "eps_avg_r.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(prefix + "eps_avg_r.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
+
+fig = plt.plot(iter, e_greedy_avg[:,0])
+plt.xlabel("t")
+plt.ylabel("r")
+plt.title("Avg Reward, epsilon")
+fig = plt.plot(iter, e_greedy_avg[:,1])
+fig = plt.plot(iter, e_greedy_avg[:,9])
+plt.legend(["0", "0.1", "0.9"])
+# plt.axis('scaled')
+# plt.colorbar()
+# plt.show()
+plt.savefig(prefix + "eps.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(prefix + "eps.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
+
 
 fig = plt.contourf(c, iter, ucb_avg)
 plt.xlabel("c")
