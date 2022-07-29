@@ -157,6 +157,11 @@ def get_action_ucb1(_actions, _c):
 def get_action_amb_e(_actions, _e, _alpha, _l, _u):
     exp_max = -inf
     ind = 0
+    # N = 0
+    # for i in range(len(_actions)):
+    #     for j in range(len(_actions[i])):
+    #         N += _actions[i][j][0]
+            
     for i in range(len(_actions)):
         dist, t = count_2_dist(_actions[i])
         # print("|||||||||||||||||||||||||")
@@ -176,7 +181,7 @@ def get_action_amb_e(_actions, _e, _alpha, _l, _u):
         # print("--------------")
         low_exp = lower_expectation(bf)
         up_exp = upper_expectation(bf)
-        expectation = _alpha*low_exp + (1-_alpha)*up_exp
+        expectation = _alpha*low_exp + (1-_alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
         if expectation > exp_max:
             exp_max = expectation
             ind = i

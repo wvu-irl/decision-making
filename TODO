@@ -1,5 +1,33 @@
 #### TODO
 
+## Results of K-AB ----------------------------------------------
+Removing the exploration term in UCB only slowed down the algorithm a bit, ambiguity approach was still slower.
+Adding exploration to UCB improved convergence, though not to the same rate as UCB.
+
+Would like to test
+- Dynamically allocate e,c (Gu thinks this is a bad idea because it is easy to pick, ruins theory). Could argue for use of highest entropy approach. Either way, I think these need to converge with time.
+    -- Could also do heuristically
+
+Bound
+- Need to come up with lowset hull for all n -> use this to refine bound (hopefully simplify and remove dependence on n)
+
+Plots
+- Have a comparison of e-greedy, ucb, ambiguity for their avg reward/% optimal actions over their respective parameters (e, c, alpha)
+    -- Need to further dig into the impact of e,c,t for ambiguity
+- Would like do do plot comparisons of e-greedy, ucb, ambiguity for their best param in the % optimal actions
+    -- This was done with 10 arms, for 2k trials and 1k timesteps in RL book
+- Similarly would like to compare their results after 1k timestep across a breadth of parameters
+
+Keep in mind we are demonstrating ambiguity here so it will be more important to show that ambiguous approach converges to optimal solution. And it is okay if it converges more slowly
+    -- Note that we see with lower alpha it is more conservative and does not approach the optimal. This is similar to worst case planning
+
+
+## In UCT/MCGS -----------------------------------------------
+Going to argue this is meant to augment UCT/MCGS with ambiguity (may want a runtime comparison)
+    -- UCT will largely be unaffected
+    -- MCGS probably want to present this as our algorithm, it is likely upper/lower bound will be replaced with upper/lower expectation
+Want to argue that capturing ambiguity gives us a more complete description of the decision. 
+
 ## Documentation
 
 ## states
