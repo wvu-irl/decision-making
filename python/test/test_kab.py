@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 
-prefix = "/media/jared/32GB/home/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/"
-
+#prefix = "/media/jared/32GB/home/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/"
+prefix = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/"
 ## UTILITIES ---------------------------------------
 ## -------------------------------------------------
 ## -------------------------------------------------
@@ -22,7 +22,7 @@ def update_model(_dist, _obs):
         if dist[i][1] == _obs:
             temp = (dist[i][0]+1,_obs)
             dist[i] = temp
-            return _dist
+            return dist
         i += 1
     dist.append((1,_obs))
     return dist
@@ -121,17 +121,18 @@ def upper_expectation(_bf):
 def get_action_epsilon_greedy(_actions, _e, _rng):
     n = _rng.random()
     if n < _e:
+        return _rng.choice(len(_actions))
+    else:
         Q_s = -inf
         ind = 0
         for i in range(len(_actions)):
             dist, N = count_2_dist(_actions[i])
             Q = get_avg(dist)
-            if Q > Q_s:
+            if Q > Q_s or Q == 0:
                 Q_s = Q
                 ind = i
         return ind
-    else:
-        return _rng.choice(len(_actions))
+        
 
         
 def get_action_ucb1(_actions, _c):
@@ -158,8 +159,11 @@ def get_action_amb_e(_actions, _e, _alpha, _l, _u):
     ind = 0
     for i in range(len(_actions)):
         dist, t = count_2_dist(_actions[i])
+        # print("|||||||||||||||||||||||||")
+        # print(t)
+        # print(dist)
         bf, n, e = compute_bf_accuracy(dist, _e)
-
+        # print(bf)
         c = (-math.log( 1/((1-e)*4/5) + (1/3-1/7)))**2
         if n == 0:
             c = 5/4*(1./(1+2*n*np.exp(-np.inf*np.sign(c)))-(1/3-(1/7)))
@@ -168,6 +172,8 @@ def get_action_amb_e(_actions, _e, _alpha, _l, _u):
             c = 5/4*(1./(1+2*n*np.exp(-c))-(1/3-(1/7)))
         
         bf = compute_discount_bf(bf, c, _l, _u)
+        # print(bf)
+        # print("--------------")
         low_exp = lower_expectation(bf)
         up_exp = upper_expectation(bf)
         expectation = _alpha*low_exp + (1-_alpha)*up_exp
@@ -194,8 +200,8 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 ## Initialize params
 # Assume we are using epsilon-greedy
 num_el = 10
-num_trials = 1e2
-num_iter = 1e2
+num_trials = 100
+num_iter = 250
 num_a = 10
 num_outcomes = 10
 L = -3
@@ -255,11 +261,13 @@ for i in list(range(int(num_trials))):
         for k in range(len(p)):
             temp[k] = (p[k], r[k])
         t_model[j] = temp
+        # print(temp)
         avg = get_avg(temp)
+        # print(avg)
         if avg > opt_r:
             opt_a = j
-            opr_r = avg
-        
+            opt_r = avg
+    # print(opt_a)
     
     # e-greedy model
     e_models = [None] * num_el
@@ -279,7 +287,7 @@ for i in list(range(int(num_trials))):
     
     ## Learn
     for j in list(range(int(num_iter))):
-        #print ("Trial ", i, " | Iteration ", j)
+        #print("Trial ", i, " Iteration ", j)
         # sample all actions
         outcomes = [0] * num_a
         for k in range(num_a):
@@ -303,7 +311,7 @@ for i in list(range(int(num_trials))):
             ucb_r[i][j][k] = outcomes[act]
         # amb
         for k in range(num_el):
-            act = get_action_amb_e(amb_models[k], 0.2, alpha[k], L, U)
+            act = get_action_amb_e(amb_models[k], 0.005, alpha[k], L, U)
             if act == opt_a:
                 amb_opt[i][j][k] += 1
             amb_models[k][act] = update_model(amb_models[k][act], outcomes[act])
@@ -316,14 +324,14 @@ for i in list(range(int(num_trials))):
 e_greedy_avg = np.average(e_greedy_r,0)
 ucb_avg = np.average(ucb_r,0)
 amb_avg = np.average(amb_r,0)
-print(amb_avg[0])
-print(amb_avg[len(amb_avg[:][0])])
+# print(amb_avg[0])
+# print(amb_avg[len(amb_avg[:][0])])
 # avg rewards
 
 iter = list(range(int(num_iter)))
-print(np.shape(e_greedy_avg))
-print(np.shape(iter))
-print(np.shape(epsilon))
+# print(np.shape(e_greedy_avg))
+# print(np.shape(iter))
+# print(np.shape(epsilon))
 
 
 fig = plt.contourf(epsilon, iter, e_greedy_avg)
@@ -336,6 +344,21 @@ plt.colorbar()
 plt.savefig(prefix + "eps_avg_r.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(prefix + "eps_avg_r.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
+
+fig = plt.plot(iter, e_greedy_avg[:,0])
+plt.xlabel("t")
+plt.ylabel("r")
+plt.title("Avg Reward, epsilon")
+fig = plt.plot(iter, e_greedy_avg[:,1])
+fig = plt.plot(iter, e_greedy_avg[:,9])
+plt.legend(["0", "0.1", "0.9"])
+# plt.axis('scaled')
+# plt.colorbar()
+# plt.show()
+plt.savefig(prefix + "eps.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(prefix + "eps.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
+
 
 fig = plt.contourf(c, iter, ucb_avg)
 plt.xlabel("c")
