@@ -246,10 +246,14 @@ for i in range(len(alpha)): alpha[i] = i/num_el
 e_greedy_r = np.zeros([int(num_trials),int(num_iter), num_el])
 ucb_r = np.zeros([int(num_trials),int(num_iter), num_el])
 amb_r = np.zeros([int(num_trials),int(num_iter), num_el])
+amb_e_r = np.zeros([int(num_trials),int(num_iter), num_el])
+
 
 e_greedy_opt = np.zeros([int(num_trials),int(num_iter), num_el])
 ucb_opt = np.zeros([int(num_trials),int(num_iter), num_el])
 amb_opt = np.zeros([int(num_trials),int(num_iter), num_el])
+amb_e_opt = np.zeros([int(num_trials),int(num_iter), num_el])
+
 
 ##  Sample and select
 for i in list(range(int(num_trials))):
@@ -282,6 +286,9 @@ for i in list(range(int(num_trials))):
     # ambiguity model
     amb_models = [None] * num_el
     
+    amb_e_models = [None] * num_el
+
+    
     temp = [None] * num_a
     for j in range(num_a):
         temp[j] = []
@@ -289,7 +296,8 @@ for i in list(range(int(num_trials))):
     for j in range(num_el):
         e_models[j] = temp
         ucb_models[j] = temp
-        amb_models[j] = temp  
+        amb_models[j] = temp
+        amb_e_models[j] = temp   
     
     ## Learn
     for j in list(range(int(num_iter))):
@@ -322,6 +330,15 @@ for i in list(range(int(num_trials))):
                 amb_opt[i][j][k] += 1
             amb_models[k][act] = update_model(amb_models[k][act], outcomes[act])
             amb_r[i][j][k] = outcomes[act]
+            
+        # amb_fixed alpha            
+        for k in range(num_el):
+            act = get_action_amb_e(amb_models[k], epsilon[k], 0.75, L, U)
+            if act == opt_a:
+                amb_e_opt[i][j][k] += 1
+            amb_e_models[k][act] = update_model(amb_e_models[k][act], outcomes[act])
+            amb_e_r[i][j][k] = outcomes[act]
+
 
 ## Need to also compare across epsilon values, maximizing entropy
 
@@ -330,6 +347,8 @@ for i in list(range(int(num_trials))):
 e_greedy_avg = np.average(e_greedy_r,0)
 ucb_avg = np.average(ucb_r,0)
 amb_avg = np.average(amb_r,0)
+amb_e_avg = np.average(amb_e_r,0)
+
 # print(amb_avg[0])
 # print(amb_avg[len(amb_avg[:][0])])
 # avg rewards
@@ -388,6 +407,17 @@ plt.colorbar()
 plt.savefig(prefix + "amb_avg_r.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(prefix + "amb_avg_r.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
+
+fig = plt.contourf(epsilon, iter, amb_e_avg)
+plt.xlabel("epsilon")
+plt.ylabel("Iteration")
+plt.title("Avg Reward, ambiguity e")
+# plt.axis('scaled')
+plt.colorbar()
+# plt.show()
+plt.savefig(prefix + "amb_e_avg_r.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(prefix + "amb_e_avg_r.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
 # cb.remove()
 ##
 ##
@@ -397,6 +427,8 @@ plt.clf()
 e_greedy_avg_opt = np.average(e_greedy_opt,0)
 ucb_avg_opt = np.average(ucb_opt,0)
 amb_avg_opt = np.average(amb_opt,0)
+amb_e_avg_opt = np.average(amb_e_opt,0)
+
 print(amb_avg_opt[0])
 print(amb_avg_opt[len(amb_avg_opt[:][0])])
 # avg rewards
@@ -438,6 +470,17 @@ plt.colorbar()
 # plt.show()
 plt.savefig(prefix + "amb_avg_o.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(prefix + "amb_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
+
+fig = plt.contourf(epsilon, iter, amb_e_avg_opt)
+plt.xlabel("epsilon")
+plt.ylabel("Iteration")
+plt.title("Avg Opt Action, ambiguity e")
+# plt.axis('scaled')
+plt.colorbar()
+# plt.show()
+plt.savefig(prefix + "amb_e_avg_o.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(prefix + "amb_e_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
 fig = plt.contourf(alpha, iter, ucb_avg_opt - amb_avg_opt)
