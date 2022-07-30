@@ -206,7 +206,7 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 # Assume we are using epsilon-greedy
 num_el = 10
 num_trials = 100
-num_iter = 250
+num_iter = 200
 num_a = 10
 num_outcomes = 10
 L = -3
@@ -220,8 +220,9 @@ epsilon = [0]* num_el
 for i in range(len(epsilon)): epsilon[i] = i/num_el
 
 # ucb1
-c = [0]* num_el
-for i in range(len(c)): c[i] = 1/2**((num_el/2 - i))
+# c = [0]* num_el
+# for i in range(len(c)): c[i] = 1/2**((num_el/2 - i))
+c = [ 0.001, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 1.5, 2]
 
 # ambiguity
 alpha = [0]* num_el
@@ -448,3 +449,19 @@ plt.colorbar()
 # plt.show()
 plt.savefig(prefix + "ucb_amb_err.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(prefix + "ucb_amb_err.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
+
+fig = plt.plot(epsilon, e_greedy_avg_opt[num_iter-1])
+fig = plt.plot(c, ucb_avg_opt[num_iter-1])
+fig = plt.plot(alpha, amb_avg_opt[num_iter-1])
+plt.xlabel("e,c,a")
+plt.ylabel("% optimal actions")
+plt.title("Optimal Actions, All")
+
+plt.legend(["e-greedy", "ucb", "amb"])
+# plt.axis('scaled')
+# plt.colorbar()
+# plt.show()
+plt.savefig(prefix + "all_opt.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(prefix + "all_opt.png", format="png", bbox_inches="tight", pad_inches=0.05)
+plt.clf()
