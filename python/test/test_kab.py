@@ -1,4 +1,3 @@
-
 from cmath import inf
 import math
 from math import comb
@@ -205,7 +204,7 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 ## Initialize params
 # Assume we are using epsilon-greedy
 num_el = 10
-num_trials = 100
+num_trials = 2000
 num_iter = 200
 num_a = 10
 num_outcomes = 10

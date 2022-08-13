@@ -175,6 +175,25 @@ class Action():
         T = self.n_ / self.N_
         return self.s_prime_, T, self.r_
     
+    def sample_transition_model(self, _rng):
+        """
+        Gets transition model associated with action
+
+        Returns:
+            list(string): has keys for children
+            list(float): transition probabilities
+            list(float): rewards
+        """
+             
+        p = _rng.random()*self.N_
+        total = 0
+        ind = 0
+        while total < p:
+            total += self.n_[ind]
+            ind += 1
+            
+        return self.s_prime_[ind], self.r_[ind]
+    
     def model_confidence(self):
         """
         Computes model confidence based on Hoeffding's Inequality
