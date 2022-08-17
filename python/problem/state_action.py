@@ -64,7 +64,7 @@ class State():
 
         return self.hash_
     
-    def add_child(self, _a, _s_p, _r):
+    def add_child(self, _a, _s_p, _s_p_i, _r):
         """
         Adds child action to state
 
@@ -81,8 +81,9 @@ class State():
         if ind == -1:
             self.a_.append(Action(_a))
             ind = len(self.a_)
-        self. a_[ind].add_child(_s_p, _r)
+        child_ind = self. a_[ind].add_child(_s_p, _s_p_i, _r)
         self.N_ += 1
+        return child_ind
     
     # @abstractmethod 
     # def get_N(self):
@@ -139,11 +140,12 @@ class Action():
 
         self.a_ = _action
         self.s_prime_ = []
+        self.s_prime_i_ = []
         self.r_ = []
         self.n_ = []
         self.N_ = 0
     
-    def add_child(self, _s, _r):
+    def add_child(self, _s, _s_p_i, _r):
         """
         Adds child state to action
 
@@ -151,15 +153,20 @@ class Action():
             _s_p (int): hash key for transition state
             _r (float): reward
         """
+        ind = -1
         if _s in self.s_prime_:
             i = [x for x in range(len(self.s_prime_)) if _s == self.s_prime_[x]]
             self.r_[i] = (self.n_[i]*self.r_[i] + _r)/(self.n_[i]+1)
             self.n_[i] += 1
+            ind = i
         else:
             self.s_prime_.append(_s)
+            self.s_prime_i_.append(_s_p_i)
             self.r_.append(_r)
             self.n_.append(1)
+            ind = _s_p_i
         self.N_ += 1
+        return ind
     
     def get_transition_model(self):
         """

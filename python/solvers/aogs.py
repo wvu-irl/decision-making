@@ -24,7 +24,7 @@ class AOGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and AOGS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection_select, _N = 5e3, _bounds = [0, 1], _performance = [0.05, 0.05]):
+    def __init__(self, _env : gym.Env, _N = 5e3, _bounds = [0, 1], _performance = [0.05, 0.05]): #_action_selection, 
 
         """
          Constructor, initializes BMF-AST
@@ -44,9 +44,7 @@ class AOGS():
         self.performance_ = _performance
         self.bounds_ = _bounds
         
-        
-
-        self.as_s_ = _action_selection_select
+        #self.as_s_ = _action_selection
         
         #### COME BACK ######
         a = _env.action_space #Action Space
@@ -74,8 +72,9 @@ class AOGS():
         Returns:
         """
         self.graph_ = [State()] * self.N_
-        self.graph_i_ : dict = {}
+        self.gi : dict = {}
         self.U_ = []
+        self.gi_ = []
         self.current_policy = -1
         self.n_ = 0
     ######################################################
@@ -95,7 +94,9 @@ class AOGS():
         s = None
         
         if self.n_ == 0:
-            self.graph_[hash(_s)] = _s
+            self.gi_[hash(_s)] = self.n_
+            self.graph_[self.gi_[hash(_s)]] = State(s, self.env_.get_actions(_s))
+            
             self.U_.append(hash(_s)) 
             self.n_ = 1
         
@@ -111,8 +112,9 @@ class AOGS():
             d = 0
             do_reset = True
             
-            while self.graph_[s].children and d < _D:        
-                self.env_.reset() #need to convert s to  seed
+            while self.graph_[self.gi_[hash(s)]].children and d < _D:   
+                if do_reset:     
+                    self.env_.reset(s)
                 
                 #select action argmax upper exp
                     #maybe do epsilon greedy
@@ -124,13 +126,12 @@ class AOGS():
                     s_p, r = s.a_.sample_transition_model(self.rng_)
                     do_reset = False
                     
-                if s_p in self.graph_:
-                    pass
-                else:
-                    pass
+                # add transition to model
                 
-                if s,a for all non dominated actions known
-                    remove s from U
+                if not (hash(s_p) in self.gi_):
+                    self.gi_[hash(_s)] = self.n_
+                    self.graph_[self.gi_[hash(_s)]] = State(s, self.env_.get_actions(_s))
+                    self.n_ += 1
                     
                 s = s_p
                 parents[p_ind] = s

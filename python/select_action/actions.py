@@ -2,6 +2,8 @@ import math
 import numpy as np
 import random
 
+from ambiguity_toolbox import *
+
 class action_selection():
     """
     Selects which actions to take through a function
@@ -22,11 +24,11 @@ class action_selection():
         pass
 
 
-    def return_action(self,_s,_a,_param = []):
+    def return_action(self,_s,_a,_param = [], _solver = None):
         return self.func_(_s,_a, self.const_,_param)
 
 
-def UCB1(_s,_a,_const,_param=[]):
+def UCB1(_s,_a,_const,_param=[], _solver = None):
     UCB = math.nan
     optAction = math.nan
     random.shuffle(_a)
@@ -36,6 +38,17 @@ def UCB1(_s,_a,_const,_param=[]):
             UCB = aVal
             optAction = a
     return optAction
+
+def ambiguity_aware(_s,_a,_const = 1,_params=[], _solver = None):
+    # accept a state which already has all actions listed
+    # no a
+    # _const is alpha
+    # params are upper and lower bounds
+    # solver gives us access to tree for value
+    
+    
+    
+    pass
 
 
 def randomAction(_s,_a,_const,_param):
