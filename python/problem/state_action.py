@@ -6,7 +6,7 @@ class State():
     """
     Description: A class for representing states in MDPs. This includes sub states, possible actions, the value, policy, and whether or not a state is terminal, and hash function
     User defines:
-        _state (dict): dictionary consisting of substates
+        _state (list(int)): dictionary consisting of substates
         _action (list(Action)): list of actions to take
         _parent (string): Hash key for parent
         _V (float): Initial estimate of the value
@@ -24,14 +24,14 @@ class State():
         self.is_terminal_ = _is_terminal
         
         self.s_ = _state
-        self.hash_ = ""
+        self.hash_ = None
 
         self.N_ = 0
 
-        if type(_state) is dict:
+        if type(_state) is list:
             self.s_ = _state
         else:
-            self.s_ = {'x': _state}
+            self.s_ = [_state]
             
         if type(_action) is list:
             self.a_ = _action
@@ -59,12 +59,10 @@ class State():
         Returns:
             string: hash key
         """
-        if self.hash_ == "":
-            self.hash_ = ""
-            for el in self.s_:
-                self.hash_ += str(el)
-        else:
-            return self.hash_
+        if self.hash_ == None:
+            self.hash_ = hash(self.s_)
+
+        return self.hash_
     
     def add_child(self, _a, _s_p, _r):
         """

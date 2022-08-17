@@ -54,14 +54,9 @@ class AOGS():
         self._select_param = []
         #####################
 
-        self.graph_ : set = {}
-        self.U_ = []
+        self.reinit()
         # for i in range(_N):
         #     self.graph_[i] = State()
-
-        
-        self.current_policy = -1
-        self.n_ = 0
         
         self.t_ = self.num_samples(_performance)
 
@@ -78,10 +73,11 @@ class AOGS():
              
         Returns:
         """
-        if _action == None:
-            self.graph_ : dict = {}
-            for i in range(self.N_):
-                self.graph_[i] = State()
+        self.graph_ = [State()] * self.N_
+        self.graph_i_ : dict = {}
+        self.U_ = []
+        self.current_policy = -1
+        self.n_ = 0
     ######################################################
               
     def search(self, _s : State, _D :int = 100):
@@ -99,8 +95,8 @@ class AOGS():
         s = None
         
         if self.n_ == 0:
-            self.graph_[_s] = _s
-            self.U_.append(_s) (append the hash key)
+            self.graph_[hash(_s)] = _s
+            self.U_.append(hash(_s)) 
             self.n_ = 1
         
         while (n < self.N_ and len(self.U_)):
