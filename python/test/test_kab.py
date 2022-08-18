@@ -153,6 +153,19 @@ def get_action_ucb1(_actions, _c):
             ind = i
     return ind
 
+def get_confidence(epsilon,t):
+    if t == 0:
+        return 0
+    else:
+        c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
+        c = (c*t)/(8)
+        c = 3/2*(1./(1+2*np.exp(-c)))-1/2
+        if c > 1:
+            return 1
+        if c < 0:
+            return 0
+        return c
+
 def get_action_amb_e(_actions, _e, _alpha, _l, _u):
     exp_max = -inf
     ind = 0
@@ -168,19 +181,14 @@ def get_action_amb_e(_actions, _e, _alpha, _l, _u):
         # print(dist)
         bf, n, e = compute_bf_accuracy(dist, _e)
         # print(bf)
-        c = (-math.log( 1/((1-e)*4/5) + (1/3-1/7)))**2
-        if n == 0:
-            c = 5/4*(1./(1+2*n*np.exp(-np.inf*np.sign(c)))-(1/3-(1/7)))
-        else:
-            c = (c*t)/(8*n)
-            c = 5/4*(1./(1+2*n*np.exp(-c))-(1/3-(1/7)))
+        c = get_confidence(e,t)
         
         bf = compute_discount_bf(bf, c, _l, _u)
         # print(bf)
         # print("--------------")
         low_exp = lower_expectation(bf)
         up_exp = upper_expectation(bf)
-        expectation = _alpha*low_exp + (1-_alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
+        expectation = _alpha*low_exp + _alpha*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
         if expectation > exp_max:
             exp_max = expectation
             ind = i
