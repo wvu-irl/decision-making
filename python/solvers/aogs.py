@@ -1,14 +1,12 @@
 import copy
-from msilib import knownbits
-from multiprocessing import parent_process
+#from msilib import knownbits
+#from multiprocessing import parent_process
 from pyexpat import model
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import gym
 
-
-from problem.state_action import State, Action
-from optimizers.optimization import Optimizer
 import sys
 import os
 
@@ -16,7 +14,10 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-import gym
+from problem.state_action import State, Action
+from optimizers.optimization import Optimizer
+
+
 
 
 class AOGS():
@@ -61,7 +62,7 @@ class AOGS():
         self.rng_ = np.random.default_rng()
 
     ############## COME BACK ##############################
-    def reinit(self, _state, _action = None, _s_prime = None):
+    def reinit(self, _state = None, _action = None, _s_prime = None):
         """
         Reinitialize Graph from state-action-state transition
         Args:
@@ -71,7 +72,7 @@ class AOGS():
              
         Returns:
         """
-        self.graph_ = [State()] * self.N_
+        self.graph_ = [State(1)] * self.N_
         self.gi : dict = {}
         self.U_ = []
         self.gi_ = []
@@ -139,7 +140,7 @@ class AOGS():
                 
             backpropagate()    
                 
-    return max over meu   
+    #return max over meu   
           
                 # 
                 # s = _s

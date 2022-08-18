@@ -2,14 +2,21 @@ import math
 import numpy as np
 import random
 
-from ambiguity_toolbox import *
+import sys
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+from select_action.ambiguity_toolbox import *
 
 class action_selection():
     """
     Selects which actions to take through a function
     Description: Class that defines which action is selected. 
     """
-    def __init__(self, _func, _const : list = []) -> None:
+    def __init__(self, _func, _const : list = []):# -> None:
         """
         Constructor
         Args:
@@ -21,9 +28,7 @@ class action_selection():
         """
         self.func_ : function = _func
         self.const_ : list = _const
-        pass
-
-
+    
     def return_action(self,_s,_a,_param = [], _solver = None):
         return self.func_(_s,_a, self.const_,_param)
 
@@ -45,10 +50,29 @@ def ambiguity_aware(_s,_a,_const = 1,_params=[], _solver = None):
     # _const is alpha
     # params are upper and lower bounds
     # solver gives us access to tree for value
+    epsilon = _params[0]
+    delta = _params[1]
+    gamma = _params[2]
+    L = _params[3]
+    U = _params[4]
     
+    max_expectation = -inf
+    ind = 0
     
-    
-    pass
+    for a in _s.a_:
+        dist, t = count_2_dist(a, gamma, _solver)
+        # dist -> distribution (a, r+gamma V)
+        # t -> number of samples
+        
+        bf = dist_2_bf(dist, t, epsilon, L, U)
+        
+        low_exp = lower_expectation(bf)
+        up_exp = upper_expectation(bf)
+        expectation = (1-_const)*low_exp + (_const)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
+        if expectation > exp_max:
+            exp_max = expectation
+            ind = a.a_
+    return ind
 
 
 def randomAction(_s,_a,_const,_param):
