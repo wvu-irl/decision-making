@@ -44,20 +44,22 @@ def UCB1(_s,_a,_const,_param=[], _solver = None):
             optAction = a
     return optAction
 
-def ambiguity_aware(_s,_a,_const = 1,_params=[], _solver = None):
-    # accept a state which already has all actions listed
-    # no a
-    # _const is alpha
-    # params are upper and lower bounds
-    # solver gives us access to tree for value
-    epsilon = _params[0]
-    delta = _params[1]
-    gamma = _params[2]
-    L = _params[3]
-    U = _params[4]
+#assume that when initialized it gets alpha, but the
+#solver can override, for example when doing optimistic search
+def ambiguity_aware(_s,_a=None,_const = 1,_params=[], _solver = None):
+    epsilon = _solver.performance_[0]
+    delta = _solver.performance_[1]
+    gamma = _solver.gamma
+    L = _solver.bounds_[0]
+    U = _solver.bounds_[1]
+    if _params == []:
+        alpha = _const[0]
+    else:
+        alpha = _params[0]
     
     max_expectation = -inf
     ind = 0
+    gap = 0
     
     for a in _s.a_:
         dist, t = count_2_dist(a, gamma, _solver)
@@ -68,11 +70,12 @@ def ambiguity_aware(_s,_a,_const = 1,_params=[], _solver = None):
         
         low_exp = lower_expectation(bf)
         up_exp = upper_expectation(bf)
-        expectation = (1-_const)*low_exp + (_const)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
+        expectation = (1-alpha)*low_exp + (alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
         if expectation > exp_max:
             exp_max = expectation
+            gap = up_exp-low_exp
             ind = a.a_
-    return ind
+    return ind, exp_max, gap
 
 
 def randomAction(_s,_a,_const,_param):

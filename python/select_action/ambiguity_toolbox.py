@@ -34,8 +34,13 @@ def get_confidence(epsilon,t):
         return 0
     else:
         c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
-        c = (c*t)/(8*t)
-        return 5/4*(1./(1+2*t*np.exp(-c))-(1/3-(1/7)))
+        c = (c*t)/(8)
+        c = 3/2*(1./(1+2*np.exp(-c)))-1/2
+        if c > 1:
+            return 1
+        if c < 0:
+            return 0
+        return c
 
 ## Belief functions --------------------------------
 ## -------------------------------------------------

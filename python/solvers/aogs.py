@@ -25,7 +25,7 @@ class AOGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and AOGS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _N = 5e3, _bounds = [0, 1], _performance = [0.05, 0.05]): #_action_selection, 
+    def __init__(self, _env : gym.Env, _action_selection, _N = 5e3, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -44,8 +44,9 @@ class AOGS():
         self.N_ = int(_N)
         self.performance_ = _performance
         self.bounds_ = _bounds
+        self.gamma_ = _gamma
         
-        #self.as_s_ = _action_selection
+        self.a_s_ = _action_selection
         
         #### COME BACK ######
         a = _env.action_space #Action Space
@@ -78,6 +79,7 @@ class AOGS():
         self.gi_ = []
         self.current_policy = -1
         self.n_ = 0
+        self.value_gap_ = self.performance_[0]
     ######################################################
               
     def search(self, _s : State, _D :int = 100):
@@ -93,6 +95,7 @@ class AOGS():
         """
         n = 0
         s = None
+        self.value_gap_ = self.performance_[0]
         
         if self.n_ == 0:
             self.gi_[hash(_s)] = self.n_
@@ -108,64 +111,44 @@ class AOGS():
                 s = _s
             
             parents = [-1]*_D
-            parents[0] = s
             p_ind = 1
             d = 0
             do_reset = True
+            is_terminal = False
             
-            while self.graph_[self.gi_[hash(s)]].children and d < _D:   
-                if do_reset:     
-                    self.env_.reset(s)
+            #should come up with better way to handle terminal states, check out MCRM
+            # right now it may not terminate
+            while self.graph_[self.gi_[hash(s)]].children and is_terminal and d < _D:
+                if hash(s) not in parents:     
+                    parents[p_ind] = hash(s)
                 
-                #select action argmax upper exp
-                    #maybe do epsilon greedy
+                #pass alpha into initialization, 
+                # bounds and params available from solver 
+                a, v_opt, gap = self.a_s_.select_action(s,None,[1],self)
                 
-                if self.graph_[s].a_.N_ >= self.t_:
-                    s_p, r, done = self.simulate(a)
-                    do_reset = False
-                else:
-                    s_p, r = s.a_.sample_transition_model(self.rng_)
-                    do_reset = False
+                if gap > self.value_gap_:
+                    self.value_gap_ = gap
+                
+                s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
                     
-                # add transition to model
+                ind = self.graph_[self.gi_[hash(_s)]].add_child(s_p, self.n_,r)
                 
-                if not (hash(s_p) in self.gi_):
-                    self.gi_[hash(_s)] = self.n_
-                    self.graph_[self.gi_[hash(_s)]] = State(s, self.env_.get_actions(_s))
+                if ind == self.n_:
+                    self.gi_[hash(s_p)] = self.n_
+                    self.graph_[self.gi_[hash(s_p)]] = State(s_p, self.env_.get_actions(s_p), hash(s), r/(1-self.gamma_), is_terminal)
                     self.n_ += 1
+                    if not is_terminal:
+                        self.U_.append(hash(s_p))
                     
                 s = s_p
-                parents[p_ind] = s
                 p_ind += 1
                 
-            backpropagate()    
-                
-    #return max over meu   
-          
-                # 
-                # s = _s
-                # for t in range(_h):
-                #     self.compute_bounds(n)
-                #     b = self.select(s,n)
-                #     self.graph_eval(obs,reward)
-                #     if done:
-                #         break
+            self.backpropagate(parents)  
+            
+        a, gap = self.a_s_.select_action(_s,None,None,self)
+        return a
                
-    def compute_bounds(self, _n):
-        return
-
-    def select(self,_s):
-        """
-        Select action to take for AOGS Simulation
-        Args:
-            self (AOGS): AOGS Object
-            _s (State): Current State
-        Returns:
-            Action: Best Action from Current state
-        """
-        return self.as_s_.return_action(_s,self.a_,self._select_param)
-
-    def simulate(self, _a):
+    def simulate(self, _s, _a, _do_reset):
         """
         Simulate the AOGS object's Enviroment
         Args:
@@ -176,13 +159,30 @@ class AOGS():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
-        obs, r, done, info = self.env_.step(_a)
-        return obs, r, done
+        if _do_reset:     
+            self.env_.reset(_s)
+            
+        if self.graph_[self.gi_[hash(_s)]].a_.N_ >= self.t_:
+            s_p, r, done, info = self.env_.step(_a)
+            _do_reset = False
+        else:
+            s_p, r = _s.a_.sample_transition_model(self.rng_)
+            _do_reset = True
+        return s_p, r, done, _do_reset 
+    
+    def backpropagate(self, _parents):
+        precision = (1-self.gamma_)/self.gamma_*self.value_gap_
+        
+        while len(_parents):
+            s = _parents.pop(0)
+            if s != -1:
+                a, v, gap = self.a_s_.select_action(s,None,[],self)
+                if v - self.graph_[s].V_ > precision:
+                    temp = self.graph_[s].parent_
+                    for p in temp:
+                        if p not in _parents:
+                            _parents.append(p)
+                self.graph_[s].V_ = v
 
-    def graph_eval(self, _obs, _r):
-        ## IF _Obs is in Graph Already
-        ## - Add state, state_ trans, action, reward into  S and new S' node
-
-        ## ELSE
-        ##  - Add state, state_ trans, action, reward into  S and S'
-        return
+            
+        
