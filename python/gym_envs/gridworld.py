@@ -57,7 +57,10 @@ class GridWorld(gym.Env):
         
         
         self.p_ = _p
+        self.agent_init 
         self.reinit(_goal)
+        
+        self.goal_ = _goal
         
         self.a_ = [0, 1, 2, 3]
         
@@ -72,10 +75,11 @@ class GridWorld(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reinit(self, _goal = None):
-        self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)] 
-        if _goal != None:
-            self.goal_ = _goal
+    def reinit(self, _state = None):
+        if _state == None:
+            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
+        else:
+            self.agent_ = _state
         
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
@@ -112,7 +116,7 @@ class GridWorld(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return [int(self.agent_[0]), int(self.agent_[1])]
+        return self.agent_
     
     
     def get_distance(self, s1, s2):
@@ -157,7 +161,7 @@ class GridWorld(gym.Env):
     def get_neighbors(self, _position):
         neighbors = []
         neighbors_ind = []
-        step = [[ 0, -1], [-1, -1], [-1,  0], [-1,  1], [ 0,  1], [ 1,  1], [ 1,  0], [ 1, -1], [0, 0]]
+        step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0], [0, 0]]
         for i in range(9):
             t = list(_position)
             t[0] += step[i][0]

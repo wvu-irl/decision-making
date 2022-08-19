@@ -8,19 +8,22 @@ import numpy as np
 import random
 
 from gym_envs.gridworld import GridWorld
+from gym_envs.sailing import Sailing
 
 
 ## Params
 
 dim = [40,40]
 goal = [10,10]
-p = 0.5
+p = 0.1
 
-env = GridWorld(dim, goal, p)
+#env = GridWorld(dim, goal, p)
+env = Sailing(dim, goal, p)
 
 while(1):
-    env.step(2)
+    s, r,d,info = env.step(2)
     env.render()
+    print(r)
 
 #env.render("/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/avi/fig")
 
