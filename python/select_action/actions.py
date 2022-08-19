@@ -1,14 +1,13 @@
 import math
 import numpy as np
 import random
-
 import sys
 import os
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-
+from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
 
 
@@ -30,24 +29,26 @@ class action_selection():
         self.func_ : function = _func
         self.const_ : list = _const
     
-    def return_action(self,_s,_a,_param = [], _solver = None):
-        return self.func_(_s,_a, self.const_,_param)
+    def return_action(self,_s,_param = [], _solver = None):
+        return self.func_(_s, self.const_,_param)
 
 
-def UCB1(_s,_a,_const,_param=[], _solver = None):
+def UCB1(_s : State,_const,_param=[], _solver = None):
     UCB = math.nan
     optAction = math.nan
-    random.shuffle(_a)
-    for a in _a:
-        aVal =_param[a]["Q"] + _const["c"]*np.sqrt(((2*np.log(_s.t_))/_param[a]["N"])) #UCB1 Equation
+    for a in _s.a_:
+        if not(a.N_ == 0 or _s.N_ == 0):
+            aVal = _s.V_ + _const["c"]*np.sqrt(((2*np.log(a.N_))/_s.N_)) #UCB1 Equation
+        else:
+            aVal = _s.V_
         if aVal > UCB or np.isnan(UCB):
             UCB = aVal
-            optAction = a
+            optAction = a.a_
     return optAction
 
 #assume that when initialized it gets alpha, but the
-#solver can override, for example when doing optimistic search
-def ambiguity_aware(_s,_a=None,_const = 1,_params=[], _solver = None):
+#solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
+def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
     delta = _solver.performance_[1]
     gamma = _solver.gamma
@@ -79,5 +80,6 @@ def ambiguity_aware(_s,_a=None,_const = 1,_params=[], _solver = None):
     return ind, exp_max, gap
 
 
-def randomAction(_s,_a,_const,_param):
-    return np.random.randint(len(_a))
+def randomAction(_s : State,_const,_param,solver = None):
+    return np.random.randint(len(_s.a_))
+    

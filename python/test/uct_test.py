@@ -11,13 +11,12 @@ from optimizers.optimization import Bellman
 
 env = gym.make('Taxi-v3')
 env.reset()
-env.render()
 print(env.action_space)
-actionSelectionSelection = act.action_selection(act.UCB1,{.93}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":.93}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
 solverUCT = UCT(Bellman(env,0),env,actionSelectionSelection,actionSelectionRollout)
 
-solverUCT.render_ = True
-print(solverUCT.select(0,range(6)))
-print(solverUCT.rollout(solverUCT.tree_[0],range(6),[],50))
+solverUCT.render_ = False
+solverUCT.search()
+print(solverUCT.tree_[4].a_[0].s_prime_i_)

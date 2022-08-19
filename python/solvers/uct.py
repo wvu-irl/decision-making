@@ -44,10 +44,10 @@ class UCT():
         self.N_ : int = int(_N)
         self.c_ : float = _c
         self.n_rollout_ : int = _n_rollout
-
-        self.tree_ : list[State] = [State([])] * self.N_
+        actionList = [Action(i) for i in range(_env.action_space.n)]
+        self.tree_ : list[State] = [State([],actionList) for i in range (self.N_)]
         self.current_policy : int = -1
-        self.n_vertices_ : int  = 0
+        self.n_vertices_ : int  = 1
 
         self.rng_ = np.random.default_rng()
         self.render_ = False
@@ -70,7 +70,7 @@ class UCT():
             #  self.tree_[0] = v
             #  self.n_vertices_ = 1
 
-    def select(self, nodeIndex,_a,_param):
+    def select(self, nodeIndex,_param = None):
         """
         Expand tree at given state
         Args:
@@ -80,14 +80,20 @@ class UCT():
         Returns:
             Action: Best Action from Current state
         """
-        action = self.as_s_.return_action(self.tree_[nodeIndex],_a,_param)
-        state,reward,done = self.simulate(action)
-        nextNodeIndex = self.tree_[nodeIndex].add_child(state,self.n_vertices_,reward)
-        if  nextNodeIndex > self.n_vertices_:
-            self.n_vertices_ += 1
+        action = self.as_s_.return_action(self.tree_[nodeIndex],_param)
+        obs,reward,done = self.simulate(action)
+        nextNodeIndex = -1
+        # for i in self.tree_[nodeIndex].a_[action].s_prime_:
+        #     if obs == self.tree_[i].s_:
+        #         nextNodeIndex = i
+        #         break
+        # if nextNodeIndex == -1:
+        nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_vertices_,reward)
+        if nextNodeIndex == self.n_vertices_:
+            self.n_vertices_ = self.n_vertices_ + 1
         return nextNodeIndex, action,  (done or self.tree_[nextNodeIndex].N_ == 0)
            
-    def search(self, _s : State = None, budget : int = 5000):
+    def search(self, s_ = 0, budget : int = 50):
         
         """
         Conducts tree search from root
@@ -98,13 +104,14 @@ class UCT():
             Action: Best Action from Current state
         """
         for _ in range(budget):
-            nextNode = self._s
+            nextNode = s_
             while True:
               nextNode, action, fullyExpanded = self.select(nextNode)
               if fullyExpanded:
                 break
-            self.tree_[nextNode].V_ = self.rollout(nextNode,action,self.n_rollout_)
-            self.backpropagate(nextNode)
+            self.tree_[nextNode].V_ = self.rollout(self.tree_[nextNode],self.n_rollout_)
+            print(self.tree_[nextNode].V_)
+            #self.backpropagate(nextNode)
 
     def simulate(self, _a):
         if self.render_:
@@ -112,7 +119,7 @@ class UCT():
         state, reward, done, info = self.env_.step(_a)
         return state,reward,done
 
-    def rollout(self, _s, _a,_param,_n = -1):
+    def rollout(self, _s,_n = -1, _param = None):
         """
         Performs rollout on UCT
         Args:
@@ -125,10 +132,10 @@ class UCT():
             r: Estimate of reward
         """
         if _n > -1:
-            a = self.as_r_.return_action(_s,_a,_param)
+            a = self.as_r_.return_action(_s,_param)
             s,r,done = self.simulate(a)
-            if ~done:
-                return r + self.rollout(_s,_a,_param,_n-1)
+            if not(done) or _n == 0:
+                return r + self.rollout(_s,_n-1,_param)
             else:
                 return r
         return 0
@@ -137,7 +144,7 @@ class UCT():
 
         # traverse up parents (using indices) call compute Q.
         self.tree_[_v_i].N_ += 1
-        self.tree_[_v_i].Q_ += self.opt.compute_Q(self.tree[_v_i])
+        self.tree_[_v_i].Q_ += self.opt_.compute_Q(self.tree[_v_i])
         if _v_i != 0:
             self.backpropagate(self.tree_[_v_i].parent_)
             

@@ -34,7 +34,7 @@ class State():
             self.s_ = [_state]
             
         if type(_action) is list:
-            self.a_ = _action
+            self.a_ : list[Action] = _action
         else:
             self.a_ = []
 
@@ -76,7 +76,7 @@ class State():
         ind = -1
         i = 0
         while ind == -1:
-            if self.a_[i].id == _a:
+            if self.a_[i].a_ == _a:
                 ind = i
         if ind == -1:
             self.a_.append(Action(_a))
@@ -149,18 +149,21 @@ class Action():
         """
         Adds child state to action
 
-        Args: 
+        Args: print(self.tree_[nextNodeIndex].V_)
             _s_p (int): hash key for transition state
             _r (float): reward
         """
         ind = -1
         if _s in self.s_prime_:
-            i = [x for x in range(len(self.s_prime_)) if _s == self.s_prime_[x]]
+            for x in range(len(self.s_prime_)): 
+                if _s == self.s_prime_[x]:
+                    i = x
+                    break
             self.r_[i] = (self.n_[i]*self.r_[i] + _r)/(self.n_[i]+1)
             self.n_[i] += 1
             ind = i
         else:
-            self.s_prime_.append(_s)
+            self.s_prime_.append(_s) 
             self.s_prime_i_.append(_s_p_i)
             self.r_.append(_r)
             self.n_.append(1)
