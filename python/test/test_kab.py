@@ -157,14 +157,18 @@ def get_confidence(epsilon,t):
     if t == 0:
         return 0
     else:
-        c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
-        c = (c*t)/(8)
-        c = 3/2*(1./(1+2*np.exp(-c)))-1/2
+        # c = math.log( 1/((1-epsilon)*2/3) + 1/2)
+        # c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
+        # c = (c*t)/(8)
+        # c = 3/2*(1./(1+2*np.exp(-c)))-1/2
+        c = t*math.log( 1/((1-epsilon)*2/3) + 1/2)**2/8
+        c = 3/2*(1./(1+np.exp(-c)))-1/2
         if c > 1:
             return 1
         if c < 0:
             return 0
         return c
+    #return 1
 
 def get_action_amb_e(_actions, _e, _alpha, _l, _u):
     exp_max = -inf
@@ -212,8 +216,8 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 ## Initialize params
 # Assume we are using epsilon-greedy
 num_el = 10
-num_trials = 2000
-num_iter = 200
+num_trials = 20
+num_iter = 100
 num_a = 10
 num_outcomes = 10
 L = -3
@@ -366,7 +370,7 @@ iter = list(range(int(num_iter)))
 # print(np.shape(epsilon))
 
 
-fig = plt.contourf(epsilon, iter, e_greedy_avg)
+fig = plt.contourf(epsilon, iter, e_greedy_avg, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("Epsilon")
 plt.ylabel("Iteration")
 plt.title("Avg Reward, epsilon")
@@ -392,7 +396,7 @@ plt.savefig(prefix + "eps.png", format="png", bbox_inches="tight", pad_inches=0.
 plt.clf()
 
 
-fig = plt.contourf(c, iter, ucb_avg)
+fig = plt.contourf(c, iter, ucb_avg, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("c")
 plt.ylabel("Iteration")
 plt.title("Avg Reward, ucb")
@@ -404,7 +408,7 @@ plt.savefig(prefix + "ucb_avg_r.png", format="png", bbox_inches="tight", pad_inc
 plt.clf()
 
 
-fig = plt.contourf(alpha, iter, amb_avg)
+fig = plt.contourf(alpha, iter, amb_avg, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("alpha")
 plt.ylabel("Iteration")
 plt.title("Avg Reward, ambiguity")
@@ -415,7 +419,7 @@ plt.savefig(prefix + "amb_avg_r.eps", format="eps", bbox_inches="tight", pad_inc
 plt.savefig(prefix + "amb_avg_r.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
-fig = plt.contourf(epsilon, iter, amb_e_avg)
+fig = plt.contourf(epsilon, iter, amb_e_avg, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("epsilon")
 plt.ylabel("Iteration")
 plt.title("Avg Reward, ambiguity e")
@@ -446,7 +450,7 @@ print(np.shape(iter))
 print(np.shape(epsilon))
 
 
-fig = plt.contourf(epsilon, iter, e_greedy_avg_opt)
+fig = plt.contourf(epsilon, iter, e_greedy_avg_opt, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("Epsilon")
 plt.ylabel("Iteration")
 plt.title("Avg Opt Action, epsilon")
@@ -457,7 +461,7 @@ plt.savefig(prefix + "eps_avg_o.eps", format="eps", bbox_inches="tight", pad_inc
 plt.savefig(prefix + "eps_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
-fig = plt.contourf(c, iter, ucb_avg_opt)
+fig = plt.contourf(c, iter, ucb_avg_opt, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("c")
 plt.ylabel("Iteration")
 plt.title("Avg Opt Action, ucb")
@@ -468,7 +472,7 @@ plt.savefig(prefix + "ucb_avg_o.eps", format="eps", bbox_inches="tight", pad_inc
 plt.savefig(prefix + "ucb_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
-fig = plt.contourf(alpha, iter, amb_avg_opt)
+fig = plt.contourf(alpha, iter, amb_avg_opt, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("alpha")
 plt.ylabel("Iteration")
 plt.title("Avg Opt Action, ambiguity")
@@ -479,7 +483,7 @@ plt.savefig(prefix + "amb_avg_o.eps", format="eps", bbox_inches="tight", pad_inc
 plt.savefig(prefix + "amb_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
-fig = plt.contourf(epsilon, iter, amb_e_avg_opt)
+fig = plt.contourf(epsilon, iter, amb_e_avg_opt, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("epsilon")
 plt.ylabel("Iteration")
 plt.title("Avg Opt Action, ambiguity e")
@@ -490,7 +494,7 @@ plt.savefig(prefix + "amb_e_avg_o.eps", format="eps", bbox_inches="tight", pad_i
 plt.savefig(prefix + "amb_e_avg_o.png", format="png", bbox_inches="tight", pad_inches=0.05)
 plt.clf()
 
-fig = plt.contourf(alpha, iter, ucb_avg_opt - amb_avg_opt)
+fig = plt.contourf(alpha, iter, ucb_avg_opt - amb_avg_opt, interpolation='bicubic', cmap='RdYlGn')
 plt.xlabel("alpha/c")
 plt.ylabel("Iteration")
 plt.title("Diff Opt Action")

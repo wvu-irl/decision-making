@@ -30,7 +30,7 @@ class action_selection():
         self.const_ : list = _const
     
     def return_action(self,_s,_param = [], _solver = None):
-        return self.func_(_s, self.const_,_param)
+        return self.func_(_s, self.const_,_param, _solver)
 
 
 def UCB1(_s : State,_const,_param=[], _solver = None):
@@ -51,13 +51,15 @@ def UCB1(_s : State,_const,_param=[], _solver = None):
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
     delta = _solver.performance_[1]
-    gamma = _solver.gamma
+    gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
     if _params == []:
         alpha = _const[0]
     else:
         alpha = _params[0]
+        if _params[2] == -1:
+            L= None
     
     max_expectation = -inf
     ind = 0

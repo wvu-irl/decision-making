@@ -60,7 +60,7 @@ class State():
             string: hash key
         """
         if self.hash_ == None:
-            self.hash_ = hash(self.s_)
+            self.hash_ = hash(str(self.s_))
 
         return self.hash_
     

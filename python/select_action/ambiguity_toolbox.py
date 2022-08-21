@@ -89,8 +89,8 @@ def compute_discount_bf(_bf, _c, _l, _u):
         for r in  temp:
             if r not in theta:
                 theta.add(r)
-                
-    bf.append((1-_c, theta))    
+    if _l != None:            
+        bf.append((1-_c, theta))    
     return bf
 
 def lower_expectation(_bf):

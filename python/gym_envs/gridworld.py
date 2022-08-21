@@ -55,12 +55,9 @@ class GridWorld(gym.Env):
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
         
-        
         self.p_ = _p
-        self.agent_init 
-        self.reinit(_goal)
-        
         self.goal_ = _goal
+        self.reinit()
         
         self.a_ = [0, 1, 2, 3]
         
@@ -162,7 +159,7 @@ class GridWorld(gym.Env):
         neighbors = []
         neighbors_ind = []
         step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0], [0, 0]]
-        for i in range(9):
+        for i in range(5):
             t = list(_position)
             t[0] += step[i][0]
             t[1] += step[i][1]
