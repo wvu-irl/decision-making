@@ -34,7 +34,9 @@ class State():
             self.s_ = [_state]
             
         if type(_action) is list:
-            self.a_ : list[Action] = _action
+            self.a_ = []
+            for a in _action:
+                self.a_.append(Action(a))
         else:
             self.a_ = []
 
@@ -64,6 +66,12 @@ class State():
 
         return self.hash_
     
+    def get_action_index(self, _a):
+        for i in range(len(self.a_)):
+            if self.a_[i].a_ == _a:
+                return i
+        return None
+    
     def add_child(self, _a, _s_p, _s_p_i, _r):
         """
         Adds child action to state
@@ -78,6 +86,7 @@ class State():
         while ind == -1:
             if self.a_[i].a_ == _a:
                 ind = i
+            i +=1
         if ind == -1:
             self.a_.append(Action(_a))
             ind = len(self.a_)
@@ -192,7 +201,8 @@ class Action():
             list(float): transition probabilities
             list(float): rewards
         """
-             
+        # print(self.N_)
+        # print(self.n_)    
         p = _rng.random()*self.N_
         total = 0
         ind = 0
@@ -200,7 +210,7 @@ class Action():
             total += self.n_[ind]
             ind += 1
             
-        return self.s_prime_[ind], self.r_[ind]
+        return self.s_prime_[ind-1], self.r_[ind-1]
     
     def model_confidence(self):
         """

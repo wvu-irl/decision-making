@@ -58,10 +58,10 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         alpha = _const[0]
     else:
         alpha = _params[0]
-        if _params[2] == -1:
+        if _params[1] == -1:
             L= None
     
-    max_expectation = -inf
+    exp_max = -inf
     ind = 0
     gap = 0
     

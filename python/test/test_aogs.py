@@ -29,7 +29,8 @@ aogs = AOGS(env, act_select)
 
 while(1):
     a = aogs.search(s)
-    s, r,d,info = env.step()
+    print("act " + str(a))
+    s, r,d,info = env.step(a)
     env.render()
     print(r)
 

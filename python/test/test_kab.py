@@ -10,7 +10,7 @@ matplotlib.rcParams['pdf.fonttype'] = 42
 matplotlib.rcParams['ps.fonttype'] = 42
 
 #prefix = "/media/jared/32GB/home/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/"
-prefix = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/"
+prefix = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/data/2"
 ## UTILITIES ---------------------------------------
 ## -------------------------------------------------
 ## -------------------------------------------------
@@ -161,8 +161,9 @@ def get_confidence(epsilon,t):
         # c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
         # c = (c*t)/(8)
         # c = 3/2*(1./(1+2*np.exp(-c)))-1/2
-        c = t*math.log( 1/((1-epsilon)*2/3) + 1/2)**2/8
-        c = 3/2*(1./(1+np.exp(-c)))-1/2
+        # c = t*math.log( 1/((1-epsilon)*2/3) + 1/2)**2/8
+        # c = 3/2*(1./(1+np.exp(-c)))-1/2
+        return 1
         if c > 1:
             return 1
         if c < 0:
@@ -216,7 +217,7 @@ def get_action_amb_entropy(_actions, _alpha, _l, _u):
 ## Initialize params
 # Assume we are using epsilon-greedy
 num_el = 10
-num_trials = 20
+num_trials = 100
 num_iter = 100
 num_a = 10
 num_outcomes = 10
@@ -228,7 +229,7 @@ rng = np.random.default_rng()
 ## Values for each approach
 # e-greedy 
 epsilon = [0]* num_el
-for i in range(len(epsilon)): epsilon[i] = i/num_el
+for i in range(len(epsilon)): epsilon[i] = i/(2*num_el)
 
 # ucb1
 # c = [0]* num_el

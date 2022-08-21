@@ -137,10 +137,10 @@ class GridWorld(gym.Env):
         return _action
     
     def step(self, _action):
-        print("------")
-        print(_action)
+        # print("------")
+        # print(_action)
         _action = self.sample_transition(_action)
-        print(_action)
+        # print(_action)
         self.agent_ = self.get_coordinate_move(self.agent_, _action)
         
         
@@ -158,8 +158,8 @@ class GridWorld(gym.Env):
     def get_neighbors(self, _position):
         neighbors = []
         neighbors_ind = []
-        step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0], [0, 0]]
-        for i in range(5):
+        step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0]]
+        for i in range(4):
             t = list(_position)
             t[0] += step[i][0]
             t[1] += step[i][1]

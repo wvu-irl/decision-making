@@ -15,9 +15,9 @@ def count_2_dist(_a, _g, _solver):
     dist = []
 
     t = 0 # Number of samples
-    for n,r,spi in zip(_a.n_, _a.r_, _a.s_p_i):
+    for n,r,spi in zip(_a.n_, _a.r_, _a.s_prime_i_):
         t += n
-        dist.append((n, r+_g*_solver.graph_[spi].V))
+        dist.append((n, r+_g*_solver.graph_[spi].V_))
     for i in range(len(dist)):
         temp = (dist[i][0]/t, dist[i][1])
         dist[i] = temp
@@ -53,9 +53,9 @@ def dist_2_bf(_dist, _t, _epsilon, _l, _u):
 
 def compute_bf_accuracy(_dist, _e):
     if len(_dist) == 0:
-        return _dist.copy, 0, _e
+        return _dist, 0, _e
     elif len(_dist) == 1:
-        return _dist.copy, 1, _e
+        return _dist, 1, _e
     else:
         bf = _dist.copy()
         els = []
