@@ -59,7 +59,7 @@ class Sailing(gym.Env):
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
         
-        self.wind_ = -1
+        self.wind_ = np.zeros(1)
         self.resample_wind()
         self.wind_init_ = self.wind_
         # print(self.wind_)
@@ -75,7 +75,7 @@ class Sailing(gym.Env):
         self.ax_ = self.fig_.add_subplot(1,1,1)
         
     def resample_wind(self):
-        if self.wind_ is np.ndarray:
+        if len(self.wind_) != 1:
             for i in range(self.dim_[0]):
                 for j in range(self.dim_[1]):
                     p = self.rng_.uniform()
@@ -164,7 +164,7 @@ class Sailing(gym.Env):
         # print(wind_diff/(2*np.sqrt(2)))
         d = self.get_distance(_s, self.goal_)
         if d >= 5:
-            return 0 -wind_diff/(2*np.sqrt(2))
+            return -0.5 -wind_diff/(2*np.sqrt(2))
         else:
             return 5000*(1 - (d**2)/25 -wind_diff/(2*np.sqrt(2)))
     

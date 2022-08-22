@@ -33,9 +33,13 @@ def get_confidence(epsilon,t):
     if t == 0:
         return 0
     else:
-        c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
-        c = (c*t)/(8)
-        c = 3/2*(1./(1+2*np.exp(-c)))-1/2
+        # c = t*math.log( 1/((1-epsilon)*2/3) + 1/2)**2/8
+        # c = 3/2*(1./(1+np.exp(-c)))-1/2
+        c = epsilon*t*math.log( 1/((1-epsilon)*2/3) + 1/2)
+        c = 3/2*(1./(1+np.exp(-c)))-1/2
+        # c = (-math.log( 1/((1-epsilon)*4/5) + (1/3-1/7)))**2
+        # c = (c*t)/(8)
+        # c = 3/2*(1./(1+2*np.exp(-c)))-1/2
         if c > 1:
             return 1
         if c < 0:
