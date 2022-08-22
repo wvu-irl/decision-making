@@ -36,7 +36,7 @@ class State():
         if type(_action) is list:
             self.a_ = []
             for a in _action:
-                self.a_.append(a)
+                self.a_.append(Action(a))
         else:
             self.a_ = []
 

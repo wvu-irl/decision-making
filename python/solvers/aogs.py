@@ -51,9 +51,9 @@ class AOGS():
         self.a_s_ = _action_selection
         
         #### COME BACK ######
-        a = _env.action_space #Action Space
-        self.a_ = a 
-        self._select_param = []
+        # a = _env.action_space #Action Space
+        # self.a_ = a 
+        # self._select_param = []
         #####################
 
         self.reinit()

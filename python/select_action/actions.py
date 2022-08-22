@@ -59,7 +59,7 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
     delta = _solver.performance_[1]
-    gamma = _solver.gamma
+    gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
     no_c = False
@@ -70,7 +70,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         # if _params[1] == None:
         #     no_c = True
     
-    max_expectation = -inf
+    exp_max = -inf
     ind = 0
     gap = 0
     
