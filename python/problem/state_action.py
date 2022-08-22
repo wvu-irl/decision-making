@@ -36,7 +36,7 @@ class State():
         if type(_action) is list:
             self.a_ = []
             for a in _action:
-                self.a_.append(Action(a))
+                self.a_.append(a)
         else:
             self.a_ = []
 
@@ -170,7 +170,7 @@ class Action():
                     break
             self.r_[i] = (self.n_[i]*self.r_[i] + _r)/(self.n_[i]+1)
             self.n_[i] += 1
-            ind = i
+            ind = self.s_prime_i_[i]
         else:
             self.s_prime_.append(_s) 
             self.s_prime_i_.append(_s_p_i)

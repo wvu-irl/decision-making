@@ -1,4 +1,5 @@
 import math
+from kiwisolver import Solver
 import numpy as np
 import random
 import sys
@@ -9,7 +10,6 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
-
 
 class action_selection():
     """
@@ -30,20 +30,28 @@ class action_selection():
         self.const_ : list = _const
     
     def return_action(self,_s,_param = [], _solver = None):
-        return self.func_(_s, self.const_,_param, _solver)
+        return self.func_(_s, self.const_,_param,_solver)
 
 
-def UCB1(_s : State,_const,_param=[], _solver = None):
+def UCB1(_s : State,_const,_param=[],_solver = None):
     UCB = math.nan
     optAction = math.nan
-    for a in _s.a_:
-        if not(a.N_ == 0 or _s.N_ == 0):
-            aVal = _s.V_ + _const["c"]*np.sqrt(((2*np.log(a.N_))/_s.N_)) #UCB1 Equation
+    actions = _s.a_ 
+    random.shuffle(actions)
+    for a in actions:
+        if len(a.s_prime_i_) > 0:
+            childInd = a.s_prime_i_[0]
+            if not(_s.N_ == 0):
+                aVal = (_solver.tree_[childInd].V_/_solver.tree_[childInd].N_) + _const["c"]*np.sqrt(((2*np.log(_s.N_))/_solver.tree_[childInd].N_)) #UCB1 Equation
+            else:
+                aVal = _solver.tree_[childInd].V_
         else:
-            aVal = _s.V_
+                aVal = 0
         if aVal > UCB or np.isnan(UCB):
             UCB = aVal
             optAction = a.a_
+        
+    print("Action:",optAction)
     return optAction
 
 #assume that when initialized it gets alpha, but the
@@ -51,17 +59,15 @@ def UCB1(_s : State,_const,_param=[], _solver = None):
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
     delta = _solver.performance_[1]
-    gamma = _solver.gamma_
+    gamma = _solver.gamma
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
     if _params == []:
         alpha = _const[0]
     else:
         alpha = _params[0]
-        if _params[1] == -1:
-            L= None
     
-    exp_max = -inf
+    max_expectation = -inf
     ind = 0
     gap = 0
     
