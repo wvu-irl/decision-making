@@ -117,7 +117,7 @@ class Sailing(gym.Env):
         
     def render(self, fp = None):
             #plt.clf()
-        
+        print(self.agent_)
         plt.cla()
         #plt.grid()
         size = 100/self.dim_[0]
@@ -166,7 +166,7 @@ class Sailing(gym.Env):
         if d >= 5:
             return -0.5 -wind_diff/(2*np.sqrt(2))
         else:
-            return 5000*(1 - (d**2)/25 -wind_diff/(2*np.sqrt(2)))
+            return 5000*(1 - (d**2)/25) -wind_diff/(2*np.sqrt(2))
     
     def sample_transition(self, _action):
         p = self.rng_.uniform()
