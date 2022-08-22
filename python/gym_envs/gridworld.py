@@ -59,6 +59,9 @@ class GridWorld(gym.Env):
         self.p_ = _p
         self.goal_ = _goal
         self.reinit()
+        for i in range(self.dim_[0]):
+            for j in range(self.dim_[1]):
+                self.map_[i][j] = self.get_reward([i,j])
         
         self.a_ = [0, 1, 2, 3]
         
@@ -79,13 +82,12 @@ class GridWorld(gym.Env):
         else:
             self.agent_ = _state
         
-        for i in range(self.dim_[0]):
-            for j in range(self.dim_[1]):
-                self.map_[i][j] = self.get_reward([i,j])
+        
     
     def render(self, fp = None):
             #plt.clf()
-        
+        print(self.agent_)
+
         plt.cla()
         plt.grid()
         size = 100/self.dim_[0]
@@ -114,7 +116,7 @@ class GridWorld(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return self.agent_
+        return [int(self.agent_[0]), int(self.agent_[1])]
     
     
     def get_distance(self, s1, s2):
@@ -138,6 +140,8 @@ class GridWorld(gym.Env):
         return _action
     
     def step(self, _action):
+        self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
+
         # print("------")
         # print(_action)
         _action = self.sample_transition(_action)
@@ -146,7 +150,7 @@ class GridWorld(gym.Env):
         
         
         r = self.get_reward(self.agent_)
-        if r == 1:
+        if self.agent_ == self.goal_:
             done = True
         else:
             done = False
