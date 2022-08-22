@@ -54,27 +54,37 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
+    no_c = False
     if _params == []:
         alpha = _const[0]
     else:
         alpha = _params[0]
-        if _params[1] == -1:
-            L= None
+        if _params[1] == None:
+            no_c = True
     
     exp_max = -inf
     ind = 0
     gap = 0
     
     for a in _s.a_:
-        dist, t = count_2_dist(a, gamma, _solver)
-        # dist -> distribution (a, r+gamma V)
-        # t -> number of samples
-        
-        bf = dist_2_bf(dist, t, epsilon, L, U)
-        
-        low_exp = lower_expectation(bf)
-        up_exp = upper_expectation(bf)
-        expectation = (1-alpha)*low_exp + (alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
+        if a.N_ == 0:
+            expectation = (1-alpha)*L + (alpha)*U
+            low_exp = L
+            up_exp = U
+        else:
+            dist, t = count_2_dist(a, gamma, _solver)
+            # dist -> distribution (a, r+gamma V)
+            # t -> number of samples
+            
+            bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            # print(bf)
+            low_exp = lower_expectation(bf)
+            # print(low_exp)
+            up_exp = upper_expectation(bf)
+            # print(up_exp)
+            expectation = (1-alpha)*low_exp + (alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
+            # print(alpha)
+            # print("exp", expectation)
         if expectation > exp_max:
             exp_max = expectation
             gap = up_exp-low_exp

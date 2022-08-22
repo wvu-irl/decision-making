@@ -1,5 +1,6 @@
 import sys
 import os
+from turtle import position
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -160,7 +161,7 @@ class GridWorld(gym.Env):
         neighbors_ind = []
         step = [[ 0, -1], [-1,  0], [ 0,  1], [ 1,  0]]
         for i in range(4):
-            t = list(_position)
+            t = _position.copy()
             t[0] += step[i][0]
             t[1] += step[i][1]
             
@@ -179,7 +180,7 @@ class GridWorld(gym.Env):
         elif _action == 2:
             step = [ 0,  1] # N
         elif _action == 3:
-            step = [ 1,  1] # NE
+            step = [ 1,  0] # NE
         else:
             step = [0, 0]   #  Z
 
@@ -195,6 +196,8 @@ class GridWorld(gym.Env):
                 temp[1] = 0
         if temp[1] >= self.dim_[1]:
             temp[1] = self.dim_[1]-1
+        # print (_position)
+        # print(temp)
         return temp
 
     def get_action(self, _action):

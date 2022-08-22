@@ -46,9 +46,12 @@ def get_confidence(epsilon,t):
 ## -------------------------------------------------
 ## -------------------------------------------------
 # Belief functions are a list of pairs(set(rewards),number of counts)
-def dist_2_bf(_dist, _t, _epsilon, _l, _u):
+def dist_2_bf(_dist, _t, _epsilon, _l, _u, no_c = False):
     bf, n, epsilon = compute_bf_accuracy(_dist, _epsilon)
-    c = get_confidence(epsilon, _t)
+    if no_c:
+        c = 1
+    else:
+        c = get_confidence(epsilon, _t)
     return compute_discount_bf(bf, c, _l, _u)
 
 def compute_bf_accuracy(_dist, _e):
@@ -80,7 +83,9 @@ def compute_bf_accuracy(_dist, _e):
 def compute_discount_bf(_bf, _c, _l, _u):
     bf = _bf.copy()
     theta = {_l, _u}
+    sum_p = 0
     for i in range(len(bf)):
+        sum_p += bf[i][0]*_c
         bf[i] = (bf[i][0]*_c, bf[i][1])
         if type(bf[i][1]) == set:
             temp = bf[i][1]
@@ -89,8 +94,12 @@ def compute_discount_bf(_bf, _c, _l, _u):
         for r in  temp:
             if r not in theta:
                 theta.add(r)
-    if _l != None:            
-        bf.append((1-_c, theta))    
+          
+    bf.append((1-_c, theta))
+    sum_p += 1-_c
+    if sum_p >= 0:
+        for i in range(len(bf)):   
+            bf[i] = (bf[i][0]/sum_p, bf[i][1])
     return bf
 
 def lower_expectation(_bf):
@@ -104,9 +113,13 @@ def lower_expectation(_bf):
 
 def upper_expectation(_bf):
     E = 0
+    # sum_p = 0
     for el in _bf:
         if type(el[1]) == set:
             E += max(el[1])*el[0]
+            # sum_p += el[0]
         else:
+            # sum_p += el[0]
             E += el[1]*el[0]
+    # print("sum p", sum_p)
     return E

@@ -19,18 +19,24 @@ dim = [40,40]
 goal = [10,10]
 p = 0.1
 env = GridWorld(dim, goal, p)
-
+#env2 = GridWorld(dim, goal, p)
+timeout = 3
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
 
 s = env.get_observation()
 aogs = AOGS(env, act_select)
-
-while(1):
-    a = aogs.search(s)
+env.render()
+r=0
+while(r != 1):
+    
+    a = aogs.search(s, _timeout=timeout)
     print("act " + str(a))
+    print("s ",s)
+    env.reinit(s)
     s, r,d,info = env.step(a)
+    print("s ",s)
     env.render()
     print(r)
 
