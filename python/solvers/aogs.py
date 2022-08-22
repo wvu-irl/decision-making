@@ -27,7 +27,7 @@ class AOGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and AOGS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection, _N = 2e3, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
+    def __init__(self, _env : gym.Env, _action_selection, _N = 1e4, _bounds = [0, 1], _performance = [0.05, 0.1], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -45,7 +45,7 @@ class AOGS():
         self.bounds_ = _bounds
         self.N_ = int(_N)
         self.performance_ = _performance
-        self.bounds_ = _bounds
+        self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
         self.gamma_ = _gamma
         
         self.a_s_ = _action_selection
@@ -104,22 +104,24 @@ class AOGS():
         self.value_gap_ = self.performance_[0]
         _str_s = hash(str(_s))
         
-        if self.n_ == 0:
+        if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
             # print("act ", self.env_.get_actions(_s))
-            self.graph_[0] = State(_s, self.env_.get_actions(_s))
+            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s))
             
             self.U_.append(_str_s) 
-            self.n_ = 1
+            self.n_ += 1
         
         while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):
             print("------------")
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)
-                
-            if not (_str_s in self.U_):
-                s = self.rng_.choice(self.U_)
+            # print(self.gi_)    
+            if _str_s not in self.U_:
+                # print("nee")
+                s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
             else:
+                # print("yee")
                 s = _s
             
             parents = [-1]*_D
@@ -131,20 +133,22 @@ class AOGS():
             print("n " + str(self.n_) + ", d " + str(d) )
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
-
+            
             while not is_leaf and not is_terminal and d < _D:
                 # print("n " + str(self.n_) + ", d " + str(d) )
+                # print("s ", s)
                 str_s = hash(str(s))
                 if str_s not in parents:     
                     parents[p_ind] = str_s
                     p_ind += 1
-                
+                # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                a, v_opt, gap = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1, None],self)
+                a, v_opt, gap = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = gap
+                # print("l151 ",s)
                 s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
                 # print(r)
                 str_sp = hash(str(s_p))

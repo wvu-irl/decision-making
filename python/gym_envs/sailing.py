@@ -16,7 +16,7 @@ class Sailing(gym.Env):
     """
     Let's an agent traverse a world starting from 0,0
     Description:
-        Agent tries to get to goal. Reward decreases from 1 to 0 in radius of 5 around goal
+        Agent tries to get to goal. Reward decreases from 50 to 0 in radius of 5 around goal
         Wind incurs a penalty from -1 (against wind) to 0 (in wind)
         at each timestep, the wind can stay the same or rotate 45 deg with probability p.
     User defines:
@@ -62,7 +62,7 @@ class Sailing(gym.Env):
         self.wind_ = -1
         self.resample_wind()
         self.wind_init_ = self.wind_
-        
+        # print(self.wind_)
         self.goal_ = _goal
         
         
@@ -100,13 +100,15 @@ class Sailing(gym.Env):
         return 8
     
     def reinit(self, _state = None):
+        # print("-----------")
+        # print(self.wind_)
         if _state == None:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)] 
             self.wind_ = self.wind_init_
         else:
-            self.agent_ = [_state.pop(0), _state.pop(1)]
-            self.wind_ = np.reshape(_state, [self.dim_])
-
+            self.agent_ = [_state[0], _state[1]]
+            self.wind_ = np.reshape(_state[2:len(_state)], [self.dim_[0], self.dim_[1]])
+        # print(self.wind_)
         #self.wind_init_ = self.wind_
         
         for i in range(self.dim_[0]):
@@ -164,7 +166,7 @@ class Sailing(gym.Env):
         if d >= 5:
             return 0 -wind_diff/(2*np.sqrt(2))
         else:
-            return 1 - (d**2)/25 -wind_diff/(2*np.sqrt(2))
+            return 5000*(1 - (d**2)/25 -wind_diff/(2*np.sqrt(2)))
     
     def sample_transition(self, _action):
         p = self.rng_.uniform()
@@ -176,7 +178,8 @@ class Sailing(gym.Env):
         return _action
     
     def step(self, _action):
-        print("------")
+        # print("------")
+        # print(self.wind_)
         wind_dir = self.wind_[int(self.agent_[0])][int(self.agent_[1])]
         # print(_action)
         # _action = self.sample_transition(_action)
@@ -192,7 +195,8 @@ class Sailing(gym.Env):
             done = False
             
         self.resample_wind()
-        return self.agent_, r, done, []
+        # print(self.wind_)
+        return self.get_observation(), r, done, []
         
     def get_actions(self, _agent):
         n, a = self.get_neighbors(_agent)

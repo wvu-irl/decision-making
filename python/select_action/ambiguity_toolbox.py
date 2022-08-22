@@ -97,7 +97,7 @@ def compute_discount_bf(_bf, _c, _l, _u):
           
     bf.append((1-_c, theta))
     sum_p += 1-_c
-    if sum_p >= 0:
+    if sum_p >= 1:
         for i in range(len(bf)):   
             bf[i] = (bf[i][0]/sum_p, bf[i][1])
     return bf
