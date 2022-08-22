@@ -119,7 +119,7 @@ class Sailing(gym.Env):
             #plt.clf()
         
         plt.cla()
-        plt.grid()
+        #plt.grid()
         size = 100/self.dim_[0]
         # Render the environment to the screen
         t_map = (self.map_)

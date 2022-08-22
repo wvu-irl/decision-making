@@ -18,7 +18,7 @@ alpha = 0
 dim = [40,40]
 goal = [10,10]
 p = 0
-sailing_test = True
+sailing_test = False
 if not sailing_test:
     env = GridWorld(dim, goal, p)
     bounds = [0,1]
