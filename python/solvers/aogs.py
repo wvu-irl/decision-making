@@ -27,7 +27,7 @@ class AOGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and AOGS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection, _N = 1e4, _bounds = [0, 1], _performance = [0.05, 0.1], _gamma = 0.95): # 
+    def __init__(self, _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -88,7 +88,7 @@ class AOGS():
         self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _D :int = 100, _timeout = 10):
+    def search(self, _s : State, _D :int = 100, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -99,6 +99,8 @@ class AOGS():
         Returns:
 
         """
+        if _reinit:
+            self.reinit()
         start_time = time.perf_counter()
         s = None
         self.value_gap_ = self.performance_[0]
@@ -113,7 +115,7 @@ class AOGS():
             self.n_ += 1
         
         while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):
-            print("------------")
+            # print("------------")
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)
             # print(self.gi_)    
@@ -130,7 +132,7 @@ class AOGS():
             do_reset = True
             is_terminal = False
             is_leaf = False
-            print("n " + str(self.n_) + ", d " + str(d) )
+            # print("n " + str(self.n_) + ", d " + str(d) )
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             
@@ -144,7 +146,7 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                a, v_opt, gap = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
+                a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = gap
@@ -187,10 +189,15 @@ class AOGS():
                 
                 s = s_p
             
-            parents.reverse()    
+            parents.reverse()   
+             
             self.backpropagate(list(set(parents)))
-            
-        a, e_max, gap = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
+    
+        print("n " + str(self.n_))
+        a, e_max, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
+        print("emax ", e_max)
+        print(exps)
+        print("gap", gap)
         return a
                
     def simulate(self, _s, _a, _do_reset):
@@ -227,7 +234,7 @@ class AOGS():
             s = _parents.pop(0)
             # print("lp " + str(len(_parents)))
             if s != -1:
-                a, v, gap = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
+                a, v, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
                 if np.abs(v - self.graph_[self.gi_[s]].V_) > precision:
                     temp = self.graph_[self.gi_[s]].parent_
                     for p in temp:

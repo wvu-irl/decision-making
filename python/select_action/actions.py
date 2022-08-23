@@ -66,6 +66,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     exp_max = -inf
     ind = 0
     gap = 0
+    exps = []
     
     for a in _s.a_:
         if a.N_ == 0:
@@ -86,11 +87,12 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             expectation = (1-alpha)*low_exp + (alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
             # print(alpha)
             # print("exp", expectation)
+            exps.append(expectation)
         if expectation > exp_max:
             exp_max = expectation
             gap = up_exp-low_exp
             ind = a.a_
-    return ind, exp_max, gap
+    return ind, exp_max, gap, exps
 
 
 def randomAction(_s : State,_const,_param,solver = None):

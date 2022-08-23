@@ -45,7 +45,7 @@ class Sailing(gym.Env):
         - black: puddle
     """
 
-    def __init__(self, _dim = [40, 40], _goal= [10, 10], _p = 0):
+    def __init__(self, _dim = [40, 40], _goal= [30, 10], _p = 0):
         """
         Constructor, initializes state
         Args:
@@ -65,7 +65,10 @@ class Sailing(gym.Env):
         # print(self.wind_)
         self.goal_ = _goal
         
-        
+        # for i in range(self.dim_[0]):
+        #     for j in range(self.dim_[1]):
+        #         self.map_[i][j] = self.get_reward([i,j], 0,0)
+                
         self.p_ = _p
         self.reinit()
         
@@ -111,15 +114,13 @@ class Sailing(gym.Env):
         # print(self.wind_)
         #self.wind_init_ = self.wind_
         
-        for i in range(self.dim_[0]):
-            for j in range(self.dim_[1]):
-                self.map_[i][j] = self.get_reward([i,j], 0,0)
+        
         
     def render(self, fp = None):
             #plt.clf()
-        
+        print(self.agent_)
         plt.cla()
-        plt.grid()
+        #plt.grid()
         size = 100/self.dim_[0]
         # Render the environment to the screen
         t_map = (self.map_)
@@ -150,7 +151,7 @@ class Sailing(gym.Env):
         #plt.close() 
         
     def get_observation(self):
-        return self.agent_ + list(self.wind_.ravel())
+        return [int(self.agent_[0]), int(self.agent_[1])] + list(self.wind_.ravel())
     
     def get_distance(self, s1, s2):
         return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
@@ -166,7 +167,9 @@ class Sailing(gym.Env):
         if d >= 5:
             return -0.5 -wind_diff/(2*np.sqrt(2))
         else:
-            return 5000*(1 - (d**2)/25 -wind_diff/(2*np.sqrt(2)))
+            return 5000*(1 - (d**2)/25) -wind_diff/(2*np.sqrt(2))
+        # d = self.get_distance(_s, self.goal_)
+        # return 5000*(1 - (d**2)/100) -wind_diff/(2*np.sqrt(2))
     
     def sample_transition(self, _action):
         p = self.rng_.uniform()
@@ -178,6 +181,8 @@ class Sailing(gym.Env):
         return _action
     
     def step(self, _action):
+        self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
+
         # print("------")
         # print(self.wind_)
         wind_dir = self.wind_[int(self.agent_[0])][int(self.agent_[1])]
@@ -189,7 +194,7 @@ class Sailing(gym.Env):
         
         
         r = self.get_reward(s, wind_dir, _action)
-        if r == 1:
+        if self.agent_ == self.goal_:
             done = True
         else:
             done = False
@@ -205,8 +210,8 @@ class Sailing(gym.Env):
     def get_neighbors(self, _position):
         neighbors = []
         neighbors_ind = []
-        step = [[ 0, -1], [-1, -1], [-1,  0], [-1,  1], [ 0,  1], [ 1,  1], [ 1,  0], [ 1, -1], [0, 0]]
-        for i in range(9):
+        step = [[ 0, -1], [-1, -1], [-1,  0], [-1,  1], [ 0,  1], [ 1,  1], [ 1,  0], [ 1, -1]]
+        for i in range(8):
             t = list(_position)
             t[0] += step[i][0]
             t[1] += step[i][1]
