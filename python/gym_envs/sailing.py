@@ -86,8 +86,8 @@ class Sailing(gym.Env):
                         dir =  self.rng_.choice([-1,1])
                         dir = self.wind_[i][j] + dir
                         if dir < 0:
-                            dir = 8
-                        elif dir > 8:
+                            dir = 7
+                        elif dir > 7:
                             dir = 0
                         self.wind_[i][j] = dir
         else:

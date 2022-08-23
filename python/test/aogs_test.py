@@ -13,11 +13,11 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-alpha = 0.5
+alpha = 0
 #Env
 dim = [30,30]
 goal = [25,10]
-p = 0
+p = 0.1
 sailing_test = True
 if not sailing_test:
     env = GridWorld(dim, goal, p)
@@ -39,7 +39,7 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _timeout=timeout, _reinit=True)
     print("act " + str(a))
     # print("ss ",s)
     env.reinit(s)

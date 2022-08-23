@@ -91,8 +91,10 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         if expectation > exp_max:
             exp_max = expectation
             gap = up_exp-low_exp
-            ind = a.a_
-    return ind, exp_max, gap, exps
+            ind = [a.a_]
+        elif expectation == exp_max:
+            ind.append(a.a_)
+    return _solver.rng_.choice(ind), exp_max, gap, exps
 
 
 def randomAction(_s : State,_const,_param,solver = None):
