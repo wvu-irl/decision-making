@@ -9,17 +9,22 @@ from solvers.uct import UCT
 from select_action import actions as act
 from optimizers.optimization import Bellman
 
-env = gym.make('Taxi-v3')
-env.reset()
+
+
+
+env = gym.make('Taxi')
+env.reset(seed=5) #2
+
 print(env.action_space)
-actionSelectionSelection = act.action_selection(act.UCB1,{"c":20}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":.5}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
 solverUCT = UCT(Bellman(env,0),env,actionSelectionSelection,actionSelectionRollout)
 
-solverUCT.render_ = False 
+solverUCT.render_ = False
 solverUCT.search()
-solverUCT.playGame()
+while(True):
+    solverUCT.playGame()
 
 print(solverUCT.tree_[0].V_)
 print(solverUCT.tree_[solverUCT.n_vertices_-1].N_)

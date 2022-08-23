@@ -35,8 +35,10 @@ class State():
             
         if type(_action) is list:
             self.a_ = []
+            self.a_unused = []
             for a in _action:
                 self.a_.append(Action(a))
+                self.a_unused.append(a)
         else:
             self.a_ = []
 
@@ -91,6 +93,8 @@ class State():
             self.a_.append(Action(_a))
             ind = len(self.a_)
         child_ind = self. a_[ind].add_child(_s_p, _s_p_i, _r)
+        if ind in self.a_unused:
+            self.a_unused.remove(ind)
         self.N_ += 1
         return child_ind
     
