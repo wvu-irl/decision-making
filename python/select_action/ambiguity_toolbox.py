@@ -11,13 +11,16 @@ import matplotlib.pyplot as plt
 ## UTILITIES ---------------------------------------
 ## -------------------------------------------------
 ## -------------------------------------------------
-def count_2_dist(_a, _g, _solver):
+def count_2_dist(_a, _g, _solver, _is_upper):
     dist = []
 
     t = 0 # Number of samples
     for n,r,spi in zip(_a.n_, _a.r_, _a.s_prime_i_):
         t += n
-        dist.append((n, r+_g*_solver.graph_[spi].V_))
+        if _is_upper:
+            dist.append((n, r+_g*_solver.graph_[spi].U_))
+        else:
+            dist.append((n, r+_g*_solver.graph_[spi].L_))
     for i in range(len(dist)):
         dist[i] = (dist[i][0]/t, dist[i][1])
     return dist, t
@@ -100,7 +103,7 @@ def compute_discount_bf(_bf, _c, _l, _u):
           
     bf.append((1-_c, theta))
     sum_p += 1-_c
-    if sum_p >= 1:
+    if sum_p > 1:
         for i in range(len(bf)):   
             bf[i] = (bf[i][0]/sum_p, bf[i][1])
     return bf

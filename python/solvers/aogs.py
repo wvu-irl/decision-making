@@ -70,7 +70,7 @@ class AOGS():
         self.U_ = []
         self.current_policy = -1
         self.n_ = 0
-        self.value_gap_ = self.performance_[0]
+        self.value_gap_ = 1
     ######################################################
               
     def search(self, _s : State, _D :int = 100, _timeout = 10, _reinit = False):
@@ -132,10 +132,10 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
+                a, v_opt, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
                 # if gap > self.value_gap_:
-                #     self.value_gap_ = gap
+                #     self.value_gap_ = U-L
                 # print("l151 ",s)
                 s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
                 # print(r)
@@ -153,7 +153,7 @@ class AOGS():
                         v = r/(1-self.gamma_)
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal)
+                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     # print("s ", s_p)
                     # print("act ", self.env_.get_actions(s_p))
                     # for a in self.graph_[self.gi_[str_sp]].a_:
@@ -184,11 +184,11 @@ class AOGS():
             self.backpropagate(list(set(parents)))
     
         print("n " + str(self.n_))
-        a, e_max, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
+        a, e_max, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
         print("emax ", e_max)
         print(exps)
-        print("gap", gap)
-        print("m ", self.m_)
+        print("gap", U-L)
+        #print("m ", self.m_)
         return a
                
     def simulate(self, _s, _a, _do_reset):
@@ -210,7 +210,7 @@ class AOGS():
             if _do_reset:     
                 self.env_.reset(_s)
             s_p, r, done, info = self.env_.step(_a)
-            self.m_+=1
+            #self.m_+=1
             _do_reset = False
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
@@ -219,20 +219,34 @@ class AOGS():
         return s_p, r, done, _do_reset 
     
     def backpropagate(self, _parents):
-        precision = (1-self.gamma_)/self.gamma_*self.value_gap_
+        
         
         while len(_parents):
-            # print(_parents)
+            #print(_parents)
             s = _parents.pop(0)
-            # print("lp " + str(len(_parents)))
+            #print("lp " + str(len(_parents)))
             if s != -1:
-                a, v, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
-                if np.abs(v - self.graph_[self.gi_[s]].V_) > precision:
+                a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
+                lprecision = (1-self.gamma_)/self.gamma_*exps[0]*3
+                # print("----------")
+                # print(lprecision)
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_))
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
+                uprecision = (1-self.gamma_)/self.gamma_*exps[1]*3
+                # print(uprecision)
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_))
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
+                if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
                     temp = self.graph_[self.gi_[s]].parent_
                     for p in temp:
                         if p not in _parents:
                             _parents.append(p)
                 self.graph_[self.gi_[s]].V_ = v
+                self.graph_[self.gi_[s]].L_ = L
+                self.graph_[self.gi_[s]].U_ = U
+                # print("V", v)
+                # print("L", L)
+                # print("U", U)
 
             
         

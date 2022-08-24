@@ -13,7 +13,7 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-alpha = 0
+alpha = 1
 #Env
 dim = [40,40]
 goal = [10,10]
@@ -27,7 +27,7 @@ else:
     bounds = [-1, 5000]
 
 #env2 = GridWorld(dim, goal, p)
-timeout = 2
+timeout = 5
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
