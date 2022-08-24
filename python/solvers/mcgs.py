@@ -45,9 +45,7 @@ class MCGS():
     
         self.reinit()
 
-        # self.graph_ : dict = {}
-        # for i in range(_N):
-        #     self.graph_[i] = State()
+        self.m_ = 0
 
 
         self.rng_ = np.random.default_rng()
@@ -105,7 +103,7 @@ class MCGS():
             
             while not is_leaf and not is_terminal and d < _D:
                 
-                """compute bounts
+                """compute bounds
                 """
                 #do optimistic action selection
                 a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
@@ -141,16 +139,8 @@ class MCGS():
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
                 d += 1
-                
                 s = s_p
                 
-                
-                    # self.compute_bounds(n)
-                    # b = self.select(s,n)
-                    # obs, reward, done = self.simulate(b)
-                    # self.graph_eval(obs,reward)
-                    # if done:
-                    #     break
         print("n " + str(self.n_))
         a, e_max, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[0],self)
         print("emax ", e_max)
@@ -173,7 +163,7 @@ class MCGS():
         """
         return self.as_s_.return_action(_s,self.a_,self._select_param)
 
-    def simulate(self, _a):
+    def simulate(self, _s, _a):
         """
         Simulate the MCGS object's Enviroment
         Args:
@@ -184,13 +174,10 @@ class MCGS():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
-        obs, r, done, info = self.env_.step(_a)
-        return obs, r, done
+        act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_a)
 
-    def graph_eval(self, _obs, _r):
-        ## IF _Obs is in Graph Already
-        ## - Add state, state_ trans, action, reward into  S and new S' node
+        s_p, r, done, info = self.env_.step(act_ind)
+        self.m_+=1
 
-        ## ELSE
-        ##  - Add state, state_ trans, action, reward into  S and S'
-        return
+        return s_p, r, done
+
