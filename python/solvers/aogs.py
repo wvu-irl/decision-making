@@ -151,6 +151,8 @@ class AOGS():
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
                         v = r/(1-self.gamma_)
+                        L = v
+                        U = v
                     else:
                         v = 0
                     self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
@@ -167,7 +169,8 @@ class AOGS():
                     if not is_terminal:
                         self.U_.append(str_sp)
                 else:
-                    self.graph_[self.gi_[str_sp]].parent_.append(str_s)
+                    if str_s not in self.graph_[self.gi_[str_sp]].parent_:
+                        self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
                 d += 1
                 

@@ -46,6 +46,7 @@ def get_confidence(epsilon,t):
             return 1
         if c < 0:
             return 0
+        # print(c)
         return c
 
 ## Belief functions --------------------------------
