@@ -45,9 +45,6 @@ class MCGS():
     
         self.reinit()
 
-        self.m_ = 0
-
-
         self.rng_ = np.random.default_rng()
 
     ############## COME BACK ##############################
@@ -82,6 +79,7 @@ class MCGS():
         if _reinit:
             self.reinit()
         start_time = time.perf_counter()
+        self.m_ = 0
 
         _str_s = hash(str(_s))
         if _str_s not in self.gi_:
@@ -103,8 +101,7 @@ class MCGS():
             
             while not is_leaf and not is_terminal and d < _D:
                 
-                """compute bounds
-                """
+                self.bound_outcomes(str_s)
                 #do optimistic action selection
                 a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
@@ -130,11 +127,7 @@ class MCGS():
                     # for a in self.graph_[self.gi_[str_sp]].a_:
                     #     print(a.a_)
                     self.n_ += 1
-                    #is_leaf = True
-                    """Took out the is_leaf check. In the spirit of GBOP, they just perform entire trajectories.
-                        This seems kind of useful for sparse problems, get's deepe rbut less accurate
-                        
-                    """
+
                 else:
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
@@ -149,8 +142,36 @@ class MCGS():
         print("m ", self.m_)
         return a
                
-    def compute_bounds(self, _n):
-        return
+    def bound_outcomes(self, _s):
+        parents = [_s]
+        
+        while len(parents):
+            #print(parents)
+            s = parents.pop(0)
+            #print("lp " + str(len(parents)))
+            if s != -1:
+                a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
+                lprecision = (1-self.gamma_)/self.gamma_*exps[0]
+                # print("----------")
+                # print(lprecision)
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_))
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
+                uprecision = (1-self.gamma_)/self.gamma_*exps[1]
+                # print(uprecision)
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_))
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
+                if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
+                    temp = self.graph_[self.gi_[s]].parent_
+                    for p in temp:
+                        if p not in parents:
+                            parents.append(p)
+                self.graph_[self.gi_[s]].V_ = v
+                self.graph_[self.gi_[s]].L_ = L
+                self.graph_[self.gi_[s]].U_ = U
+                # print("V", v)
+                # print("L", L)
+                # print("U", U)
+    
 
     def select(self,_s):
         """
