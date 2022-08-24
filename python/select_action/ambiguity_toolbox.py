@@ -65,7 +65,7 @@ def compute_bf_accuracy(_dist, _e):
     if len(_dist) == 0:
         return _dist, 0, _e
     elif len(_dist) == 1:
-        return _dist, 1, _e
+        return _dist, 1, 0.99
     else:
         _e = 1
         bf = _dist.copy()
