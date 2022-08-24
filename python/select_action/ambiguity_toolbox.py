@@ -19,8 +19,7 @@ def count_2_dist(_a, _g, _solver):
         t += n
         dist.append((n, r+_g*_solver.graph_[spi].V_))
     for i in range(len(dist)):
-        temp = (dist[i][0]/t, dist[i][1])
-        dist[i] = temp
+        dist[i] = (dist[i][0]/t, dist[i][1])
     return dist, t
 
 def get_avg(_dist):
@@ -75,11 +74,11 @@ def compute_bf_accuracy(_dist, _e):
         n = len(els)
         
         for i in range(len(bf)):
-            bf[i] = (bf[i][0]-_e, bf[i][1])
+            bf[i] = (bf[i][0]-_e, {bf[i][1]})
         if n > 1:
             m = n*_e/comb(n,2)
             for i in range(len(els)):
-                for j in range(len(els)):
+                for j in range(i):
                     if not(i == j):
                         bf.append((m,{els[i],els[j]}))
         return bf, n, _e

@@ -10,6 +10,8 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
+from select_action.gbop_toolbox import *
+
 
 class action_selection():
     """
@@ -46,6 +48,10 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
                 UCB = aVal
                 optAction = a.a_
     return optAction
+
+def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
+    pass
+
 
 #assume that when initialized it gets alpha, but the
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search

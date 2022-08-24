@@ -1,7 +1,3 @@
-import copy
-#from msilib import knownbits
-#from multiprocessing import parent_process
-from pyexpat import model
 import random
 import math
 import numpy as np
@@ -18,9 +14,6 @@ sys.path.append(parent)
 
 from problem.state_action import State, Action
 from optimizers.optimization import Optimizer
-
-
-
 
 class AOGS():
     """
@@ -49,16 +42,8 @@ class AOGS():
         self.gamma_ = _gamma
         
         self.a_s_ = _action_selection
-        
-        #### COME BACK ######
-        # a = _env.action_space #Action Space
-        # self.a_ = a 
-        # self._select_param = []
-        #####################
 
         self.reinit()
-        # for i in range(_N):
-        #     self.graph_[i] = State()
         
         self.t_ = self.num_samples(_performance)
 
@@ -105,7 +90,7 @@ class AOGS():
         s = None
         self.value_gap_ = self.performance_[0]
         _str_s = hash(str(_s))
-        
+        self.m_ = 0
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
             # print("act ", self.env_.get_actions(_s))
@@ -114,7 +99,7 @@ class AOGS():
             self.U_.append(_str_s) 
             self.n_ += 1
         
-        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):
+        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_) and self.m_ < 5460:
             # print("------------")
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)
@@ -137,6 +122,7 @@ class AOGS():
             # right now it may not terminate
             
             while not is_leaf and not is_terminal and d < _D:
+                
                 # print("n " + str(self.n_) + ", d " + str(d) )
                 # print("s ", s)
                 str_s = hash(str(s))
@@ -173,7 +159,11 @@ class AOGS():
                     # for a in self.graph_[self.gi_[str_sp]].a_:
                     #     print(a.a_)
                     self.n_ += 1
-                    is_leaf = True
+                    #is_leaf = True
+                    """Took out the is_leaf check. In the spirit of GBOP, they just perform entire trajectories.
+                        This seems kind of useful for sparse problems, get's deepe rbut less accurate
+                        
+                    """
                     if not is_terminal:
                         self.U_.append(str_sp)
                 else:
@@ -198,6 +188,7 @@ class AOGS():
         print("emax ", e_max)
         print(exps)
         print("gap", gap)
+        print("m ", self.m_)
         return a
                
     def simulate(self, _s, _a, _do_reset):
@@ -217,8 +208,9 @@ class AOGS():
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
             if _do_reset:     
-                self.env_.reinit(_s)
+                self.env_.reset(_s)
             s_p, r, done, info = self.env_.step(_a)
+            self.m_+=1
             _do_reset = False
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
