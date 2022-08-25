@@ -145,8 +145,9 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         _dist.append(1, {_l, _u})
         return _dist
     elif len(_dist) == 1:
-        _dist[0] = (1-_delta, _dist[0][1])
-        _dist.append((_delta, {_l, _u}))
+        d = 1 / (1+ _t)
+        _dist[0] = (1-d, _dist[0][1])
+        _dist.append((d, {_l, _u}))
         return _dist
     else:
         # print(len(_dist))
