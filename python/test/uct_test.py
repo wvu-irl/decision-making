@@ -13,16 +13,14 @@ from optimizers.optimization import Bellman
 
 
 env = gym.make('Taxi')
-env.reset(seed=5) #2
 
 print(env.action_space)
-actionSelectionSelection = act.action_selection(act.UCB1,{"c":.5}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":12}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
 solverUCT = UCT(Bellman(env,0),env,actionSelectionSelection,actionSelectionRollout)
-
 solverUCT.render_ = False
-solverUCT.search()
+solverUCT.learn()
 while(True):
     solverUCT.playGame()
 
