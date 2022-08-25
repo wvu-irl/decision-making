@@ -231,12 +231,12 @@ class AOGS():
             #print("lp " + str(len(_parents)))
             if s != -1:
                 a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
-                lprecision = (1-self.gamma_)/self.gamma_*exps[0]*60
+                lprecision = (1-self.gamma_)/self.gamma_*exps[0]
                 # print("----------")
                 # print(lprecision)
                 # print(np.abs(L - self.graph_[self.gi_[s]].L_))
                 # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
-                uprecision = (1-self.gamma_)/self.gamma_*exps[1]*60
+                uprecision = (1-self.gamma_)/self.gamma_*exps[1]
                 # print(uprecision)
                 # print(np.abs(U - self.graph_[self.gi_[s]].U_))
                 # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)

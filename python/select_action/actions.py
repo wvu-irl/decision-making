@@ -123,11 +123,11 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         
         ldiff = max(0.1,ldiff)
         udiff = max(0.1,udiff)
-        if int(_s.s_[0]) == 20 and int(_s.s_[1]) == 20 :
-            print("------------")
-            print(U_exp)
-            print(exp_max)
-            print(L_exp)
+        # if int(_s.s_[0]) == 20 and int(_s.s_[1]) == 20 :
+            # print("------------")
+            # print(U_exp)
+            # print(exp_max)
+            # print(L_exp)
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff]
 
 
