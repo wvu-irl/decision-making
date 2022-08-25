@@ -48,7 +48,7 @@ def generate_invA(M):
         #print(np.linalg.pinv(A))
         
 
-#generate_invA(MAX_NUMEL = 12)
+generate_invA(MAX_NUMEL)
 
 
 ## UTILITIES ---------------------------------------
@@ -111,24 +111,27 @@ def get_accuracy(_delta,_t, a):
 ## -------------------------------------------------
 # Belief functions are a list of pairs(set(rewards),number of counts)
 def bin_dist(_dist, _n = MAX_NUMEL):
-    if len(_dist) > _n:
-        pass
+    temp_dist = []
+    l_dist = len(_dist)
+    mass = np.zeros(l_dist)
+    val = np.zeros(l_dist)
+    # print(val)
+    
+    for i in range(l_dist):
+        mass[i] = _dist[i][0]
+        val[i] = _dist[i][1]
+    
+    if len(_dist) < _n:
+        return mass, val
     else:
-        temp_dist = []
-        l_dist = len(_dist)
-        mass = np.zeros([l_dist,1])
-        val = np.zeros([l_dist,1])
-        for i in range(l_dist):
-            mass[i] = _dist[i][0]
-            val[i] = _dist[i][1]
-            
+   
         min_mass = min(mass)
         bin_size = max(mass)-min_mass
         
-        tmass = np.zeros([l_dist,1])
-        tval = np.zeros([l_dist,1])
+        tmass = np.zeros(l_dist)
+        tval = np.zeros(l_dist)
         for i in range(l_dist):
-           ind = np.floor((tmass-min_mass)/bin_size)
+           ind = int(np.floor((tmass[i]-min_mass)/bin_size))
            tval[ind] = tmass[ind]*tval[ind] + mass[i]*val[i]
            tmass[ind] += mass[i] 
            tval[ind] /= tmass[ind]     
@@ -146,6 +149,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         _dist.append((_delta, {_l, _u}))
         return _dist
     else:
+        # print(len(_dist))
         epsilon = get_accuracy(_delta,_t, 0.05)
         
         mass, val = bin_dist(_dist)
@@ -159,36 +163,44 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         temp_sum = 0
         for i in range(lmass):
             bel[i] = max([0, mass[i]-epsilon])
-            pl[i] = max([1, mass[i]+epsilon])
+            pl[i] = min([1, mass[i]+epsilon])
             pl_minus_bel[i] = pl[i] - bel[i]
             temp_sum += pl[i] - bel[i]
             
-        pl_minus_bel[lmass+1] = temp_sum
+        pl_minus_bel[lmass] = temp_sum
 
         #compute belief + plausibility
         #compute excess mass from belief
         
         #generate
-        
+        # print(len(invA))
+        # print(invA[len(mass)-2])
+        # print(invA[len(mass)-2])
+        # print(pl_minus_bel)
         mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 
-
-        pset = powerset(len(mass))
-        pset.remove(0)
+        # print("mass", lmass)
+        pset = powerset(len(_dist))
+        del pset[0:lmass+1]
         
         theta = {_l, _u}
         lpset = len(pset)
-        for el in pset(lpset):
+        # print(pset)
+        for el in range(lpset):
             theta.add(el)
         
         sum_p = 0
         bf = []
         #singletons
-        for i in range(bel):
+        for i in range(len(bel)):
             bf.append((bel[i], val[i]))
             sum_p += bel[i]
         # multiple hypostheses
         for i in range(lpset):
-            bf.append((mass[i], pset[i]))
+            temp = set()
+            for j in pset[i]:
+                # print(val[j])
+                temp.add(val[j])
+            bf.append((mass[i], temp))
             sum_p += mass[i]
         #compute theta 
         bf.append((_delta, theta))
