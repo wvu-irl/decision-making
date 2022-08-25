@@ -53,7 +53,7 @@ class UCT():
         self.render_ = False
 
 
-    def learn(self, s_ = 0, budget : int = 30000):
+    def learn(self, s_ = 0, budget : int = 50000):
         for i in range(budget):
             if i >= self.N_:
                 break
