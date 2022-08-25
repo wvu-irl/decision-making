@@ -57,7 +57,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
-    delta = _solver.performance_[1]
+    delta = 1-_solver.performance_[1]
     gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
@@ -85,12 +85,15 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             dist, t = count_2_dist(a, gamma, _solver, True)
             # dist -> distribution (a, r+gamma V)
             # t -> number of samples
-            bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            bf = generate_bf_conf(dist, delta, t, L, U)
             up_exp = upper_expectation(bf)
             # print(bf)
             
             dist, t = count_2_dist(a, gamma, _solver, False)
-            bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            bf = generate_bf_conf(dist, delta, t, L, U)
+
             low_exp = lower_expectation(bf)
             # print(low_exp)
             

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 
 ## TODO 
-# need to remap dist to take n most likely elements
+# finish restrict_dist()
 
 #generate bf should take a confidence, use this to compute accuracy
 # Need way to generate the bel() and plausibility() of each element absed on
@@ -110,62 +110,94 @@ def get_accuracy(_delta,_t, a):
 ## -------------------------------------------------
 ## -------------------------------------------------
 # Belief functions are a list of pairs(set(rewards),number of counts)
-def dist_2_bf(_dist, _t, _epsilon, _l, _u, no_c = False):
-    bf, n, epsilon = compute_bf_accuracy(_dist, _epsilon)
-    if no_c:
-        c = 1
+def bin_dist(_dist, _n = MAX_NUMEL):
+    if len(_dist) > _n:
+        pass
     else:
-        c = get_confidence(epsilon, _t)
-    return compute_discount_bf(bf, c, _l, _u)
-
-def compute_bf_accuracy(_dist, _e):
-    if len(_dist) == 0:
-        return _dist, 0, _e
-    elif len(_dist) == 1:
-        return _dist, 1, 0.99
-    else:
-        _e = 1
-        bf = _dist.copy()
-        els = []
-        for el in bf:
-            #print(el[1])
-            els.append(el[1])
-            if el[0]-_e < 0 or el[0]+_e > 1:
-                _e = np.min([el[0], 1-el[0]])
-        els = np.unique(els)
-        n = len(els)
+        temp_dist = []
+        l_dist = len(_dist)
+        mass = np.zeros([l_dist,1])
+        val = np.zeros([l_dist,1])
+        for i in range(l_dist):
+            mass[i] = _dist[i][0]
+            val[i] = _dist[i][1]
+            
+        min_mass = min(mass)
+        bin_size = max(mass)-min_mass
         
-        for i in range(len(bf)):
-            bf[i] = (bf[i][0]-_e, {bf[i][1]})
-        if n > 1:
-            m = n*_e/comb(n,2)
-            for i in range(len(els)):
-                for j in range(i):
-                    if not(i == j):
-                        bf.append((m,{els[i],els[j]}))
-        return bf, n, _e
+        tmass = np.zeros([l_dist,1])
+        tval = np.zeros([l_dist,1])
+        for i in range(l_dist):
+           ind = np.floor((tmass-min_mass)/bin_size)
+           tval[ind] = tmass[ind]*tval[ind] + mass[i]*val[i]
+           tmass[ind] += mass[i] 
+           tval[ind] /= tmass[ind]     
+           pass         
+        # for i in range(l_dist):
+        #     temp_dist.append(tmass[i],tval[i])          
+        return tmass, tval
 
-def compute_discount_bf(_bf, _c, _l, _u):
-    bf = _bf.copy()
-    theta = {_l, _u}
-    sum_p = 0
-    for i in range(len(bf)):
-        sum_p += bf[i][0]*_c
-        bf[i] = (bf[i][0]*_c, bf[i][1])
-        if type(bf[i][1]) == set:
-            temp = bf[i][1]
-        else:
-            temp = {bf[i][1]}
-        for r in  temp:
-            if r not in theta:
-                theta.add(r)
-          
-    bf.append((1-_c, theta))
-    sum_p += 1-_c
-    if sum_p > 1:
-        for i in range(len(bf)):   
-            bf[i] = (bf[i][0]/sum_p, bf[i][1])
-    return bf
+def generate_bf_conf(_dist, _delta, _t, _l, _u):
+    if len(_dist) == 0:
+        _dist.append(1, {_l, _u})
+        return _dist
+    elif len(_dist) == 1:
+        _dist[0] = (1-_delta, _dist[1])
+        _dist.append(_delta, {_l, _u})
+        return _dist
+    else:
+        epsilon = get_accuracy(_delta,_t, 0.05)
+        
+        mass, val = bin_dist(_dist)
+        
+        mass /= np.sum(mass)
+        
+        lmass = len(mass)
+        bel = np.zeros([lmass,1])
+        pl = np.zeros([lmass,1])
+        pl_minus_bel = np.zeros([lmass+1,1])
+        temp_sum = 0
+        for i in range(lmass):
+            bel[i] = max([0, mass[i]-epsilon])
+            pl[i] = max([1, mass[i]+epsilon])
+            pl_minus_bel[i] = pl[i] - bel[i]
+            temp_sum += pl[i] - bel[i]
+            
+        pl_minus_bel[lmass+1] = temp_sum
+
+        #compute belief + plausibility
+        #compute excess mass from belief
+        
+        #generate
+        
+        mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 
+
+        pset = powerset(len(mass))
+        pset.remove(0)
+        
+        theta = {_l, _u}
+        lpset = len(pset)
+        for el in pset(lpset):
+            theta.add(el)
+        
+        sum_p = 0
+        bf = []
+        #singletons
+        for i in range(bel):
+            bf.append((bel[i], val[i]))
+            sum_p += bel[i]
+        # multiple hypostheses
+        for i in range(lpset):
+            bf.append((mass[i], pset[i]))
+            sum_p += mass[i]
+        #compute theta 
+        bf.append((_delta, theta))
+        sum_p += _delta
+        # p > 1 check
+        if sum_p > 1:
+            for i in range(len(bf)):   
+                bf[i] = (bf[i][0]/sum_p, bf[i][1])
+    return bf  
 
 def lower_expectation(_bf):
     E = 0
