@@ -1,12 +1,9 @@
-import copy
-from multiprocessing import parent_process
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import gym
+import time
 
-
-from problem.state_action import State, Action
-from optimizers.optimization import Optimizer
 import sys
 import os
 
@@ -14,7 +11,8 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-import gym
+from problem.state_action import State, Action
+from optimizers.optimization import Optimizer
 
 
 class MCGS():
@@ -22,7 +20,7 @@ class MCGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _opt : Optimizer, _action_selection_select, _N = 5e3,_bounds = None):
+    def __init__(self, _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -39,45 +37,35 @@ class MCGS():
         self.env_ = _env
         self.bounds_ = _bounds
         self.N_ = int(_N)
-        self.opt_ = _opt
-        self.budget_ = 10000
-
-        self.as_s_ = _action_selection_select
+        self.performance_ = _performance
+        self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
+        self.gamma_ = _gamma
         
-        #### COME BACK ######
-        a = _env.action_space #Action Space
-        self.a_ = a 
-        self._select_param = []
-        #####################
-
-        self.graph_ : dict = {}
-        for i in range(_N):
-            self.graph_[i] = State()
-
-        
-        self.current_policy = -1
-        self.n_vertices_ = 0
+        self.a_s_ = _action_selection
+    
+        self.reinit()
 
         self.rng_ = np.random.default_rng()
 
     ############## COME BACK ##############################
-    def reinit(self, _state, _action = None, _s_prime = None):
+    def reinit(self, _state = None, _action = None, _s_prime = None):
         """
         Reinitialize Graph from state-action-state transition
         Args:
-            self (MCGS): MCGS Object
+            self (AOGS): AOGS Object
             _state (State): State Transition
             _action (Action): Action to selected
              
         Returns:
         """
-        if _action == None:
-            self.graph_ : dict = {}
-            for i in range(self.N_):
-                self.graph_[i] = State()
+        self.graph_ = [State(1)] * self.N_
+        self.gi_ : dict = {}
+        self.current_policy = -1
+        self.n_ = 0
+        self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _h :int = 100):
+    def search(self, _s : State, _D :int = 100, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -88,23 +76,102 @@ class MCGS():
         Returns:
 
         """
-        if _h > self.budget_:
-            print("Please Enter a Horizon (_h) that is less than the computational Budget")
-        else:
-            for m in range(self.budget_):
-                self.env_.reset()
-                s = _s
-                for t in range(_h):
-                    n = (m-1)*_h + t
-                    self.compute_bounds(n)
-                    b = self.select(s,n)
-                    obs, reward, done = self.simulate(b)
-                    self.graph_eval(obs,reward)
-                    if done:
-                        break
+        if _reinit:
+            self.reinit()
+        start_time = time.perf_counter()
+        self.m_ = 0
+
+        _str_s = hash(str(_s))
+        if _str_s not in self.gi_:
+            self.gi_[_str_s] = self.n_
+            # print("act ", self.env_.get_actions(_s))
+            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s))
+            self.n_ += 1
+        
+        #N is the number of trajectories now    
+        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_:
+            s = _s
+            str_s = hash(str(s))
+            self.env_.reset()
+            
+            d = 0
+            do_reset = True
+            is_terminal = False
+            is_leaf = False
+            
+            while not is_leaf and not is_terminal and d < _D:
+                
+                self.bound_outcomes(str_s)
+                #do optimistic action selection
+                a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
+                
+                s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
+
+                str_sp = hash(str(s_p))
+                if str_sp in self.gi_:
+                    ind = self.gi_[str_sp]
+                else:
+                    ind = self.n_
+
+                ind = self.graph_[self.gi_[str_s]].add_child(a, s_p, ind,r)
+                if ind == self.n_:
+                    
+                    self.gi_[str_sp] = self.n_
+                    if is_terminal:
+                        v = r/(1-self.gamma_)
+                    else:
+                        v = 0
+                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal)
+                    # print("s ", s_p)
+                    # print("act ", self.env_.get_actions(s_p))
+                    # for a in self.graph_[self.gi_[str_sp]].a_:
+                    #     print(a.a_)
+                    self.n_ += 1
+
+                else:
+                    self.graph_[self.gi_[str_sp]].parent_.append(str_s)
+                    
+                d += 1
+                s = s_p
+                
+        print("n " + str(self.n_))
+        a, e_max, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[0],self)
+        print("emax ", e_max)
+        print(exps)
+        print("gap", gap)
+        print("m ", self.m_)
+        return a
                
-    def compute_bounds(self, _n):
-        return
+    def bound_outcomes(self, _s):
+        parents = [_s]
+        
+        while len(parents):
+            #print(parents)
+            s = parents.pop(0)
+            #print("lp " + str(len(parents)))
+            if s != -1:
+                a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
+                lprecision = (1-self.gamma_)/self.gamma_*exps[0]
+                # print("----------")
+                # print(lprecision)
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_))
+                # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
+                uprecision = (1-self.gamma_)/self.gamma_*exps[1]
+                # print(uprecision)
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_))
+                # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
+                if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
+                    temp = self.graph_[self.gi_[s]].parent_
+                    for p in temp:
+                        if p not in parents:
+                            parents.append(p)
+                self.graph_[self.gi_[s]].V_ = v
+                self.graph_[self.gi_[s]].L_ = L
+                self.graph_[self.gi_[s]].U_ = U
+                # print("V", v)
+                # print("L", L)
+                # print("U", U)
+    
 
     def select(self,_s):
         """
@@ -117,7 +184,7 @@ class MCGS():
         """
         return self.as_s_.return_action(_s,self.a_,self._select_param)
 
-    def simulate(self, _a):
+    def simulate(self, _s, _a):
         """
         Simulate the MCGS object's Enviroment
         Args:
@@ -128,13 +195,10 @@ class MCGS():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
-        obs, r, done, info = self.env_.step(_a)
-        return obs, r, done
+        act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_a)
 
-    def graph_eval(self, _obs, _r):
-        ## IF _Obs is in Graph Already
-        ## - Add state, state_ trans, action, reward into  S and new S' node
+        s_p, r, done, info = self.env_.step(act_ind)
+        self.m_+=1
 
-        ## ELSE
-        ##  - Add state, state_ trans, action, reward into  S and S'
-        return
+        return s_p, r, done
+

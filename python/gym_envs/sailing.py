@@ -70,7 +70,7 @@ class Sailing(gym.Env):
         #         self.map_[i][j] = self.get_reward([i,j], 0,0)
                 
         self.p_ = _p
-        self.reinit()
+        self.reset()
         
         self.a_ = [list(range(7))]
         
@@ -86,8 +86,8 @@ class Sailing(gym.Env):
                         dir =  self.rng_.choice([-1,1])
                         dir = self.wind_[i][j] + dir
                         if dir < 0:
-                            dir = 8
-                        elif dir > 8:
+                            dir = 7
+                        elif dir > 7:
                             dir = 0
                         self.wind_[i][j] = dir
         else:
@@ -102,7 +102,7 @@ class Sailing(gym.Env):
     def get_num_actions(self):
         return 8
     
-    def reinit(self, _state = None):
+    def reset(self, _state = None):
         # print("-----------")
         # print(self.wind_)
         if _state == None:

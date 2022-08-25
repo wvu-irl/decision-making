@@ -58,7 +58,7 @@ class GridWorld(gym.Env):
         
         self.p_ = _p
         self.goal_ = _goal
-        self.reinit()
+        self.reset()
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
                 self.map_[i][j] = self.get_reward([i,j])
@@ -76,7 +76,7 @@ class GridWorld(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reinit(self, _state = None):
+    def reset(self, _state = None):
         if _state == None:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         else:
@@ -93,6 +93,7 @@ class GridWorld(gym.Env):
         size = 100/self.dim_[0]
         # Render the environment to the screen
         t_map = (self.map_)
+        print("max map ", np.max(np.max(self.map_)))
         plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
         if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
             plt.plot(self.agent_[0], self.agent_[1],

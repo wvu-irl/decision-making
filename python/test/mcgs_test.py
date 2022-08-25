@@ -15,10 +15,10 @@ from select_action.actions import *
 ## Params
 alpha = 0
 #Env
-dim = [40,40]
-goal = [10,10]
+dim = [30,30]
+goal = [25,10]
 p = 0.1
-sailing_test = False
+sailing_test = True
 if not sailing_test:
     env = GridWorld(dim, goal, p)
     bounds = [0,1]
@@ -27,7 +27,7 @@ else:
     bounds = [-1, 5000]
 
 #env2 = GridWorld(dim, goal, p)
-timeout = 2
+timeout = 10
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
@@ -39,10 +39,10 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _timeout=timeout, _reinit=True)
     print("act " + str(a))
     # print("ss ",s)
-    env.reset(s)
+    env.reinit(s)
     s, r,d,info = env.step(a)
     # print("ss ",s)
     env.render()

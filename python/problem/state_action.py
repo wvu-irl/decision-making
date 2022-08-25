@@ -13,13 +13,21 @@ class State():
         _is_terminal (bool): is true if state is terminal
         _policy (int): Action to select
     """
-    def __init__(self, _state, _action = None, _parent = None, _V = 0, _is_terminal = False, _policy = None):
+    def __init__(self, _state, _action = None, _parent = None, _V = 0, _is_terminal = False, _policy = None, _L = None, _U = None):
         """
         Constructor
         """
         super(State, self).__init__()
 
         self.V_ = _V
+        if _U == None:
+            self.U_ = _V
+        else:
+            self.U_ = _U
+        if _L == None:
+            self.L_ = _V
+        else:
+            self.L_ = _L
         self.policy_ = _policy
         self.is_terminal_ = _is_terminal
         

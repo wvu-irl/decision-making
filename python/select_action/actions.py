@@ -10,6 +10,8 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
+from select_action.gbop_toolbox import *
+
 
 class action_selection():
     """
@@ -46,6 +48,48 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
                 UCB = aVal
                 optAction = a.a_
     return optAction
+
+def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
+    epsilon = _solver.performance_[0]
+    delta = _solver.performance_[1]
+    gamma = _solver.gamma_
+    L = _solver.bounds_[0]
+    U = _solver.bounds_[1]
+    beta = _const
+    
+    U_max = -inf
+    L_min = inf
+    ind_L = 0
+    ind_U = 0
+    Us = []
+    Ls = []
+    
+    for a in _s.a_:
+        if a.N_ == 0:
+            low_b = L
+            up_b = U
+        else:
+            # print(bf)
+            low_b = lower_bound(_s, a, _solver, delta)
+            # print(low_exp)
+            up_b = upper_bound(_s, a, _solver, delta)
+            # print(up_exp)
+        if up_b > U_max:
+            U_max = up_b
+            ind_U = [a.a_]
+        if low_b < L_min:
+            L_min = low_b
+            ind_L = [a.a_]
+        if up_b == U_max:
+            ind_U.append(a.a_)
+        if low_b == L_min:
+            ind_L.append(a.a_)
+            
+        Us.append(up_b)
+        Ls.append(low_b)
+
+    return _solver.rng_.choice(ind_L), _solver.rng_.choice(ind_U), L_min, U_max, Ls, Us 
+
 
 #assume that when initialized it gets alpha, but the
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
@@ -91,8 +135,10 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         if expectation > exp_max:
             exp_max = expectation
             gap = up_exp-low_exp
-            ind = a.a_
-    return ind, exp_max, gap, exps
+            ind = [a.a_]
+        elif expectation == exp_max:
+            ind.append(a.a_)
+    return _solver.rng_.choice(ind), exp_max, gap, exps
 
 
 def randomAction(_s : State,_const,_param,solver = None):
