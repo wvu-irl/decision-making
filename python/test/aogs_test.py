@@ -13,7 +13,7 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-alpha = 0.5
+alpha = 0
 #Env
 dim = [40,40]
 goal = [10,10]

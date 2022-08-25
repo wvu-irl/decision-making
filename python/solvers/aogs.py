@@ -53,6 +53,7 @@ class AOGS():
         num = math.log( 1/ (2/3*(1-_perf[1]+1/2) ) - 1)
         den = math.log( 1/ (2/3*(1-_perf[0]) ) + 1/2)**2
         t = -num/(_perf[0]*den)
+        print("t", t)
         return t
     ############## COME BACK ##############################
     def reinit(self, _state = None, _action = None, _s_prime = None):

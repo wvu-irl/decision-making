@@ -5,7 +5,50 @@ import numpy as np
 import random
 import matplotlib
 import matplotlib.pyplot as plt
+from itertools import combinations
 
+## TODO 
+# need to remap dist to take n most likely elements
+
+#generate bf should take a confidence, use this to compute accuracy
+# Need way to generate the bel() and plausibility() of each element absed on
+# this. Use it to compute a "b" vector.
+# compute masses and convert to distribution
+# then do as before
+
+invA = []
+MAX_NUMEL = 12
+            
+def powerset(max_el):
+    l = list(range(max_el))
+    pset = []
+    for i in range(0,max_el+1):
+        for element in combinations(l,i):
+            pset.append(element)
+    return pset
+         
+def generate_invA(M):
+    for i in range(2,M+1):
+        #print("---------")
+        numel = (2**(i))-(i+1)
+        A = np.ones([i+1,numel])
+        #print("i ", i, numel)
+        n = 0
+        for el in powerset(i):
+            #print("els ", el)
+            if len(el) > 1:
+                for k in range(i):
+                    if k not in el:
+                        #print("check ", k,el)
+                        # print(k, numel-n-1)
+                        A[k][n] = 0
+                n += 1
+        #print(A)
+        invA.append(np.linalg.pinv(A))
+        #print(np.linalg.pinv(A))
+        
+
+#generate_invA(MAX_NUMEL = 12)
 
 
 ## UTILITIES ---------------------------------------
@@ -25,12 +68,6 @@ def count_2_dist(_a, _g, _solver, _is_upper):
         dist[i] = (dist[i][0]/t, dist[i][1])
     return dist, t
 
-def get_avg(_dist):
-    avg = 0
-    for el in _dist:
-        avg += el[0]*el[1]
-    return avg  
-
 def get_confidence(epsilon,t):
     if t == 0:
         return 0
@@ -48,6 +85,26 @@ def get_confidence(epsilon,t):
             return 0
         # print(c)
         return c
+    
+def get_accuracy(_delta,_t, a):
+    change = inf
+    epsilon = 0
+    while np.fabs(change) > 0.005:
+        e = -math.log(1/ (2/3*(1-_delta+1/2) ) - 1)
+        e /= (_t*(math.log(1/ (2/3*(1-epsilon) ) + 1/2))**2)
+        #e = 1-e
+        change = e-epsilon
+        # print("------------------")
+        # print (epsilon, change, e)
+        # print(a*change)
+        epsilon = epsilon + a*change
+        # print (epsilon, change, e)
+    #epsilon += 1    
+    if epsilon > 1:
+        return 1
+    if epsilon < 0:
+        return 0   
+    return epsilon
 
 ## Belief functions --------------------------------
 ## -------------------------------------------------
