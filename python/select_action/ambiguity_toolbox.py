@@ -150,6 +150,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         c = get_confidence(_e,_t)
         _dist[0] = (c, _dist[0][1])
         _dist.append((1-c, {_l, _u}))
+        # print(c, _t)
         return _dist
     else:
         # print(len(_dist))

@@ -13,11 +13,11 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-alpha = 0
+alpha = 1
 #Env
 dim = [40,40]
 goal = [10,10]
-p = 0.3
+p = 0
 sailing_test = False
 if not sailing_test:
     env = GridWorld(dim, goal, p)
@@ -33,7 +33,7 @@ timeout = 2
 act_select = action_selection(ambiguity_aware, [alpha])
 
 s = env.get_observation()
-aogs = AOGS(env, act_select, _bounds = bounds)
+aogs = AOGS(env, act_select, _performance = [0.2, 0.05], _bounds = bounds)
 env.render()
 r=0
 d = False
