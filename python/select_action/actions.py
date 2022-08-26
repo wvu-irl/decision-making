@@ -49,8 +49,8 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
                 optAction = a.a_
     return optAction
 
-def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
-    pass
+# def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
+#     pass
 
 
 #assume that when initialized it gets alpha, but the
@@ -71,7 +71,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     
     exp_max = -inf
     exp_max2 = -inf
-    ind = 0
+    ind = _s.a_[0].a_
     gap = 0
     lexps = []
     uexps = []
@@ -89,6 +89,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             bf = generate_bf_conf(dist, delta, t, L, U)
             up_exp = upper_expectation(bf)
             # print(bf)
+            # print(up_exp)
             
             dist, t = count_2_dist(a, gamma, _solver, False)
             #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
@@ -128,7 +129,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # print(U_exp)
             # print(exp_max)
             # print(L_exp)
-    return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff]
+    return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 
 def randomAction(_s : State,_const,_param,solver = None):

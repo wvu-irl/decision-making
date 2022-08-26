@@ -17,7 +17,7 @@ alpha = 1
 #Env
 dim = [40,40]
 goal = [10,10]
-p = 0.1
+p = 0
 sailing_test = False
 if not sailing_test:
     env = GridWorld(dim, goal, p)
@@ -27,7 +27,7 @@ else:
     bounds = [-1, 5000]
 
 #env2 = GridWorld(dim, goal, p)
-timeout = 2
+timeout = 10
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
@@ -39,7 +39,7 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _D = 450, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _D = 100, _timeout=timeout, _reinit=False)
     print("act " + str(a))
     # print("ss ",s)
     env.reset(s)

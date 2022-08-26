@@ -62,8 +62,10 @@ def count_2_dist(_a, _g, _solver, _is_upper):
         t += n
         if _is_upper:
             dist.append((n, r+_g*_solver.graph_[spi].U_))
+            # print(r+_g*_solver.graph_[spi].U_)
         else:
             dist.append((n, r+_g*_solver.graph_[spi].L_))
+            # print(r+_g*_solver.graph_[spi].L_)
     for i in range(len(dist)):
         dist[i] = (dist[i][0]/t, dist[i][1])
     return dist, t
@@ -187,13 +189,16 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         theta = {_l, _u}
         lpset = len(pset)
         # print(pset)
-        for el in range(lpset):
-            theta.add(el)
+        for i in range(len(val)):
+            theta.add(val[i])
         
         sum_p = 0
         bf = []
         #singletons
         for i in range(len(bel)):
+            # print(val, val[i], type(val[i]))
+            # print(val[i], val[i][0])
+            # print(type(val[i]))
             bf.append((bel[i], val[i]))
             sum_p += bel[i]
         # multiple hypostheses
@@ -210,7 +215,9 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         # p > 1 check
         if sum_p > 1:
             for i in range(len(bf)):   
-                bf[i] = (bf[i][0]/sum_p, bf[i][1])
+                bf[i] = (float(bf[i][0]/sum_p), bf[i][1])
+            # print("------------")
+            # print(bf)
     return bf  
 
 def lower_expectation(_bf):
@@ -225,12 +232,18 @@ def lower_expectation(_bf):
 def upper_expectation(_bf):
     E = 0
     # sum_p = 0
+    # print("------------")
+    # print(_bf)
     for el in _bf:
         if type(el[1]) == set:
+            # print(max(el[1])*el[0])
             E += max(el[1])*el[0]
+            # print(max(el[1]))
             # sum_p += el[0]
         else:
+            # print(el[1]*el[0])
             # sum_p += el[0]
             E += el[1]*el[0]
-    # print("sum p", sum_p)
+
+    # print(E)    
     return E

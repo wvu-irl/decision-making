@@ -42,6 +42,7 @@ class AOGS():
         self.gamma_ = _gamma
         
         self.a_s_ = _action_selection
+        self.m_ = 0
 
         self.reinit()
         
@@ -91,16 +92,17 @@ class AOGS():
         s = None
         self.value_gap_ = self.performance_[0]
         _str_s = hash(str(_s))
-        self.m_ = 0
+        # self.m_ = 0
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
             # print("act ", self.env_.get_actions(_s))
-            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s))
+            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             
             self.U_.append(_str_s) 
             self.n_ += 1
         
-        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_) and self.m_ < 5460:
+        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):# and self.m_ < 5460:
+            print(len(self.U_))
             # print("------------")
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)
@@ -133,7 +135,7 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                a, v_opt, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
+                a, v_opt, L, U, diffs, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
@@ -174,13 +176,16 @@ class AOGS():
                         self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
                 d += 1
-                
-                remove_u = True
-                for a in self.graph_[self.gi_[str_s]].a_:
-                    remove_u = remove_u and (a.N_ > self.t_)
-                if str_s in self.U_ and remove_u:
+                policy = self.graph_[self.gi_[str_s]].policy_
+                pol_ind = self.graph_[self.gi_[str_s]].get_action_index(policy)
+                # print(self.graph_[self.gi_[str_s]].s_)
+                # print(self.graph_[self.gi_[str_s]].a_)
+                # print(pol_ind, len(self.graph_[self.gi_[str_s]].a_))
+                if str_s in self.U_ and self.graph_[self.gi_[str_s]].a_[pol_ind].N_ > self.t_:
                     self.U_.remove(str_s)
-                
+                elif str_s not in self.U_ and self.graph_[self.gi_[str_s]].a_[pol_ind].N_ <= self.t_: 
+                    self.U_.append(str_s)
+                    
                 s = s_p
             
             parents.reverse()   
@@ -188,12 +193,12 @@ class AOGS():
             self.backpropagate(list(set(parents)))
     
         print("n " + str(self.n_))
-        a, e_max, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
+        a, e_max, L, U, diffs, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
         print("emax ", e_max)
         print(exps)
         print("gap", U-L)
-        #print("m ", self.m_)
-        return a
+        print("m ", self.m_)
+        return self.graph_[self.gi_[_str_s]].get_action_index(a)
                
     def simulate(self, _s, _a, _do_reset):
         """
@@ -214,7 +219,7 @@ class AOGS():
             if _do_reset:     
                 self.env_.reset(_s)
             s_p, r, done, info = self.env_.step(_a)
-            #self.m_+=1
+            self.m_+=1
             _do_reset = False
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
@@ -230,13 +235,13 @@ class AOGS():
             s = _parents.pop(0)
             #print("lp " + str(len(_parents)))
             if s != -1:
-                a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
-                lprecision = (1-self.gamma_)/self.gamma_*exps[0]
+                a, v, L, U, diffs, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
+                lprecision = (1-self.gamma_)/self.gamma_*diffs[0]
                 # print("----------")
                 # print(lprecision)
                 # print(np.abs(L - self.graph_[self.gi_[s]].L_))
                 # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
-                uprecision = (1-self.gamma_)/self.gamma_*exps[1]
+                uprecision = (1-self.gamma_)/self.gamma_*diffs[1]
                 # print(uprecision)
                 # print(np.abs(U - self.graph_[self.gi_[s]].U_))
                 # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
@@ -248,9 +253,11 @@ class AOGS():
                 self.graph_[self.gi_[s]].V_ = v
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
+                self.graph_[self.gi_[s]].policy_ = a
                 # print("V", v)
                 # print("L", L)
                 # print("U", U)
+                lmn = 0
 
             
         

@@ -28,7 +28,6 @@ class State():
             self.L_ = _V
         else:
             self.L_ = _L
-        self.policy_ = _policy
         self.is_terminal_ = _is_terminal
         
         self.s_ = _state
@@ -49,6 +48,12 @@ class State():
                 self.a_unused.append(a)
         else:
             self.a_ = []
+            
+        if _policy == None and self.a_ != []:
+            self.policy_ = self.a_[0].a_
+        else:
+            self.policy_ = _policy
+
 
         if type(_parent) is list:
             self.parent_ = _parent
