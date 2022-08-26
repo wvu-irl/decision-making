@@ -166,9 +166,9 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
             bel[i] = max([0, mass[i]-epsilon])
             pl[i] = min([1, mass[i]+epsilon])
             pl_minus_bel[i] = pl[i] - bel[i]
-            temp_sum += pl[i] - bel[i]
+            temp_sum += bel[i]
             
-        pl_minus_bel[lmass] = temp_sum
+        pl_minus_bel[lmass] = 1-temp_sum
 
         #compute belief + plausibility
         #compute excess mass from belief
@@ -179,6 +179,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u):
         # print(invA[len(mass)-2])
         # print(pl_minus_bel)
         mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 
+        #print(mass)
         # print("mass", lmass)
         pset = powerset(len(_dist))
         del pset[0:lmass+1]
