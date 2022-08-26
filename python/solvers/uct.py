@@ -53,13 +53,13 @@ class UCT():
         self.render_ = False
 
 
-    def learn(self, s_ = 0, budget : int = 50000):
+    def learn(self, s_ = 0, budget : int = 20000):
         for i in range(budget):
             if i >= self.N_:
                 break
             self.env_.reset(seed = self.seed, return_info=True)
             nodeTrajectory = self.search(s_)
-            print("Interation",i)
+            nodeTrajectory[0] = "Interation" + " " + i.__str__() + ": "+ nodeTrajectory[0].__str__()
             print(*nodeTrajectory, sep=" -> ")
 
     def select(self, nodeIndex,_param = None):
@@ -108,7 +108,10 @@ class UCT():
         while not(self.tree_[nextNode].is_terminal_) and not(done):
            nextNode,done = self.treeStep(nextNode)
            treePrintList.append(nextNode)
-        rolloutReward = self.rollout(self.tree_[nextNode],self.n_rollout_)
+        if not(self.tree_[nextNode].is_terminal_):
+            rolloutReward = self.rollout(self.tree_[nextNode],self.n_rollout_)
+        else:
+            rolloutReward = 20
         self.tree_[nextNode].V_ = rolloutReward
         self.backpropagate(nextNode,rolloutReward)
         return treePrintList
@@ -169,10 +172,11 @@ class UCT():
     def playGame(self, stateIndex = 0):
         self.render_ = True
         self.env_.reset(seed = self.seed, return_info=True)
+        done = False
         while True:
-            if not(self.tree_[stateIndex].is_terminal_):
-                stateIndex,_ = self.treeStep(stateIndex)
+            if not(self.tree_[stateIndex].is_terminal_) and not(done):
+                stateIndex,done = self.treeStep(stateIndex)
                 print(stateIndex)
             else:
-                self.env_.reset(seed=5, return_info=True)
+                self.env_.reset(seed = self.seed, return_info=True)
                 stateIndex = 0
