@@ -102,7 +102,7 @@ class AOGS():
             self.n_ += 1
         
         while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):# and self.m_ < 5460:
-            print(len(self.U_))
+            # print(len(self.U_))
             # print("------------")
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)

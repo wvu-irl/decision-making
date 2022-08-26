@@ -86,14 +86,14 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # dist -> distribution (a, r+gamma V)
             # t -> number of samples
             #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
-            bf = generate_bf_conf(dist, delta, t, L, U)
+            bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
             up_exp = upper_expectation(bf)
             # print(bf)
             # print(up_exp)
             
             dist, t = count_2_dist(a, gamma, _solver, False)
             #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
-            bf = generate_bf_conf(dist, delta, t, L, U)
+            bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
 
             low_exp = lower_expectation(bf)
             # print(low_exp)

@@ -142,14 +142,14 @@ def bin_dist(_dist, _n = MAX_NUMEL):
         #     temp_dist.append(tmass[i],tval[i])          
         return tmass, tval
 
-def generate_bf_conf(_dist, _delta, _t, _l, _u):
+def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
     if len(_dist) == 0:
         _dist.append(1, {_l, _u})
         return _dist
     elif len(_dist) == 1:
-        d = 1 / (1+ _t)
-        _dist[0] = (1-d, _dist[0][1])
-        _dist.append((d, {_l, _u}))
+        c = get_confidence(_e,_t)
+        _dist[0] = (c, _dist[0][1])
+        _dist.append((1-c, {_l, _u}))
         return _dist
     else:
         # print(len(_dist))
