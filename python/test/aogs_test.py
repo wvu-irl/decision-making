@@ -7,6 +7,8 @@ sys.path.append(parent)
 import numpy as np
 import random
 
+import gym
+
 from gym_envs.gridworld import GridWorld
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
@@ -19,6 +21,7 @@ dim = [40,40]
 goal = [10,10]
 p = 0
 sailing_test = False
+env = gym.make("GridWorld")
 if not sailing_test:
     env = GridWorld(dim, goal, p)
     bounds = [0,1]

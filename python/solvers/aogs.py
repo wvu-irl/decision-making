@@ -198,6 +198,7 @@ class AOGS():
         print(exps)
         print("gap", U-L)
         print("m ", self.m_)
+        print("Usize", len(self.U_))
         return self.graph_[self.gi_[_str_s]].get_action_index(a)
                
     def simulate(self, _s, _a, _do_reset):

@@ -70,7 +70,6 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         #     no_c = True
     
     exp_max = -inf
-    exp_max2 = -inf
     ind = _s.a_[0].a_
     gap = 0
     lexps = []

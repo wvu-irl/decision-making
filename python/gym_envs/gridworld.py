@@ -69,6 +69,10 @@ class GridWorld(gym.Env):
         self.ax_ = self.fig_.add_subplot(1,1,1)
         
         self.rng_ = np.random.default_rng()
+        # self.prefix_ = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/gif/"
+        # self.count_im_ = 0
+
+
         
     def get_num_states(self):
         return self.dim_[0]*self.dim_[1]
@@ -104,9 +108,9 @@ class GridWorld(gym.Env):
             plt.plot(self.goal_[0], self.goal_[1],
                      'bX', markersize=size) # agent and goal
 
-        ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
-        self.ax_.set_xticks(ticks)
-        self.ax_.set_yticks(ticks)
+        # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
+        # self.ax_.set_xticks(ticks)
+        # self.ax_.set_yticks(ticks)
         plt.xticks(color='w')
         plt.yticks(color='w')
         plt.show(block=False)
@@ -114,6 +118,10 @@ class GridWorld(gym.Env):
         #     self.fig_.savefig(fp +"%d.png" % self.img_num_)
         #     self.img_num_ += 1
         plt.pause(1)
+        # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+        # self.count_im_+=1
+
+
         #plt.close() 
         
     def get_observation(self):
@@ -135,9 +143,10 @@ class GridWorld(gym.Env):
         p = self.rng_.uniform()
 
         if p < self.p_:
-            t = self.a_.copy()
-            t.remove(_action)
-            _action = self.rng_.choice(t)     
+            # t = self.a_.copy()
+            # t.remove(_action)
+            # _action = self.rng_.choice(t)     
+            _action = 4
         return _action
     
     def step(self, _action):
