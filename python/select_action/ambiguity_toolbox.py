@@ -182,6 +182,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         # print(invA[len(mass)-2])
         # print(pl_minus_bel)
         mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 
+        # print(" <0 ", mass < 0)
         #print(mass)
         # print("mass", lmass)
         pset = powerset(len(_dist))

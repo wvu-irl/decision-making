@@ -19,9 +19,9 @@ alpha = 1
 #Env
 dim = [40,40]
 goal = [10,10]
-p = 0
+p = 0.1
 sailing_test = False
-env = gym.make("GridWorld")
+# env = gym.make("GridWorld")
 if not sailing_test:
     env = GridWorld(dim, goal, p)
     bounds = [0,1]
