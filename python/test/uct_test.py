@@ -1,3 +1,4 @@
+from math import gamma
 import gym
 import sys
 import os
@@ -13,14 +14,14 @@ from optimizers.optimization import Bellman
 
 
 env = gym.make('Taxi')
-
+env_sim = gym.make('Taxi')
 print(env.action_space)
-actionSelectionSelection = act.action_selection(act.UCB1,{"c":15}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":25}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
-solverUCT = UCT(Bellman(env,0),env,actionSelectionSelection,actionSelectionRollout)
+solverUCT = UCT(env,env_sim,actionSelectionSelection,actionSelectionRollout)
 solverUCT.render_ = False
-solverUCT.learn()
+solverUCT.seed = 5
 while(True):
     solverUCT.playGame()
 
