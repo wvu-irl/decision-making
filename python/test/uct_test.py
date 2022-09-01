@@ -16,10 +16,9 @@ from optimizers.optimization import Bellman
 env = gym.make('Taxi')
 env_sim = gym.make('Taxi')
 print(env.action_space)
-actionSelectionSelection = act.action_selection(act.UCB1,{"c":25}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":.75}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
-
-solverUCT = UCT(env,env_sim,actionSelectionSelection,actionSelectionRollout)
+solverUCT = UCT(env,env_sim,[0,1,2,3,4,5],actionSelectionSelection,actionSelectionRollout)
 solverUCT.render_ = False
 solverUCT.seed = 5
 while(True):

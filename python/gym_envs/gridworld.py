@@ -76,11 +76,12 @@ class GridWorld(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reset(self, _state = None):
+    def reset(self, _state = None,seed = 0):
         if _state == None:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
         else:
             self.agent_ = _state
+        return self.agent_
         
         
     

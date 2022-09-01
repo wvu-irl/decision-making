@@ -41,8 +41,8 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     actions = _s.a_ 
     random.shuffle(actions)
     for a in actions:
-        if len(a.s_prime_i_) > 0:
-            childInd = a.s_prime_i_[0]
+        for i in a.s_prime_i_:
+            childInd = i
             aVal = _solver.tree_[childInd].V_/_solver.tree_[childInd].N_ + 2*_const["c"]*np.sqrt(((2*np.log(_s.N_))/_solver.tree_[childInd].N_)) #UCB1 Equation
             if aVal > UCB or np.isnan(UCB):
                 UCB = aVal
