@@ -61,7 +61,7 @@ class UCT():
         self.tree_ : list[State] = [State([],self.actions_,None,0) for i in range (self.N_)]
         self.n_vertices_ : int  = 1
 
-    def learn(self, s_ , budget : int = 2000,gamma = .9):
+    def learn(self, s_ , budget : int = 5000,gamma = .9):
         self.gamma_ = gamma
         for i in range(budget):
             if i >= self.N_-1:
@@ -143,6 +143,8 @@ class UCT():
             rolloutReward = self.rollout(self.tree_[nextNode],self.n_rollout_,gamma)
         else:
             rolloutReward = self.bounds_[1]/(1-self.gamma_)
+            
+        #rolloutReward += distance to goal()
         self.tree_[nextNode].V_ = rolloutReward
         self.backpropagate(nextNode,rolloutReward)
         return treePrintList
