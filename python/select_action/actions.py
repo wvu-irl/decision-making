@@ -41,11 +41,13 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     actions = _s.a_ 
     random.shuffle(actions)
     for a in actions:
-        for i in a.s_prime_i_:
-            childInd = i
-            aVal = _solver.tree_[childInd].V_/_solver.tree_[childInd].N_ + 2*_const["c"]*np.sqrt(((2*np.log(_s.N_))/_solver.tree_[childInd].N_)) #UCB1 Equation
-            if aVal > UCB or np.isnan(UCB):
-                UCB = aVal
+        Q = 0
+        for r,s_p_i,n in zip(a.r_, a.s_prime_i_, a.n_):
+            Q += n*(r + _solver.gamma_*_solver.tree_[s_p_i].V_)#/_solver.tree_[s_p_i].N_  #UCB1 Equation
+        Q /= a.N_
+        Q += 2*_const["c"]*np.sqrt(((np.log(_s.N_))/a.N_))
+        if Q > UCB or np.isnan(UCB):
+                UCB = Q
                 optAction = a.a_
     return optAction
 

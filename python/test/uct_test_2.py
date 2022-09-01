@@ -12,28 +12,31 @@ from gym_envs.gridworld import GridWorld
 
 
 
-dim = [40,40]
+dim = [30,30]
 goal = [10,10]
-p = 0.05
-env = GridWorld(dim, goal, p)
+p = 0.1
+# env = GridWorld(dim, goal, p)
 env_sim = GridWorld(dim, goal, p)
 
 
 actionSelectionSelection = act.action_selection(act.UCB1,{"c":10}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
-solverUCT = UCT(env,env_sim,env.a_,actionSelectionSelection,actionSelectionRollout)
+solverUCT = UCT(env_sim,env_sim.a_,actionSelectionSelection,actionSelectionRollout)
 solverUCT.render_ = True
 solverUCT.seed = 5
 
 env_sim.render()
 s=env_sim.get_observation()
-while(True):
-    solverUCT.reinnit(s)
+d = False
+while(not d):
+    print("-------")
+    solverUCT.reinit(s)
     a = solverUCT.learn(s)
-    print("act " + str(a.a_))
+    print(s)
+    print("act " + str(a))
     env_sim.reset(s)
-    s, r,d,info = env_sim.step(a.a_)
+    s, r,d,info = env_sim.step(a)
     # print("ss ",s)
     env_sim.render()
     print(r)

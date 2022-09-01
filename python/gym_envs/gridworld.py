@@ -25,10 +25,10 @@ class GridWorld(gym.Env):
         agent position
     Actions:
         -  S 0: move south        [ 0, -1]
-        -  W 2: move west         [-1,  0]
-        -  N 4: move north        [ 0,  1]
-        -  E 6: move east         [ 1,  0]
-        -  Z 8: stay              [ 0,  0]
+        -  W 1: move west         [-1,  0]
+        -  N 2: move north        [ 0,  1]
+        -  E 3: move east         [ 1,  0]
+        -  Z 4: stay              [ 0,  0]
     
     Transition: 
         movement 
