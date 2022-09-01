@@ -107,12 +107,12 @@ class AOGS():
             # for i in range(len(self.gi_)):
             #     print(self.graph_[i].s_)
             # print(self.gi_)    
-            if _str_s not in self.U_:
-                # print("nee")
-                s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
-            else:
+            # if _str_s not in self.U_:
+            #     # print("nee")
+            #     s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
+            # else:
                 # print("yee")
-                s = _s
+            s = _s
             
             parents = [-1]*_D
             p_ind = 0

@@ -10,20 +10,30 @@ import random
 import gym
 
 from gym_envs.gridworld import GridWorld
+from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-alpha = 1
+# fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/a_0_75_greedy_test/"
+
+alpha = 0.95
 #Env
 dim = [40,40]
 goal = [10,10]
-p = 0.1
-sailing_test = False
+p = 0
+test_type = 1
+D = 100
 # env = gym.make("GridWorld")
-if not sailing_test:
+if test_type == 0:
     env = GridWorld(dim, goal, p)
+    bounds = [0,1]
+elif test_type == 1:
+    dim = [35,10]
+    goal = [10,5]
+    D = 10
+    env = GridTrap(dim, goal, p)
     bounds = [0,1]
 else:
     env = Sailing(dim, goal, p)
@@ -42,13 +52,13 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _D = 100, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _D = D, _timeout=timeout, _reinit=False)
     print("act " + str(a))
     # print("ss ",s)
     env.reset(s)
     s, r,d,info = env.step(a)
     # print("ss ",s)
-    env.render()
+    env.render()#fp)
     print(r)
 
 #env.render("/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/avi/fig")
