@@ -16,8 +16,8 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-if False:
-    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/a_0_75_greedy_test/"
+if True:
+    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/sailing_test/"
 else:
     fp = None
     

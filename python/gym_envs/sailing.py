@@ -67,7 +67,7 @@ class Sailing(gym.Env):
         self.wind_init_ = self.wind_
         # print(self.wind_)
         self.goal_ = _goal
-        
+        self.img_num_ = 0
         # for i in range(self.dim_[0]):
         #     for j in range(self.dim_[1]):
         #         self.map_[i][j] = self.get_reward([i,j], 0,0)
