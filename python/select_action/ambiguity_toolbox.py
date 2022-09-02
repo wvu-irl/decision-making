@@ -112,7 +112,7 @@ def get_accuracy(_delta,_t, a):
 ## -------------------------------------------------
 ## -------------------------------------------------
 # Belief functions are a list of pairs(set(rewards),number of counts)
-def bin_dist(_dist, _n = MAX_NUMEL):
+def bin_dist(_dist, _n = MAX_NUMEL-1):
     temp_dist = []
     l_dist = len(_dist)
     mass = np.zeros(l_dist)
@@ -157,12 +157,14 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         return _dist
     else:
         # print(len(_dist))
+        # print("-----------")
         epsilon = get_accuracy(_delta,_t, 0.05)
         
         mass, val = bin_dist(_dist)
         
         mass /= np.sum(mass)
-        
+        # print(mass)
+        # print(val)
         lmass = len(mass)
         bel = np.zeros([lmass,1])
         pl = np.zeros([lmass,1])
@@ -189,9 +191,9 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         # print(" <0 ", mass < 0)
         #print(mass)
         # print("mass", lmass)
-        pset = powerset(len(_dist))
+        pset = powerset(lmass)
         del pset[0:lmass+1]
-        
+        # print(pset)
         theta = {_l, _u}
         lpset = len(pset)
         # print(pset)
@@ -211,6 +213,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         for i in range(lpset):
             temp = set()
             for j in pset[i]:
+                # print(pset[i])
                 # print(val[j])
                 temp.add(val[j])
             bf.append((mass[i], temp))
