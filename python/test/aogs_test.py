@@ -7,45 +7,65 @@ sys.path.append(parent)
 import numpy as np
 import random
 
+import gym
+
 from gym_envs.gridworld import GridWorld
+from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
+if False:
+    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/a_0_75_greedy_test/"
+else:
+    fp = None
+    
 alpha = 0
-#Env
-dim = [40,40]
-goal = [10,10]
-p = 0.1
-sailing_test = False
-if not sailing_test:
+
+p = 0
+test_type = 2
+D = 100
+# env = gym.make("GridWorld")
+if test_type == 0:
+    #Env
+    dim = [40,40]
+    goal = [10,10]
     env = GridWorld(dim, goal, p)
     bounds = [0,1]
+elif test_type == 1:
+    dim = [35,10]
+    goal = [10,5]
+    D = 10
+    env = GridTrap(dim, goal, p)
+    bounds = [0,1]
 else:
+    #Env
+    dim = [50,50]
+    goal = [12,12]
     env = Sailing(dim, goal, p)
-    bounds = [-1, 5000]
+    bounds = [-401.11, 1100.99]
 
 #env2 = GridWorld(dim, goal, p)
-timeout = 2
+timeout = 3
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
 
 s = env.get_observation()
-aogs = AOGS(env, act_select, _bounds = bounds)
+aogs = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
 env.render()
 r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _D = D, _timeout=timeout, _reinit=False)
     print("act " + str(a))
     # print("ss ",s)
     env.reset(s)
     s, r,d,info = env.step(a)
     # print("ss ",s)
-    env.render()
+    env.render(fp)
     print(r)
 
 #env.render("/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/avi/fig")

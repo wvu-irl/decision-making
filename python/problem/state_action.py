@@ -49,6 +49,12 @@ class State():
                 self.a_unused.append(a)
         else:
             self.a_ = []
+            
+        if _policy == None and self.a_ != []:
+            self.policy_ = self.a_[0].a_
+        else:
+            self.policy_ = _policy
+
 
         if type(_parent) is list:
             self.parent_ = _parent

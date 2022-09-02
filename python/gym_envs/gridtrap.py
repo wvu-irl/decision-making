@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class GridWorld(gym.Env):
+class GridTrap(gym.Env):
     """
     Let's an agent traverse a world starting from 0,0
     Description:
@@ -25,10 +25,10 @@ class GridWorld(gym.Env):
         agent position
     Actions:
         -  S 0: move south        [ 0, -1]
-        -  W 1: move west         [-1,  0]
-        -  N 2: move north        [ 0,  1]
-        -  E 3: move east         [ 1,  0]
-        -  Z 4: stay              [ 0,  0]
+        -  W 2: move west         [-1,  0]
+        -  N 4: move north        [ 0,  1]
+        -  E 6: move east         [ 1,  0]
+        -  Z 8: stay              [ 0,  0]
     
     Transition: 
         movement 
@@ -51,7 +51,7 @@ class GridWorld(gym.Env):
         Returns:
             State: State object
         """
-        super(GridWorld, self).__init__()
+        super(GridTrap, self).__init__()
 
         self.map_ = np.zeros(_dim)
         self.dim_ = _dim
@@ -69,8 +69,7 @@ class GridWorld(gym.Env):
         self.ax_ = self.fig_.add_subplot(1,1,1)
         
         self.rng_ = np.random.default_rng()
-        # self.prefix_ = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/gif/"
-        # self.count_im_ = 0
+        self.count_im_ = 0
 
 
         
@@ -80,12 +79,13 @@ class GridWorld(gym.Env):
     def get_num_actions(self):
         return 4
     
-    def reset(self, _state = None,seed = 0):
+    def reset(self, _state = None):
         if _state == None:
-            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)]
+            self.agent_ = [self.dim_[0]-self.goal_[0], self.dim_[1]-self.goal_[1]]
         else:
             self.agent_ = _state
-        return self.agent_
+            
+        self.trap_ = [self.agent_[0] + 2, self.agent_[1]]
         
         
     
@@ -120,8 +120,9 @@ class GridWorld(gym.Env):
             self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
             self.img_num_ += 1
         plt.pause(1)
-        # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-        # self.count_im_+=1
+        if _fp != None:
+            plt.savefig(_fp + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+            self.count_im_+=1
 
 
         #plt.close() 
@@ -137,7 +138,11 @@ class GridWorld(gym.Env):
     def get_reward(self, _s):
         d = self.get_distance(_s, self.goal_)
         if d >= 5:
-            return 0
+            d = self.get_distance(_s, self.trap_)
+            if d >= 5:
+                return 0
+            else:
+                return (1 - (d**2)/25)/3
         else:
             return 1 - (d**2)/25
     
@@ -227,6 +232,6 @@ class GridWorld(gym.Env):
             return 3 #  E
         else:
             return 4 # Z
-
+        
     def write_gif(self):
         pass

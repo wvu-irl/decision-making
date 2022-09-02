@@ -97,7 +97,7 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     epsilon = _solver.performance_[0]
-    delta = _solver.performance_[1]
+    delta = 1-_solver.performance_[1]
     gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
@@ -110,37 +110,65 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         #     no_c = True
     
     exp_max = -inf
-    ind = 0
+    ind = _s.a_[0].a_
     gap = 0
-    exps = []
-    
+    lexps = []
+    uexps = []
     for a in _s.a_:
         if a.N_ == 0:
             expectation = (1-alpha)*L + (alpha)*U
             low_exp = L
             up_exp = U
         else:
-            dist, t = count_2_dist(a, gamma, _solver)
+            
+            dist, t = count_2_dist(a, gamma, _solver, True)
             # dist -> distribution (a, r+gamma V)
             # t -> number of samples
-            
-            bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
+            up_exp = upper_expectation(bf)
             # print(bf)
+            # print(up_exp)
+            
+            dist, t = count_2_dist(a, gamma, _solver, False)
+            #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
+
             low_exp = lower_expectation(bf)
             # print(low_exp)
-            up_exp = upper_expectation(bf)
+            
             # print(up_exp)
             expectation = (1-alpha)*low_exp + (alpha)*up_exp #+ 0.5**np.sqrt(np.log(N)/t)
             # print(alpha)
             # print("exp", expectation)
-            exps.append(expectation)
+            #exps.append(expectation)
+            uexps.append(up_exp)
+            lexps.append(low_exp)
         if expectation > exp_max:
             exp_max = expectation
+            L_exp = low_exp
+            U_exp = up_exp
             gap = up_exp-low_exp
             ind = [a.a_]
+            
         elif expectation == exp_max:
             ind.append(a.a_)
-    return _solver.rng_.choice(ind), exp_max, gap, exps
+        ldiff = 0
+        udiff = 0
+        if len(uexps) > 1:
+            uexps.sort()
+            lexps.sort()    
+            ldiff = lexps[0]-lexps[1]
+            udiff = uexps[0]-uexps[1]
+        
+        ldiff = max(0.1,ldiff)
+        udiff = max(0.1,udiff)
+        # if int(_s.s_[0]) == 20 and int(_s.s_[1]) == 20 :
+            # print("------------")
+            # print(U_exp)
+            # print(exp_max)
+            # print(L_exp)
+    return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 
 def randomAction(_s : State,_const,_param,solver = None):
