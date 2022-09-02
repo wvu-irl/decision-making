@@ -88,7 +88,7 @@ class GridWorld(gym.Env):
         
         
     
-    def render(self, fp = None):
+    def render(self, _fp = None):
             #plt.clf()
         print(self.agent_)
 
@@ -114,9 +114,10 @@ class GridWorld(gym.Env):
         plt.xticks(color='w')
         plt.yticks(color='w')
         plt.show(block=False)
-        # if fp != None:
-        #     self.fig_.savefig(fp +"%d.png" % self.img_num_)
-        #     self.img_num_ += 1
+        if _fp != None:
+            self.fig_.savefig(_fp +"%d.png" % self.img_num_)
+            self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
+            self.img_num_ += 1
         plt.pause(1)
         # plt.savefig(self.prefix_ + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
         # self.count_im_+=1
@@ -225,3 +226,6 @@ class GridWorld(gym.Env):
             return 3 #  E
         else:
             return 4 # Z
+
+    def write_gif(self):
+        pass

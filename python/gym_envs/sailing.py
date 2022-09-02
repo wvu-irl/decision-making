@@ -24,6 +24,9 @@ class Sailing(gym.Env):
     Observations:
         agent position
     Actions:
+        - L -1: turn left
+        - C 0: straight
+        - R 1: turn right
         -  S 0: move south        [ 0, -1]
         - SW 1: move southwest    [-1, -1]
         -  W 2: move west         [-1,  0]
@@ -100,17 +103,17 @@ class Sailing(gym.Env):
         return self.dim_[0]*self.dim_[1]
     
     def get_num_actions(self):
-        return 8
+        return 3
     
     def reset(self, _state = None):
         # print("-----------")
         # print(self.wind_)
         if _state == None:
-            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2)] 
+            self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0] 
             self.wind_ = self.wind_init_
         else:
-            self.agent_ = [_state[0], _state[1]]
-            self.wind_ = np.reshape(_state[2:len(_state)], [self.dim_[0], self.dim_[1]])
+            self.agent_ = [_state[0], _state[1], _state[2]]
+            self.wind_ = np.reshape(_state[3:len(_state)], [self.dim_[0], self.dim_[1]])
         # print(self.wind_)
         #self.wind_init_ = self.wind_
         
@@ -121,7 +124,7 @@ class Sailing(gym.Env):
         print(self.agent_)
         plt.cla()
         #plt.grid()
-        size = 100/self.dim_[0]
+        size = 200/self.dim_[0]
         # Render the environment to the screen
         t_map = (self.map_)
         plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
@@ -132,57 +135,70 @@ class Sailing(gym.Env):
         if self.agent_[0] != self.goal_[0] or self.agent_[1] != self.goal_[1]:
             plt.plot(self.agent_[0], self.agent_[1],
                      'bo', markersize=size)  # blue agent
+            temp = self.act_2_dir(int(self.agent_[2]))
+            plt.arrow(int(self.agent_[0]),int(self.agent_[1]),temp[0],temp[1])
             plt.plot(self.goal_[0], self.goal_[1],
                      'gX', markersize=size)
         else:
             plt.plot(self.goal_[0], self.goal_[1],
                      'bX', markersize=size) # agent and goal
 
-        ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
-        self.ax_.set_xticks(ticks)
-        self.ax_.set_yticks(ticks)
-        plt.xticks(color='w')
-        plt.yticks(color='w')
+        # ticks = np.arange(-0.5, self.dim_[0]-0.5, 1)
+        # self.ax_.set_xticks(ticks)
+        # self.ax_.set_yticks(ticks)
+        # plt.xticks(color='w')
+        # plt.yticks(color='w')
         plt.show(block=False)
-        # if fp != None:
-        #     self.fig_.savefig(fp +"%d.png" % self.img_num_)
-        #     self.img_num_ += 1
+        if fp != None:
+            self.fig_.savefig(fp +"%d.png" % self.img_num_)
+            self.fig_.savefig(fp +"%d.eps" % self.img_num_)
+            self.img_num_ += 1
         plt.pause(1)
         #plt.close() 
         
     def get_observation(self):
-        return [int(self.agent_[0]), int(self.agent_[1])] + list(self.wind_.ravel())
+        return [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])] + list(self.wind_.ravel())
     
     def get_distance(self, s1, s2):
         return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
     
-    def get_reward(self, _s, _w, _a):
-        
-        wind_diff = self.get_distance(self.act_2_dir(_w),self.act_2_dir(_a))
+    def get_reward(self, _s, _w, _a, _sp):
+        r = -0.01
+        r += - self.get_distance(self.act_2_dir(_w),self.act_2_dir(_a))/(2*np.sqrt(2))
                 
-        # print(_w)
-        # print(_a)
-        # print(wind_diff/(2*np.sqrt(2)))
         d = self.get_distance(_s, self.goal_)
-        if d >= 5:
-            return -0.5 -wind_diff/(2*np.sqrt(2))
-        else:
-            return 5000*(1 - (d**2)/25) -wind_diff/(2*np.sqrt(2))
-        # d = self.get_distance(_s, self.goal_)
-        # return 5000*(1 - (d**2)/100) -wind_diff/(2*np.sqrt(2))
-    
-    def sample_transition(self, _action):
-        p = self.rng_.uniform()
+        d2 = self.get_distance(_sp, self.goal_)
+        if d > d2:
+            r += 1
+            
+        if _sp[0] < 10 or _sp[0] > self.dim_[0]-10 or _sp[1] < 10 or _sp[1] > self.dim_[1]-10:
+            r += -0.1
+        
+        step = self.act_2_dir(_sp[2])
+        ag = [_s[0]+step[0], _s[1]+step[1]]
+        if int(ag[0]) == 0 or int(ag[0]) >= self.dim_[0] or int(ag[1]) ==0 or int(ag[1]) >= self.dim_[1]:
+            r += -400
+            
 
-        if p < self.p_:
-            t = self.a_.copy()
-            t.remove(_action)
-            _action = self.rng_.choice(t)     
-        return _action
+        if d <= 5 and d > 0:
+            r += 1000*(1 - (d**2)/25)
+        elif d == 0:
+            r += 1100
+            
+        return r
+
+    
+    # def sample_transition(self, _action):
+    #     p = self.rng_.uniform()
+
+    #     if p < self.p_:
+    #         t = self.a_.copy()
+    #         t.remove(_action)
+    #         _action = self.rng_.choice(t)     
+    #     return _action
     
     def step(self, _action):
         self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
-
         # print("------")
         # print(self.wind_)
         wind_dir = self.wind_[int(self.agent_[0])][int(self.agent_[1])]
@@ -190,11 +206,18 @@ class Sailing(gym.Env):
         # _action = self.sample_transition(_action)
         # print(_action)
         s = self.agent_.copy()
-        self.agent_ = self.get_coordinate_move(self.agent_, _action)
+        
+        self.agent_[2] += _action
+        if self.agent_[2] < 0:
+            self.agent_[2] = 7
+        if self.agent_[2] > 7:
+            self.agent_[2] = 0
+        
+        self.agent_ = self.get_coordinate_move(self.agent_, int(self.agent_[2]))
         
         
-        r = self.get_reward(s, wind_dir, _action)
-        if self.agent_ == self.goal_:
+        r = self.get_reward(s, wind_dir, _action, self.agent_)
+        if self.get_distance(self.agent_,self.goal_) < 1e-2:
             done = True
         else:
             done = False
@@ -204,8 +227,8 @@ class Sailing(gym.Env):
         return self.get_observation(), r, done, []
         
     def get_actions(self, _agent):
-        n, a = self.get_neighbors(_agent)
-        return a
+
+        return [-1, 0, 1]
     
     def get_neighbors(self, _position):
         neighbors = []
@@ -222,32 +245,32 @@ class Sailing(gym.Env):
         return neighbors, neighbors_ind
 
     def act_2_dir(self, _action):
-        step = []
         if   _action == 0:
-            step = [ 0, -1] # S
+            return [ 0, -1] # S
         elif _action == 1:
-            step = [-1, -1] # SW
+            return [-1, -1] # SW
         elif _action == 2:
-            step = [-1,  0] #  W
+            return [-1,  0] #  W
         elif _action == 3:
-            step = [-1,  1] # NW
+            return [-1,  1] # NW
         elif _action == 4:
-            step = [ 0,  1] # N
+            return [ 0,  1] # N
         elif _action == 5:
-            step = [ 1,  1] # NE
+            return [ 1,  1] # NE
         elif _action == 6:
-            step = [ 1,  0] #  E
+            return [ 1,  0] #  E
         elif _action == 7:
-            step = [ 1, -1] # SE
+            return [ 1, -1] # SE
         else:
-            step = [0, 0]   #  Z
-        return step
+            return [0, 0]   #  Z
     
     def get_coordinate_move(self, _position, _action):
         _position = _position.copy()
         step = self.act_2_dir(_action)
 
         temp = _position.copy()
+        # print(temp)
+        # print(step)
         temp[0] = temp[0] + step[0]
         temp[1] = temp[1] + step[1]
         
@@ -280,3 +303,6 @@ class Sailing(gym.Env):
             return 7 # SE
         else:
             return 8 # Z
+
+    def write_gif(self):
+        pass
