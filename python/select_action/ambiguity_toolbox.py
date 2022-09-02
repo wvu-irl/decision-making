@@ -126,21 +126,24 @@ def bin_dist(_dist, _n = MAX_NUMEL):
     if len(_dist) < _n:
         return mass, val
     else:
-   
-        min_mass = min(mass)
-        bin_size = max(mass)-min_mass
+        # print("-------------------")
+        # print(mass)
+        min_val = min(val)
+        bin_size = max(val)-min_val
+        if bin_size != 0:
+            tmass = np.zeros(l_dist)
+            tval = np.zeros(l_dist)
+            for i in range(l_dist):
+                ind = int(np.floor((val[i]-min_val)/bin_size))
+                # print(val[i]-min_val)
+                tval[ind] = tmass[ind]*tval[ind] + mass[i]*val[i]
+                tmass[ind] += mass[i] 
+                tval[ind] /= tmass[ind]  
+            return tmass, tval   
+        else:
+            
+            return mass, val                
         
-        tmass = np.zeros(l_dist)
-        tval = np.zeros(l_dist)
-        for i in range(l_dist):
-           ind = int(np.floor((tmass[i]-min_mass)/bin_size))
-           tval[ind] = tmass[ind]*tval[ind] + mass[i]*val[i]
-           tmass[ind] += mass[i] 
-           tval[ind] /= tmass[ind]     
-           pass         
-        # for i in range(l_dist):
-        #     temp_dist.append(tmass[i],tval[i])          
-        return tmass, tval
 
 def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
     if len(_dist) == 0:

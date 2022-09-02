@@ -22,8 +22,8 @@ else:
     fp = None
     
 alpha = 0
-
-p = 0
+timeout = 10
+p = 0.1
 test_type = 2
 D = 100
 # env = gym.make("GridWorld")
@@ -47,7 +47,7 @@ else:
     bounds = [-401.11, 1100.99]
 
 #env2 = GridWorld(dim, goal, p)
-timeout = 3
+
 
 #Solver
 act_select = action_selection(ambiguity_aware, [alpha])
@@ -59,7 +59,7 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _D = D, _timeout=timeout, _reinit=False)
+    a = aogs.search(s, _D = D, _timeout=timeout, _reinit=True)
     print("act " + str(a))
     # print("ss ",s)
     env.reset(s)
