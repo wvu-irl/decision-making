@@ -14,7 +14,7 @@ def lower_bound(_s, _a, _solver, _delta):
     l = []
     for a in _s.a_:
         v = 0
-        for _ in range(1000):
+        for _ in range(1000): # COME BACK
             kl = KL_divergence_Bernoulli(a.r_,v)
             if(kl <= beta_r(_s.n,_solver.n)/_s.n_ and kl > v):
                 v = kl
@@ -24,7 +24,9 @@ def lower_bound(_s, _a, _solver, _delta):
     B = np.inf
     for i,a in enumerate(_s.a_):
         P = 0
-        C = [] #Solve C!
+        Cp = beta_p(_s.N_,n) #COME BACK AND ADD B K H and FIX n
+        s_prime, T,reward = _s.a_.get_transition_model()
+        C = MaxKL([_solver.graph_[i].V_ for i in s_prime],T,Cp)
         for q in C:
             p = 0
             for s in a.s_prime_i_:
@@ -56,12 +58,22 @@ def KL_divergence_Bernoulli(_u,_v):
     return _u*np.log(_u/_v) + (1-_u)*np.log((1-_u)/(1-_v))
 
 def MaxKL(_V,_p,_c): 
+
+    def f(_v,_V,_p,_Z_hat):
+        a = 0
+        b = 0
+        for i in _Z_hat:
+            a += _p[i]*np.log(_v-_V[i])
+            b += _p[i]/(_v-_V[i]) 
+        return a+np.log(b)
+
     i_p = range(len(_p))
     q = np.zeros(len(_p))
     q_hat = np.zeros(len(_p))
     Z_zero = np.where(_p == 0, i_p)
     Z_hat = np.where(_p > 0, i_p)
     I_star = Z_zero.intersection(np.amax(_V))
+
     belowBounds = False
     for i in I_star:
         if f(_V[i]) < _c:
@@ -69,7 +81,7 @@ def MaxKL(_V,_p,_c):
             v = _V[i]
             return
     if belowBounds:
-        r = 1- np.exp(f(v)-_c)
+        r = 1- np.exp(f(v,_V,_p,Z_hat)-_c)
         for i in I_star:
             q[i] = r/len(I_star) # COME BACK    
     else:
@@ -85,13 +97,7 @@ def MaxKL(_V,_p,_c):
 
         q[i] = ((1-r)*(_p[i]/(v-_V[i])))/q_hat_zero_sum
 
-def f(_v,_V,_p,_Z_hat):
-    a = 0
-    b = 0
-    for i in _Z_hat:
-        a += _p[i]*np.log(_v-_V[i])
-        b += _p[i]/(_v-_V[i]) 
-    return a+np.log(b)
+
 def newtons_method():
     return
 
