@@ -7,6 +7,8 @@ import time
 import sys
 import os
 
+from python.select_action.actions import action_selection
+
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -41,7 +43,7 @@ class MCGS():
         self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
         self.gamma_ = _gamma
         
-        self.a_s_ = _action_selection
+        self.a_s_ : action_selection= _action_selection
     
         self.reinit()
 
