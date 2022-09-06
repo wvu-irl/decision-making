@@ -7,12 +7,11 @@ import time
 import sys
 import os
 
-from python.select_action.actions import action_selection
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-
+from select_action.actions import action_selection
 from problem.state_action import State, Action
 from optimizers.optimization import Optimizer
 
@@ -22,7 +21,7 @@ class MCGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
+    def __init__(self, _env : gym.Env, _action_selection,  _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -42,7 +41,7 @@ class MCGS():
         self.performance_ = _performance
         self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
         self.gamma_ = _gamma
-        
+
         self.a_s_ : action_selection= _action_selection
     
         self.reinit()
@@ -67,7 +66,7 @@ class MCGS():
         self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _D :int = 100, _timeout = 10, _reinit = False):
+    def search(self, _s : State, _B :int ,_K : int, _H :int = 100, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -78,6 +77,9 @@ class MCGS():
         Returns:
 
         """
+        self.H_ = _H
+        self.B_ = _B
+        self.K_ = _K
         if _reinit:
             self.reinit()
         start_time = time.perf_counter()
@@ -96,15 +98,15 @@ class MCGS():
             str_s = hash(str(s))
             self.env_.reset()
             
-            d = 0
+            t = 0
             do_reset = True
             is_terminal = False
             is_leaf = False
             
-            while not is_leaf and not is_terminal and d < _D:
+            while not is_leaf and not is_terminal and t < _H:
                 
+
                 self.bound_outcomes(str_s)
-                #do optimistic action selection
                 a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
                 s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
@@ -124,16 +126,10 @@ class MCGS():
                     else:
                         v = 0
                     self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal)
-                    # print("s ", s_p)
-                    # print("act ", self.env_.get_actions(s_p))
-                    # for a in self.graph_[self.gi_[str_sp]].a_:
-                    #     print(a.a_)
                     self.n_ += 1
-
                 else:
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
-                    
-                d += 1
+                t += 1
                 s = s_p
                 
         print("n " + str(self.n_))
@@ -154,14 +150,9 @@ class MCGS():
             if s != -1:
                 a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
                 lprecision = (1-self.gamma_)/self.gamma_*exps[0]
-                # print("----------")
-                # print(lprecision)
-                # print(np.abs(L - self.graph_[self.gi_[s]].L_))
-                # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
+
                 uprecision = (1-self.gamma_)/self.gamma_*exps[1]
-                # print(uprecision)
-                # print(np.abs(U - self.graph_[self.gi_[s]].U_))
-                # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
+
                 if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
                     temp = self.graph_[self.gi_[s]].parent_
                     for p in temp:
@@ -170,9 +161,6 @@ class MCGS():
                 self.graph_[self.gi_[s]].V_ = v
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
-                # print("V", v)
-                # print("L", L)
-                # print("U", U)
     
 
     def select(self,_s):
