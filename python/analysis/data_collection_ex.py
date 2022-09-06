@@ -9,18 +9,51 @@ import csv
 import numpy as np
 import random
 
-from solver.optimization import Bellman, PignisticBellman
-from solver.VI import VI
+import gym
 
-from env.AmbiguousPuddleWorld import AmbiguousPuddleWorld
-from env.PuddleWorldGen import PuddleWorldGen
-from utils.utils import *
+from gym_envs.gridworld import GridWorld
+from gym_envs.gridtrap import GridTrap
+from gym_envs.sailing import Sailing
+from solvers.aogs import AOGS
+from select_action.actions import *
 
 ## functions
 def compute_min_time(d):
     return np.ceil(d/(2**(1/2)))
 
 ## Params
+if True:
+    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
+else:
+    fp = None
+    
+alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
+p = [0, 0.05, 0.1, 0.15, 0.2]
+D = 100
+timeout = 10
+test_type = 2
+# env = gym.make("GridWorld")
+if test_type == 0:
+    #Env
+    dim = [40,40]
+    goal = [10,10]
+    env = GridWorld(dim, goal, p)
+    bounds = [0,1]
+elif test_type == 1:
+    dim = [35,10]
+    goal = [10,5]
+    D = 10
+    env = GridTrap(dim, goal, p)
+    bounds = [0,1]
+else:
+    #Env
+    dim = [50,50]
+    goal = [12,12]
+    env = Sailing(dim, goal, p)
+    bounds = [-401.11, 1100.99]
+
+#env2 = GridWorld(dim, goal, p)
+
 prefix = "/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/"
 attempt_num = 7
 
