@@ -30,11 +30,12 @@ else:
 timeout = 10
 
 #Solver
-act_select = action_selection(mcgs_dm)
+act_select_bounds = action_selection(mcgs_dm)
+act_select_move = action_selection(mcgs_best_action)
 s = env.get_observation()
 env.render()
 
-mcgs = MCGS(env, act_select, _bounds = bounds)
+mcgs = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
 
 done = False
 while(not done):

@@ -8,55 +8,84 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-def lower_bound(_s, _a,_solver, _delta):
+# def lower_bound(_s, _a,_solver, _delta):
     
-    # Solve l for all actions
-    l = []
-    for a in _s.a_:
-        v = 0
-        Cr = beta_r(_s.N_,_solver.n_,_solver.B_,len(_s.a_),_solver.H_)
-        kl = lambda x,A : KL_divergence_Bernoulli(a.r_,x) - Cr
-        dkl = lambda x,A : dKL_divergence_Bernoulli(a.r,x)
-        v = newtons_method(kl,dkl)
-        l.append(v)
+#     # Solve l for all actions
+#     l = []
+#     for a in _s.a_:
+#         v = 0
+#         Cr = beta_r(_s.N_,_solver.n_,_solver.B_,len(_s.a_),_solver.H_)
+#         r = np.sum(a.r_)/len(a.r_)
+#         kl = lambda x,A : KL_divergence_Bernoulli(r,x) - Cr
+#         dkl = lambda x,A : dKL_divergence_Bernoulli(r,x)
+#         v = newtons_method(kl,dkl)
+#         l.append(v) #COME BACK
 
-    # solve Bellman Operator for state
-    B = np.inf
-    for i,a in enumerate(_s.a_):
-        P = 0
-        Cp = beta_p(_s.N_,_solver.n_,_solver.B_,len(_s.a_),_solver.H_) 
-        s_prime, T,reward = _s.a_.get_transition_model()
-        C = MaxKL([_solver.graph_[_solver.gi_[s]].V_ for s in s_prime],T,Cp)
-        for q in C:
-            p = 0
-            for s in a.s_prime_i_:
-                p += q*_solver.graph_[_solver.gi_[s]].L_
-            if p > P:
-                P = p
-            b = l[i] + P
-        if b < B:
-            B = b
+#     # solve Bellman Operator for state
+#     B = np.inf
+#     for i,a in enumerate(_s.a_):
+#         P = 0
+#         Cp = beta_p(_s.N_,_solver.n_,_solver.B_,len(_s.a_),_solver.H_) 
+#         s_prime, T,reward = _s.a_.get_transition_model()
+#         C = MaxKL([_solver.graph_[_solver.gi_[s]].V_ for s in s_prime],T,Cp)
+#         for q in C:
+#             p = 0
+#             for s in a.s_prime_i_:
+#                 p += q*_solver.graph_[_solver.gi_[s]].L_
+#             if p > P:
+#                 P = p
+#             b = l[i] + P
+#         if b < B:
+#             B = b
     
-    # Find Low Bound
-    lowerBound = np.inf
-    for low in l:
-       L = low + _solver.gamma_*B
-       if  L < lowerBound:
-            lowerBound = L
-    _s.L_ = lowerBound
-    return lowerBound
+#     # Find Low Bound
+#     lowerBound = np.inf
+#     for low in l:
+#        L = low + _solver.gamma_*B
+#        if  L < lowerBound:
+#             lowerBound = L
+#     _s.L_ = lowerBound
+#     return lowerBound
 
             
 
-def upper_bound(_s, _a, _solver, _delta):
-    #min r _ gamma*min_q q*U
-    pass
+def boundSolver(_s , _solver, _type):
+    # Solve l for all actions
+    bound = np.inf
+    totalActions = len(_s.a_)
+    for a in _s.a_:
+        #Solve for U for State-Action
+        Cr = beta_r(_s.N_,_solver.n_,_solver.B_,totalActions,_solver.H_)
+        reward = np.sum(a.r_)/len(a.r_)
+        kl = lambda x,A : KL_divergence_Bernoulli(reward,x) - Cr
+        dkl = lambda x,A : dKL_divergence_Bernoulli(reward,x)
+        u = newtons_method(kl,dkl)
+
+        #Solve for Sum(p*U) for state action
+        Cp = beta_p(_s.N_,_solver.n_,_solver.B_,totalActions,_solver.H_) 
+        V, T, reward = a.get_transition_model()
+        C = MaxKL(V[0],T,Cp)
+
+        p = 0
+        if _type == "upper":
+            for j,q in enumerate(C):
+                p += q*_solver.graph_[_solver.gi_[a.s_prime_i_[j]]].U_
+            b = u + _solver.gamma_*p
+            if b > bound:
+                bound = b
+        else:
+            for j,q in enumerate(C):
+                p += q*_solver.graph_[_solver.gi_[a.s_prime_i_[j]]].L_
+            b = u + _solver.gamma_*p
+            if b > bound:
+                bound = b
+    return bound
 
 def beta_r(_n, _delta, _B, _K, _H):
-    return np.log((3(_B*_K)**_H)/_delta)+np.log(np.e*(1+_n))
+    return np.log((3*(_B*_K)**_H)/_delta)+np.log(np.e*(1+_n))
 
 def beta_p(_n,_delta,_B,_K,_H):
-    return np.log((3(_B*_K)**_H)/_delta)+(_B-1)*np.log(np.e*(1+_n/(_B-1)))
+    return np.log((3*(_B*_K)**_H)/_delta)+(_B-1)*np.log(np.e*(1+_n/(_B-1)))
 
 def KL_divergence(_p, _q):
     d = 0
@@ -90,13 +119,16 @@ def MaxKL(_V,_p,_c):
         return a - (b/c)
 
     # Solving for Z
-    i_p = range(len(_p))
-    q = np.zeros(len(_p))
+    q = np.zeros(_p.shape[0])
     q_hat = np.zeros(len(_p))
-    Z_zero = np.where(_p == 0, i_p)
-    Z_hat = np.where(_p > 0, i_p)
+    Z_zero = np.where(_p == 0)
+    Z_hat = np.where(_p > 0)
     A["Z_hat"] = Z_hat
-    I_star = Z_zero.intersection(np.amax(_V))
+    I_star = []
+    np.argmax(_V)
+    for i in I_star:
+        if i == np.argmax(_V):
+            I_star.append(i)
 
     # Solving for r, v and some q* values
     belowBounds = False

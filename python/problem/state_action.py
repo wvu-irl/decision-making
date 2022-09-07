@@ -207,7 +207,7 @@ class Action():
             list(float): transition probabilities
             list(float): rewards
         """
-        T = self.n_ / self.N_
+        T = np.divide(self.n_, self.N_)
         return self.s_prime_, T, self.r_
     
     def sample_transition_model(self, _rng):

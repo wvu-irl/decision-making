@@ -21,7 +21,7 @@ class MCGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection,  _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
+    def __init__(self, _env : gym.Env, _action_selection_bounds, _action_selection_move, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST
@@ -42,8 +42,9 @@ class MCGS():
         self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
         self.gamma_ = _gamma
 
-        self.a_s_ : action_selection= _action_selection
-    
+        self.a_s_b_ : action_selection = _action_selection_bounds
+        self.a_s_m_ : action_selection = _action_selection_move
+
         self.reinit()
 
         self.rng_ = np.random.default_rng()
@@ -107,9 +108,10 @@ class MCGS():
                 
 
                 self.bound_outcomes(str_s)
-                a, v_opt, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[str_s]],[1],self)
+
+                a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 
-                s_p, r, is_terminal, do_reset = self.simulate(s,a, do_reset)
+                s_p, r, is_terminal= self.simulate(s,a)
 
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
@@ -142,23 +144,19 @@ class MCGS():
                
     def bound_outcomes(self, _s):
         parents = [_s]
-        
         while len(parents):
-            #print(parents)
             s = parents.pop(0)
-            #print("lp " + str(len(parents)))
             if s != -1:
-                a, v, L, U, exps = self.a_s_.return_action(self.graph_[self.gi_[s]],[],self)
-                lprecision = (1-self.gamma_)/self.gamma_*exps[0]
-
-                uprecision = (1-self.gamma_)/self.gamma_*exps[1]
+                L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[],self)
+                
+                lprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
+                uprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
 
                 if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
                     temp = self.graph_[self.gi_[s]].parent_
                     for p in temp:
                         if p not in parents:
                             parents.append(p)
-                self.graph_[self.gi_[s]].V_ = v
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
     

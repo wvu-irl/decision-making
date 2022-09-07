@@ -8,6 +8,7 @@ import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+
 from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
 from select_action.gbop_toolbox import *
@@ -52,12 +53,9 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     return optAction
 
 def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
-    epsilon = _solver.performance_[0]
     delta = _solver.performance_[1]
-    gamma = _solver.gamma_
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
-    beta = _const
     
     U_max = -inf
     L_min = inf
@@ -71,11 +69,8 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
             low_b = L
             up_b = U
         else:
-            # print(bf)
-            low_b = lower_bound(_s, a, _solver, delta)
-            # print(low_exp)
-            up_b = upper_bound(_s, a, _solver, delta)
-            # print(up_exp)
+            low_b = boundSolver(_s,_solver,"lower")
+            up_b = boundSolver(_s,_solver,"upper")
         if up_b > U_max:
             U_max = up_b
             ind_U = [a.a_]
@@ -90,8 +85,21 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
         Us.append(up_b)
         Ls.append(low_b)
 
-    return _solver.rng_.choice(ind_L), _solver.rng_.choice(ind_U), L_min, U_max, Ls, Us 
+    return L_min, U_max
 
+def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
+    bestAction = None
+    bestValue = -np.inf
+    for a in _s.a_:
+        for s in a.s_prime_i_:
+            s_p = _solver.graph_[_solver.gi_[s]]
+            V = a.r_ + _solver.gamma_*s_p.U_
+            if V > bestValue:
+                bestAction = a
+                bestValue = V
+        if bestAction == None:
+            bestAction = a
+    return bestAction.a_
 
 #assume that when initialized it gets alpha, but the
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
