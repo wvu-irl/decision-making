@@ -21,10 +21,10 @@ if True:
 else:
     fp = None
     
-alpha = 0
-timeout = 10
-p = 0.1
-test_type = 2
+alpha = 1
+timeout = 2
+p = 0
+test_type = 1
 D = 100
 # env = gym.make("GridWorld")
 if test_type == 0:
@@ -59,13 +59,13 @@ r=0
 d = False
 while(not d):
     
-    a = aogs.search(s, _D = D, _timeout=timeout, _reinit=True)
+    a = aogs.search(s, _D = D, _num_samples = 5000, _timeout=timeout, _reinit=False)
     print("act " + str(a))
     # print("ss ",s)
     env.reset(s)
     s, r,d,info = env.step(a)
     # print("ss ",s)
-    env.render(fp)
+    env.render()
     print(r)
 
 #env.render("/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/avi/fig")

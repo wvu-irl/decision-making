@@ -91,7 +91,7 @@ def get_confidence(epsilon,t):
 def get_accuracy(_delta,_t, a):
     change = inf
     epsilon = 0
-    while np.fabs(change) > 0.005:
+    while np.fabs(change) > 0.05:
         e = -math.log(1/ (2/3*(1-_delta+1/2) ) - 1)
         e /= (_t*(math.log(1/ (2/3*(1-epsilon) ) + 1/2))**2)
         #e = 1-e
@@ -122,7 +122,7 @@ def bin_dist(_dist, _n = MAX_NUMEL-1):
     for i in range(l_dist):
         mass[i] = _dist[i][0]
         val[i] = _dist[i][1]
-    
+    # print(mass)
     if len(_dist) < _n:
         return mass, val
     else:
@@ -187,6 +187,8 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         # print(invA[len(mass)-2])
         # print(pl_minus_bel)
         # print(len(mass)-2)
+        # print(len(mass))
+        # print(len(invA))
         mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 
         # print(" <0 ", mass < 0)
         #print(mass)

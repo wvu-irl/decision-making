@@ -111,6 +111,7 @@ class Sailing(gym.Env):
         if _state == None:
             self.agent_ = [np.floor(self.dim_[0]/2), np.floor(self.dim_[1]/2), 0] 
             self.wind_ = self.wind_init_
+            # print("um")
         else:
             self.agent_ = [_state[0], _state[1], _state[2]]
             self.wind_ = np.reshape(_state[3:len(_state)], [self.dim_[0], self.dim_[1]])
@@ -226,7 +227,7 @@ class Sailing(gym.Env):
         # print(self.wind_)
         return self.get_observation(), r, done, []
         
-    def get_actions(self, _agent):
+    def get_actions(self, _agent=None):
 
         return [-1, 0, 1]
     

@@ -24,7 +24,7 @@ class UCT():
     Perform Upper Confidence Tree Search 
     Description: User specifies problem and UCT solves for the policy
     """
-    def __init__(self, _env_sim : gym.Env,actions : int ,_action_selection_select : act.action_selection, _action_selection_rollout: act.action_selection, _N : int = 10000, _c : float = 0.5, _n_rollout : int = 10, _bounds = [0,1]):
+    def __init__(self, _env_sim : gym.Env,actions : int ,_action_selection_select : act.action_selection, _action_selection_rollout: act.action_selection, _N : int = 10000, _c : float = 0.5, _n_rollout : int = 15, _bounds = [0,1]):
         """
          Constructor, initializes BMF-AST
          Args:
@@ -61,12 +61,14 @@ class UCT():
         self.tree_ : list[State] = [State([],self.actions_,None,0) for i in range (self.N_)]
         self.n_vertices_ : int  = 1
 
-    def learn(self, s_ , budget : int = 5000,gamma = .9):
+    def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
+        self.m_ = 0
+        self.n_samples_ = _num_samples
         self.gamma_ = gamma
         for i in range(budget):
-            if i >= self.N_-1:
+            if i >= self.N_-1 or self.m_ >= self.n_samples_:
                 break
-            self.env_sim_.reset(_state = s_, seed = self.seed) #_state = s_
+            self.env_sim_.reset(_state = s_)#, seed = self.seed) #_state = s_
             nodeTrajectory = self.search(0,gamma)
             nodeTrajectory[0] = "Iteration" + " " + i.__str__() + ": " + nodeTrajectory[0].__str__()
             # print(*nodeTrajectory, sep = " -> ")
@@ -75,13 +77,14 @@ class UCT():
             Qn = 0
             for r,s,n in  zip(a.r_, a.s_prime_i_,a.n_):
                 Qn += (r + self.gamma_*self.tree_[s].V_)*n 
-            Qn /= a.N_
+            if a.N_ != 0:
+               Qn /= a.N_
             if Qn > Q:
                 Q = Qn
                 bestAction = a
-            print("Q:", Qn, "R:", a.r_, "N:", a.N_, "n:", a.n_, "s':", a.s_prime_, "action:", a.a_)#, "V:",self.tree_[s].V_, "action:", a.a_)#, "State", s)
-            for sp in a.s_prime_i_:
-                print ("V:", self.tree_[sp].V_, self.tree_[sp].V_/self.tree_[sp].N_)
+            # print("Q:", Qn, "R:", a.r_, "N:", a.N_, "n:", a.n_, "s':", a.s_prime_, "action:", a.a_)#, "V:",self.tree_[s].V_, "action:", a.a_)#, "State", s)
+            # for sp in a.s_prime_i_:
+            #     print ("V:", self.tree_[sp].V_, self.tree_[sp].V_/self.tree_[sp].N_)
         #bestAction = self.as_s_.return_action(self.tree_[0],[],self)
 
         return bestAction.a_
@@ -136,7 +139,7 @@ class UCT():
         nextNode = baseNode
         treePrintList = []
         done = False
-        while not(self.tree_[nextNode].is_terminal_) and not(done):
+        while not(self.tree_[nextNode].is_terminal_) and not(done) and self.m_ < self.n_samples_:
            nextNode,done = self.treeStep(nextNode)
            treePrintList.append(nextNode)
         if not(self.tree_[nextNode].is_terminal_):
@@ -182,8 +185,9 @@ class UCT():
             a = self.as_r_.return_action(_s,_param)
             s,r,done = self.simulate(a)                
             reward += (gamma**i)*r
-            if done:
+            if done or self.m_ >= self.n_samples_:
                 reward += r/(1-gamma)
+                break
         return reward
 
     def backpropagate(self, _v_i, _val):

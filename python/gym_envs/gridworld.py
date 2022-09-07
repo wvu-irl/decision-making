@@ -137,7 +137,7 @@ class GridWorld(gym.Env):
     def get_reward(self, _s):
         d = self.get_distance(_s, self.goal_)
         if d >= 5:
-            return 0
+            return -0.01
         else:
             return 1 - (d**2)/25
     
@@ -168,7 +168,7 @@ class GridWorld(gym.Env):
             done = False
         return self.agent_, r, done, []
         
-    def get_actions(self, _agent):
+    def get_actions(self, _agent=None):
         n, a = self.get_neighbors(_agent)
         return a
     

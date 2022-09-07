@@ -54,7 +54,7 @@ class AOGS():
         num = math.log( 1/ (2/3*(1-_perf[1]+1/2) ) - 1)
         den = math.log( 1/ (2/3*(1-_perf[0]) ) + 1/2)**2
         t = -num/(_perf[0]*den)
-        print("t", t)
+        # print("t", t)
         return t
     ############## COME BACK ##############################
     def reinit(self, _state = None, _action = None, _s_prime = None):
@@ -75,7 +75,7 @@ class AOGS():
         self.value_gap_ = 1
     ######################################################
               
-    def search(self, _s : State, _D :int = 100, _timeout = 10, _reinit = False):
+    def search(self, _s : State, _num_samples = 5e3, _D :int = 100, _timeout = 1000, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -86,6 +86,7 @@ class AOGS():
         Returns:
 
         """
+        self.m_ = 0
         if _reinit:
             self.reinit()
         start_time = time.perf_counter()
@@ -100,8 +101,8 @@ class AOGS():
             
             self.U_.append(_str_s) 
             self.n_ += 1
-        
-        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_):# and self.m_ < 5460:
+        self.is_not_converged_ = True
+        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_) and self.m_ < _num_samples and self.is_not_converged_:
             # print(len(self.U_))
             # print("------------")
             # for i in range(len(self.gi_)):
@@ -123,8 +124,8 @@ class AOGS():
             # print("n " + str(self.n_) + ", d " + str(d) )
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
-            
-            while not is_leaf and not is_terminal and d < _D:
+            self.is_not_converged_ = False
+            while not is_leaf and not is_terminal and d < _D and self.m_ < _num_samples:
                 
                 # print("n " + str(self.n_) + ", d " + str(d) )
                 # print("s ", s)
@@ -192,13 +193,13 @@ class AOGS():
              
             self.backpropagate(list(set(parents)))
     
-        print("n " + str(self.n_))
+        # print("n " + str(self.n_))
         a, e_max, L, U, diffs, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[],self)
-        print("emax ", e_max)
-        print(exps)
-        print("gap", U-L)
-        print("m ", self.m_)
-        print("Usize", len(self.U_))
+        # print("emax ", e_max)
+        # print(exps)
+        # print("gap", U-L)
+        # print("m ", self.m_)
+        # print("Usize", len(self.U_))
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
                
     def simulate(self, _s, _a, _do_reset):
@@ -222,16 +223,19 @@ class AOGS():
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
             _do_reset = False
+            self.is_not_converged_ = True
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
             done = self.graph_[self.gi_[hash(str(s_p))]].is_terminal_
             _do_reset = True
+            # self.is_converged_ = self.is_converged_ and True
         return s_p, r, done, _do_reset 
     
     def backpropagate(self, _parents):
         
-        
-        while len(_parents):
+        start_time = time.perf_counter()
+
+        while len(_parents) and (time.perf_counter()-start_time < 10):
             #print(_parents)
             s = _parents.pop(0)
             #print("lp " + str(len(_parents)))
@@ -259,6 +263,7 @@ class AOGS():
                 # print("L", L)
                 # print("U", U)
                 lmn = 0
+        _parents.clear()
 
             
         

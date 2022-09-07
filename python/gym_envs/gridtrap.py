@@ -120,9 +120,9 @@ class GridTrap(gym.Env):
             self.fig_.savefig(_fp +"%d.eps" % self.img_num_)
             self.img_num_ += 1
         plt.pause(1)
-        if _fp != None:
-            plt.savefig(_fp + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
-            self.count_im_+=1
+        # if _fp != None:
+        #     plt.savefig(_fp + "img" + str(self.count_im_) + ".png", format="png", bbox_inches="tight", pad_inches=0.05)
+        #     self.count_im_+=1
 
 
         #plt.close() 

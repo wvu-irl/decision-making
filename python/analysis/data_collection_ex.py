@@ -15,30 +15,46 @@ from gym_envs.gridworld import GridWorld
 from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
-from select_action.actions import *
+from solvers.uct import UCT
+# from solvers.mcgs import MCGS
+from select_action import actions as act
 
 ## functions
 def compute_min_time(d):
     return np.ceil(d/(2**(1/2)))
 
-## Params
+
+## Params ------------------------------------------------------------------------
+alg = 0
+max_samples = [100, 500, 1e3, 5e3, 1e4]
+n_trials = 100
+D = 50
+test_type = 2
+    
+alpha = 1
+
 if True:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
 else:
     fp = None
     
-alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
-p = [0, 0.05, 0.1, 0.15, 0.2]
-D = 100
-timeout = 10
-test_type = 2
+file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + ".npy"
+path = fp + file_name
+data = []
+# h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
+data.append(max_samples)
+r = np.zeros([n_trials,len(max_samples)])
+#[0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
+p = 0.1
+# timeout = 10
+
 # env = gym.make("GridWorld")
 if test_type == 0:
     #Env
     dim = [40,40]
     goal = [10,10]
     env = GridWorld(dim, goal, p)
-    bounds = [0,1]
+    bounds = [-0.01,1]
 elif test_type == 1:
     dim = [35,10]
     goal = [10,5]
@@ -52,159 +68,57 @@ else:
     env = Sailing(dim, goal, p)
     bounds = [-401.11, 1100.99]
 
-#env2 = GridWorld(dim, goal, p)
+s = env.get_observation()
+   
+if alg == 0:
+    act_select = act.action_selection(act.ambiguity_aware, [alpha])
+    planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
+elif alg == 1:
+    actionSelectionSelection = act.action_selection(act.UCB1,{"c":10}) 
+    actionSelectionRollout = act.action_selection(act.randomAction)
 
-prefix = "/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/"
-attempt_num = 7
-
-world_size = 10
-puddle_transition = [0.6, 0.5]
-R = [0, 1, 50]
-
-file_name = "w" + str(world_size) + "avi" + str(attempt_num) + ".csv"
-path = prefix + file_name
-data = []
-h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
-data.append(h)
-
-map = PuddleWorldGen(world_size,world_size,0)
-
-epsilon = 5e1
-gamma = 0.97
-t_max = 250
-
-rng = np.random.default_rng()
-
-num_goals = 5
-num_init = 5
-num_trials = 10
-num_box_scenarios = 5
-num_ambiguity = 6
-num_probability = 5
-max_num_boxes = 5
-max_size_boxes = 5
-
-## Initialize
-num_iter = num_goals*num_init*num_trials*num_box_scenarios*num_ambiguity*num_probability
-reward = np.zeros([num_iter,2])
-min_distance = np.zeros([num_iter,1])
-min_time = np.zeros([num_iter,1])
-distance = np.zeros([num_iter,2])
-time = np.zeros([num_iter,2])
-ambiguity = np.zeros([num_iter,1])
-probability = np.zeros([num_iter,1])
-
-prob = list(range(1,6))
-amb = list(range(6))
-
-
-seed = np.round(rng.uniform(0,9999,4))
-print(seed)
-env = AmbiguousPuddleWorld(map.get_coarsened_world(world_size,world_size), R, puddle_transition, list(seed))
-
-## Collect Data
-k = 0
-for i_goal in range(num_goals):
-    seed[2] = np.round(rng.uniform(0,9999))
-    seed[3] = np.round(rng.uniform(0,9999))
-    for i_box in range(num_box_scenarios):
-        num_boxes = int(np.ceil(rng.uniform(0,max_num_boxes)))
-        map = PuddleWorldGen(world_size,world_size,0)
-        for j in range(num_boxes):
-            box_x = int(np.floor(rng.uniform(0,max_size_boxes)))
-            box_y = int(np.floor(rng.uniform(0,max_size_boxes)))
-            ag_x = int(np.floor(rng.uniform(0,world_size-box_x-2)))
-            ag_y = int(np.floor(rng.uniform(0,world_size-box_y-2)))
-            map.add_rectangle_puddle(ag_x, ag_y, box_x, box_y )
+    planner = UCT(env,env.get_actions(s),actionSelectionSelection,actionSelectionRollout)
+    planner.render_ = True
+    planner.seed = 5
+else:
+    pass # GBOP
+    
+## Testing --------------------------------------------------
+for i in range(len(max_samples)):
+    
+    for j in range(n_trials):
+        env.reset()
+        s = env.get_observation()
+        done = False
+        d = 0
+        while not done and d < D:
+            print("alg", alg, "test", test_type, "samples ", max_samples[i], "trial", j, "depth", d)
             
-        for p in prob:
-            for a in amb:
-                puddle_transition = [p/5,a/5]
+            if alg == 0:
+                if planner.N_ > 5e4 or test_type == 2:
+                    do_reinit = True
+                else:
+                    do_reinit = False
+                a = planner.search(s, _D = D, _num_samples = max_samples[i], _reinit = do_reinit)#, _timeout=timeout, _reinit=True)
+            elif alg == 1:
+                planner.reinit(s)
+                a = planner.learn(s, _num_samples = max_samples[i])
+            else:
+                pass
             
-                env = AmbiguousPuddleWorld(map.get_coarsened_world(world_size,world_size), R, puddle_transition, list(seed))
-                opt = Bellman(env)
-                dst_opt = PignisticBellman(env)
-                #env.render()
-                vi = VI(opt, epsilon, gamma)
-                vi.solve()
-                dst_vi = VI(dst_opt, epsilon, gamma)
-                dst_vi.solve()
-        
-                for i_init in range(num_init):
-                    d = 0
-                    while d < 2500:
-                        seed[0] = np.round(rng.uniform(0,9999))
-                        seed[1] = np.round(rng.uniform(0,9999))
-                        d = get_distance([seed[0],seed[1]], [seed[2], seed[3]])
+            env.reset(s)
+            s, reward ,done ,info = env.step(a)
+            print(s[0:3], reward)
             
-                    for i_trial in range(num_trials):
-                        print("Goal ", i_goal, " | Box ", i_box, " | P ", p, " | A ", a, " | Init ", i_init, " | Trial ", i_trial)
-                        env.sample_T()
-                        
-                        env.reinit(map,list(seed))
-                        
-                        ag, goal = env.get_observation()
-                        min_distance[k][0] = get_distance(ag, goal)
-                        print(ag, goal, min_distance[k][0])
-                        min_time[k][0] = compute_min_time(min_distance[k][0])
-                        ambiguity[k][0] = a
-                        probability[k][0] = p
-                        
-                        print("vi")
-                        env.reinit(map,list(seed))
-                        t = 0
-                        r = 0
-                        d = 0
-                        ag, g_temp = env.get_observation()
-                        ag_prev = ag
-                        while r != R[2] and t < 250:
-                            
-                            
-                            act = vi.get_policy(ag)
-                            #print(ag, act)
-                            env.step(act)
-                            # print("--------------")
-                            # print(ag,goal)
-                            ag, g_temp = env.get_observation()
-                            r = env.get_reward()
-                            reward[k][0] += r
-                            t += 1
-                            d += get_distance(ag, ag_prev)
-                            # print(d)
-                            # print("--------------")
-                            # env.render()
-                            ag_prev = ag
-                            
-                        distance[k][0] = d
-                        time[k][0] = t
-                        
-                        print("avi")
-                        env.reinit(map,list(seed))
-                        t = 0
-                        r = 0
-                        d = 0
-                        ag, g_temp = env.get_observation()
-                        ag_prev = ag
-                        while r != R[2] and t < 250:
-                            act = dst_vi.get_policy(ag)
-                            #print(ag, act)
-                            env.step(act)
-                            r = env.get_reward()
-                            ag, g_temp = env.get_observation()
-                            reward[k][1] += r
-                            t += 1
-                            d += get_distance(ag, ag_prev)
-                            #env.render()
-                            ag_prev = ag
-                            
-                        distance[k][1] = d
-                        time[k][1] = t
-                        
-                        data.append([reward[k][0], reward[k][1], min_distance[k][0], min_time[k][0], distance[k][0], distance[k][1], time[k][0],  time[k][1], ambiguity[k][0]/5, probability[k][0]/5])
-  
-                        k += 1
-                        with open(path, "w", newline="") as f:
-                            writer = csv.writer(f)
-                            writer.writerows(data)
+            r[j][i] += reward
+            if done:
+                reward += (D-d)*reward
+            d+=1
+        with open(path, 'wb') as f:
+            np.save(f, r)
+            
 
+print(r)
 
+with open(path, 'wb') as f:
+    np.load(f)
