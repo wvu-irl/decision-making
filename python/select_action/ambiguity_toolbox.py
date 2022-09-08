@@ -141,8 +141,10 @@ def bin_dist(_dist, _n = MAX_NUMEL-1):
                 tval[ind] /= tmass[ind]  
             return tmass, tval   
         else:
-            
-            return mass, val                
+            tval = 0
+            for m,v in zip(mass,val):
+                tval+= m*v
+            return [sum(mass)], [tval]
         
 
 def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
@@ -161,6 +163,14 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         epsilon = get_accuracy(_delta,_t, 0.05)
         
         mass, val = bin_dist(_dist)
+        
+        if len(mass) == 1:
+            c = get_confidence(_e,_t)
+            dist = []
+            dist.append((c, _dist[0][1]))
+            dist.append((1-c, {_l, _u}))
+            # print(c, _t)
+            return dist
         
         mass /= np.sum(mass)
         # print(mass)
@@ -187,6 +197,7 @@ def generate_bf_conf(_dist, _delta, _t, _l, _u, _e):
         # print(invA[len(mass)-2])
         # print(pl_minus_bel)
         # print(len(mass)-2)
+        # print(mass)
         # print(len(mass))
         # print(len(invA))
         mass = (1-_delta)*np.matmul(invA[len(mass)-2],pl_minus_bel) 

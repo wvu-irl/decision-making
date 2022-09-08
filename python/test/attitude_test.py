@@ -30,7 +30,7 @@ def get_distance( s1, s2):
 alg = 0
 #max_samples = [100, 500, 1e3, 5e3, 1e4]
 dims = [30, 35, 40, 45, 50]
-n_trials = 100
+n_trials = 200
 maxD = 100
 test_type = 1
 p = 0

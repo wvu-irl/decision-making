@@ -27,9 +27,10 @@ def compute_min_time(d):
 ## Params ------------------------------------------------------------------------
 alg = 0
 max_samples = [100, 500, 1e3, 5e3, 1e4]
-n_trials = 100
+n_trials = 200
 D = 50
 test_type = 2
+ds = 0
     
 alpha = 1
 
@@ -38,7 +39,7 @@ if True:
 else:
     fp = None
     
-file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + ".npy"
+file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + ".npy"
 path = fp + file_name
 data = []
 # h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
@@ -92,7 +93,7 @@ for i in range(len(max_samples)):
         done = False
         d = 0
         while not done and d < D:
-            print("alg", alg, "test", test_type, "samples ", max_samples[i], "trial", j, "depth", d)
+            print("alg", alg, "test", test_type, "samples ", max_samples[i], "alpha", alpha, "trial", j, "depth", d)
             
             if alg == 0:
                 if planner.N_ > 5e4 or test_type == 2:
@@ -120,5 +121,5 @@ for i in range(len(max_samples)):
 
 print(r)
 
-with open(path, 'wb') as f:
-    np.load(f)
+# with open(path, 'rb') as f:
+#     np.load(f)
