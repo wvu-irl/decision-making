@@ -102,5 +102,5 @@ for i in range(len(dims)):
 
 print(r)
 
-with open(path, 'wb') as f:
+with open(path, 'rb') as f:
     np.load(f)

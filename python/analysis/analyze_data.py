@@ -1,94 +1,51 @@
-import numpy as np
 import sys
+import os
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 import csv
-print(csv.__file__)
+
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-from matplotlib import cm
+import random
 
-matplotlib.rcParams['pdf.fonttype'] = 42
-matplotlib.rcParams['ps.fonttype'] = 42
-#matplotlib.rcParams['text.usetex'] = True
-# Initialize --------------------------
-# User specified -------
-world_size = 10
-num = 7
-n_trials = 25
-p = [0.2, 0.4, 0.6, 0.8, 1]
-amb = [0, 0.2, 0.4, 0.6, 0.8, 1]
-# Auto populated -------
-prefix = "/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/"
+import gym
 
-raw_data = []
+from gym_envs.gridworld import GridWorld
+from gym_envs.gridtrap import GridTrap
+from gym_envs.sailing import Sailing
+from solvers.aogs import AOGS
+from solvers.uct import UCT
+# from solvers.mcgs import MCGS
+from select_action import actions as act
 
-#store 
-t_vi = []
-t_avi = []
-t_min = []
-d_vi = []
-d_avi = []
-d_min = []
-r_vi = []
-r_avi = []
+## functions
+def compute_min_time(d):
+    return np.ceil(d/(2**(1/2)))
 
-# Separate data -----------------------
-for i in range(num):
-    file_name = "/w" + str(world_size) + "avi" + str(i+1) + ".csv"
-    path = prefix + file_name
-    with open(path, "r", newline="") as f:
-        
-        _csv = csv.reader(f, delimiter=',')
-        for row in _csv:
-            if row[0] != 'r_vi':
-                raw_data.append(row)
-                
-for i in range(len(p)):
-    t_vi_row = []
-    t_avi_row = []
-    t_min_row = []
-    d_vi_row = []
-    d_avi_row = []
-    d_min_row = []
-    r_vi_row = []
-    r_avi_row = []
-    for j in range(len(amb)):
-        t_vi_data = []
-        t_avi_data = []
-        t_min_data = []
-        d_vi_data = []
-        d_avi_data = []
-        d_min_data = []
-        r_vi_data = []
-        r_avi_data = []
-        for row in raw_data:
-            #print(row[9], p[i],row[8],amb[j], float(row[9]) == p[i] and float(row[8]) == amb[j])
-            if float(row[9]) == p[i] and float(row[8]) == amb[j]:
-                r_vi_data.append(float(row[0]))
-                r_avi_data.append(float(row[1]))
-                d_min_data.append(float(row[2]))
-                t_min_data.append(float(row[3]))
-                d_vi_data.append(float(row[4]))
-                d_avi_data.append(float(row[5]))
-                t_vi_data.append(float(row[6]))
-                t_avi_data.append(float(row[7]))
-        t_vi_row.append(t_vi_data)
-        t_avi_row.append(t_avi_data)
-        t_min_row.append(t_min_data)
-        d_vi_row.append(d_vi_data)
-        d_avi_row.append(d_avi_data)
-        d_min_row.append(d_min_data)
-        r_vi_row.append(r_vi_data)
-        r_avi_row.append(r_avi_data)
-    t_vi.append(t_vi_row)
-    t_avi.append(t_avi_row)
-    t_min.append(t_min_row)
-    d_vi.append(d_vi_row)
-    d_avi.append(d_avi_row)
-    d_min.append(d_min_row)
-    r_vi.append(r_vi_row)
-    r_avi.append(r_avi_row)
-                
+
+## Params ------------------------------------------------------------------------
+alg = 0
+max_samples = [5e3]#[100, 500, 1e3, 5e3, 1e4]
+n_trials = 18
+D = 50
+test_type = 0
+ds = 0
+    
+alpha = 1
+
+if True:
+    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
+else:
+    fp = None
+    
+file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + "last18_5k.npy"
+path = fp + file_name
+data = []
+
+
+with open(path, 'rb') as f:
+    data = np.load(f)
 
 t_vi_avg = np.zeros([len(p),len(amb)])
 t_avi_avg = np.zeros([len(p),len(amb)])

@@ -26,10 +26,10 @@ def compute_min_time(d):
 
 ## Params ------------------------------------------------------------------------
 alg = 0
-max_samples = [100, 500, 1e3, 5e3, 1e4]
-n_trials = 200
+max_samples = [5e3]#[100, 500, 1e3, 5e3, 1e4]
+n_trials = 18
 D = 50
-test_type = 2
+test_type = 0
 ds = 0
     
 alpha = 1
@@ -39,7 +39,7 @@ if True:
 else:
     fp = None
     
-file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + ".npy"
+file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + "last18_5k.npy"
 path = fp + file_name
 data = []
 # h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
