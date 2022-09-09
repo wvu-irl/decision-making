@@ -16,15 +16,15 @@ from solvers.aogs import AOGS
 from select_action.actions import *
 
 ## Params
-if True:
+if False:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/sailing_test/"
 else:
     fp = None
     
-alpha = 1
+alpha = 0
 timeout = 2
 p = 0
-test_type = 1
+test_type = 0
 D = 100
 # env = gym.make("GridWorld")
 if test_type == 0:
@@ -57,7 +57,10 @@ aogs = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
 env.render()
 r=0
 d = False
-while(not d):
+max_count = 50
+cnt = 0
+rew = 0
+while(not d and cnt < max_count):
     
     a = aogs.search(s, _D = D, _num_samples = 5000, _timeout=timeout, _reinit=False)
     print("act " + str(a))
@@ -66,8 +69,12 @@ while(not d):
     s, r,d,info = env.step(a)
     # print("ss ",s)
     env.render()
-    print(r)
-
+    #print(r)
+    rew += r
+    cnt+=1
+if cnt < max_count:
+    rew += r*(max_count-cnt)
+    print(rew)
 #env.render("/home/jared/pomdp_ws/src/ambiguity-value-iteration/data/avi/fig")
 
 # print("standard")

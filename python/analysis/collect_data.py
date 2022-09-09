@@ -26,13 +26,13 @@ def compute_min_time(d):
 
 ## Params ------------------------------------------------------------------------
 alg = 0
-max_samples = [5e3]#[100, 500, 1e3, 5e3, 1e4]
-n_trials = 18
+max_samples = [1e3]#[100, 500, 1e3, 5e3, 1e4]
+n_trials = 1
 D = 50
 test_type = 0
 ds = 0
     
-alpha = 1
+alpha = 0
 
 if True:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
@@ -113,8 +113,10 @@ for i in range(len(max_samples)):
             
             r[j][i] += reward
             if done:
-                reward += (D-d)*reward
+                print(D-d)
+                r[j][i] += (D-d)*reward
             d+=1
+        print(r[j][i])
         with open(path, 'wb') as f:
             np.save(f, r)
             
