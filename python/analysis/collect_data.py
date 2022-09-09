@@ -26,8 +26,8 @@ def compute_min_time(d):
 
 ## Params ------------------------------------------------------------------------
 alg = 0
-max_samples = [1e3]#[100, 500, 1e3, 5e3, 1e4]
-n_trials = 1
+max_samples = [100, 500, 1e3, 5e3, 1e4]
+n_trials = 200
 D = 50
 test_type = 0
 ds = 0
@@ -39,14 +39,14 @@ if True:
 else:
     fp = None
     
-file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + "last18_5k.npy"
+file_name = "alg" + str(alg) + "_test" + str(test_type) + "_alpha" + str(alpha) + "_ds_" + str(ds) + ".npy"
 path = fp + file_name
 data = []
 # h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
 data.append(max_samples)
 r = np.zeros([n_trials,len(max_samples)])
 #[0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
-p = 0.1
+p = 0.2
 # timeout = 10
 
 # env = gym.make("GridWorld")
@@ -93,7 +93,7 @@ for i in range(len(max_samples)):
         done = False
         d = 0
         while not done and d < D:
-            print("alg", alg, "test", test_type, "samples ", max_samples[i], "alpha", alpha, "trial", j, "depth", d)
+            print("alg", alg, "test", test_type, "samples ", max_samples[i], "alpha", alpha, "trial", j, "depth", d, "ds", ds)
             
             if alg == 0:
                 if planner.N_ > 5e4 or test_type == 2:
@@ -113,7 +113,7 @@ for i in range(len(max_samples)):
             
             r[j][i] += reward
             if done:
-                print(D-d)
+                # print(D-d)
                 r[j][i] += (D-d)*reward
             d+=1
         print(r[j][i])
