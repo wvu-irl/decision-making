@@ -25,12 +25,12 @@ def compute_min_time(d):
 
 
 ## Params ------------------------------------------------------------------------
-alg = 0
-max_samples = [100, 500, 1e3, 5e3, 1e4]
+alg = 1
+max_samples = [1e4]#[100, 500, 1e3, 5e3]#, 1e4]
 n_trials = 200
-D = 50
-test_type = 0
-ds = 0
+D = 75
+test_type = 2
+ds = 1
     
 alpha = 0
 
