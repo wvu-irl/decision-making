@@ -65,6 +65,10 @@ for i in range(len(dims)):
 
 with open(path, 'rb') as f:
     steps, mind, maxd = np.load(f)
+    
+steps+=1
+
+
 # print(steps)
 # print("---------------")
 # print(mind)
@@ -100,7 +104,9 @@ for i in range(a_size[1]):
       
 # print(mind)  
 # print(mind_avg)
-
+print(steps_avg)
+print(mind_avg)
+print(maxd_avg)
 ## PRINT --------------------------------------------------------
 
 #fig, ax = plt.subplots(1,2,sharey='row',figsize=(7.5, 3.75 ))
@@ -127,7 +133,8 @@ plt.ylabel("alpha")
 plt.xlabel("distance")
 plt.title("Steps")
 # plt.axis('scaled')
-plt.colorbar()
+cb = plt.colorbar()
+
 # ax.plot(max_samples, steps_avg)
 # ax.plot(max_samples, mind_avg)
 # ax.plot(max_samples, maxd_avg)
@@ -147,7 +154,7 @@ plt.colorbar()
 
 plt.savefig(fp + "figs/steps.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(fp + "figs/steps.png", format="png", bbox_inches="tight", pad_inches=0.05)
-# cb.remove()
+cb.remove()
 
 
 fig, ax = plt.subplots()
@@ -159,11 +166,11 @@ plt.ylabel("alpha")
 plt.xlabel("distance")
 plt.title("MinD")
 # plt.axis('scaled')
-plt.colorbar()
+cb = plt.colorbar()
 
 plt.savefig(fp + "figs/mind.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(fp + "figs/mind.png", format="png", bbox_inches="tight", pad_inches=0.05)
-
+cb.remove()
 
 fig = plt.contourf(ddim,aalpha, maxd_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
 # plt.xticks(p)
@@ -173,6 +180,7 @@ plt.xlabel("distance")
 plt.title("MaxD")
 # plt.axis('scaled')
 # plt.colorbar()
+cb = plt.colorbar()
 
 plt.savefig(fp + "figs/maxd.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(fp + "figs/maxd.png", format="png", bbox_inches="tight", pad_inches=0.05)
