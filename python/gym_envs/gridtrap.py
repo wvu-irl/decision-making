@@ -59,6 +59,8 @@ class GridTrap(gym.Env):
         self.p_ = _p
         self.goal_ = _goal
         self.reset()
+        self.trap_ = [self.agent_[0] + 2, self.agent_[1]]
+
         for i in range(self.dim_[0]):
             for j in range(self.dim_[1]):
                 self.map_[i][j] = self.get_reward([i,j])
@@ -70,6 +72,7 @@ class GridTrap(gym.Env):
         
         self.rng_ = np.random.default_rng()
         self.count_im_ = 0
+        
 
 
         
@@ -85,7 +88,7 @@ class GridTrap(gym.Env):
         else:
             self.agent_ = _state
             
-        self.trap_ = [self.agent_[0] + 2, self.agent_[1]]
+        
         
         
     
@@ -135,10 +138,16 @@ class GridTrap(gym.Env):
         return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
     
     
-    def get_reward(self, _s):
+    def get_reward(self, _s, _p = False):
         d = self.get_distance(_s, self.goal_)
+        if _p:
+            print(d)
         if d >= 5:
             d = self.get_distance(_s, self.trap_)
+            if _p:
+                print(d)
+                print(_s)
+                print(self.trap_)
             if d >= 5:
                 return 0
             else:
@@ -157,7 +166,7 @@ class GridTrap(gym.Env):
         return _action
     
     def step(self, _action):
-        self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
+        # self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
 
         # print("------")
         # print(_action)
