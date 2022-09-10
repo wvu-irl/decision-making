@@ -29,12 +29,13 @@ def get_distance( s1, s2):
 ## Params ------------------------------------------------------------------------
 alg = 0
 #max_samples = [100, 500, 1e3, 5e3, 1e4]
-dims = [30, 35, 40, 45, 50]
-n_trials = 200
+dims = [30, 35, 40, 50]
+n_trials = 50
 maxD = 100
 test_type = 1
-p = 0
-timeout = 2
+p = 0.1
+timeout = 1
+ds = 0
     
 alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
 
@@ -43,7 +44,7 @@ if True:
 else:
     fp = None
     
-file_name = "ambiguity_attitude_p" + str(p) + ".npy"
+file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + ".npy"
 path = fp + file_name
 data = []
 # h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
@@ -64,7 +65,7 @@ for i in range(len(dims)):
         env = GridTrap(dim, goal, p)
         bounds = [0,1]
         act_select = act.action_selection(act.ambiguity_aware, [alpha[j]])
-        planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
+        planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds, _gamma = 0.99)
         s = env.get_observation()
         
     
@@ -72,11 +73,12 @@ for i in range(len(dims)):
             env.reset()
             s = env.get_observation()
             done = False
+            planner.reinit()
             d = 0
             while not done and d < maxD:
                 print("dim", dims[i], "alpha", alpha[j], "trial", k, "depth", d)
             
-                if planner.N_ > 5e4 or test_type == 2:
+                if planner.n_ > 5e4 or test_type == 2:
                     do_reinit = True
                 else:
                     do_reinit = False
@@ -100,7 +102,10 @@ for i in range(len(dims)):
                 np.save(f, max_d)
             
 
-print(r)
+# print(r)
+print(n_steps)
+print(min_d)
+print(max_d)
 
 with open(path, 'rb') as f:
     np.load(f)

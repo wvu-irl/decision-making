@@ -25,14 +25,14 @@ def compute_min_time(d):
 
 
 ## Params ------------------------------------------------------------------------
-alg = 1
-max_samples = [1e4]#[100, 500, 1e3, 5e3]#, 1e4]
+alg = 0
+max_samples = [100, 500, 1e3, 5e3, 1e4]
 n_trials = 200
 D = 75
 test_type = 2
-ds = 1
+ds = 0
     
-alpha = 0
+alpha = 1
 
 if True:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
@@ -46,7 +46,7 @@ data = []
 data.append(max_samples)
 r = np.zeros([n_trials,len(max_samples)])
 #[0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
-p = 0.2
+p = 0.2 ###########################################-> P = 0.2!!!
 # timeout = 10
 
 # env = gym.make("GridWorld")
@@ -96,7 +96,7 @@ for i in range(len(max_samples)):
             print("alg", alg, "test", test_type, "samples ", max_samples[i], "alpha", alpha, "trial", j, "depth", d, "ds", ds)
             
             if alg == 0:
-                if planner.N_ > 5e4 or test_type == 2:
+                if planner.n_ > 5e4 or test_type == 2:
                     do_reinit = True
                 else:
                     do_reinit = False

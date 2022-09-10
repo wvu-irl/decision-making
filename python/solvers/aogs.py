@@ -98,8 +98,8 @@ class AOGS():
             self.gi_[_str_s] = self.n_
             # print("act ", self.env_.get_actions(_s))
             self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
-            
             self.U_.append(_str_s) 
+            
             self.n_ += 1
         self.is_not_converged_ = True
         while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and len(self.U_) and self.m_ < _num_samples and self.is_not_converged_:
@@ -115,9 +115,9 @@ class AOGS():
                 # print("yee")
             s = _s
             
-            parents = [-1]*_D
+            parents = [-1]*(_D*5+1)
             p_ind = 0
-            d = 0
+            self.d_ = 0
             do_reset = True
             is_terminal = False
             is_leaf = False
@@ -125,7 +125,7 @@ class AOGS():
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             self.is_not_converged_ = False
-            while not is_leaf and not is_terminal and d < _D and self.m_ < _num_samples:
+            while not is_leaf and not is_terminal and self.d_ < _D and self.m_ < _num_samples:
                 
                 # print("n " + str(self.n_) + ", d " + str(d) )
                 # print("s ", s)
@@ -176,7 +176,7 @@ class AOGS():
                     if str_s not in self.graph_[self.gi_[str_sp]].parent_:
                         self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
-                d += 1
+                self.d_ += 1
                 policy = self.graph_[self.gi_[str_s]].policy_
                 pol_ind = self.graph_[self.gi_[str_s]].get_action_index(policy)
                 # print(self.graph_[self.gi_[str_s]].s_)
@@ -222,12 +222,14 @@ class AOGS():
                 self.env_.reset(_s)
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
+            # self.d_+=1
             _do_reset = False
             self.is_not_converged_ = True
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
             done = self.graph_[self.gi_[hash(str(s_p))]].is_terminal_
             _do_reset = True
+            # self.d_+=0.2
             # self.is_converged_ = self.is_converged_ and True
         return s_p, r, done, _do_reset 
     
@@ -262,7 +264,7 @@ class AOGS():
                 # print("V", v)
                 # print("L", L)
                 # print("U", U)
-                lmn = 0
+                # lmn = 0
         _parents.clear()
 
             
