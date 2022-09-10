@@ -33,18 +33,18 @@ n_trials = 18
 D = 50
 test_type = 1
 ds = 0
-    
+p = 0  
 alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
 
 
 if True:
-    fp = "/home/jared/amb_ws/src/ambiguous-decision-making/python/analysis/results/"
-    # fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
+    #fp = "/home/jared/amb_ws/src/ambiguous-decision-making/python/analysis/results/"
+    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
 
 else:
     fp = None
     
-file_name = "alg" + str(0) + "_test" + str(test_type) + "_alpha" + str(0) + "_ds_" + str(0) + ".npy"
+file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + ".npy"
 path = fp + file_name
 # file_name = "alg" + str(0) + "_test" + str(test_type) + "_alpha" + str(1) + "_ds_" + str(0) + ".npy"
 # mindpt_path = fp + file_name
@@ -52,30 +52,54 @@ path = fp + file_name
 # maxd_path = fp + file_name
 # file_name = "alg" + str(0) + "_test" + str(test_type) + "_alpha" + str(0) + "_ds_" + str(0) + "final.npy"
 # stepsh = fp + file_name
-
+ddim = []
+aalpha = []
+for i in range(len(dims)):
+    aalpha.append(alpha)
+for i in range(len(dims)):
+    ddim.append(dims[i]*np.ones(len(alpha)))
+# print(ddim)
+# print(aalpha)
+# print(np.shape(ddim))
+# print(np.shape(aalpha))
 
 with open(path, 'rb') as f:
     steps, mind, maxd = np.load(f)
-
+# print(steps)
+# print("---------------")
+# print(mind)
+# print("---------------")
+# print(maxd)
+# print("---------------")
 # with open(path, 'rb') as f:
     # data = np.load(f)
+a_size = np.shape(steps)
+steps_avg = np.zeros([a_size[1],a_size[2]])
+mind_avg = np.zeros([a_size[1],a_size[2]])
+maxd_avg = np.zeros([a_size[1],a_size[2]])
 
-steps_avg = np.zeros(len(steps[0]))
-mind_avg = np.zeros(len(mind[0]))
-maxd_avg = np.zeros(len(maxd[0]))
+steps_var = np.zeros([a_size[1],a_size[2]])
+mind_var = np.zeros([a_size[1],a_size[2]])
+maxd_var = np.zeros([a_size[1],a_size[2]])
 
-steps_var = np.zeros(len(steps[0]))
-mind_var = np.zeros(len(mind[0]))
-maxd_var = np.zeros(len(maxd[0]))
-            
-for i in range(len(steps[0])):
-    steps_avg[i] = np.average(np.array(steps[i]))
-    mind_avg[i] = np.average(np.array(mind[i]))
-    maxd_avg[i] = np.average(np.array(maxd[i]))
+# print(a_size)      
+# print(a_size[1])
+# print(a_size[2])
 
-    steps_var[i] = np.var(np.array(steps[i]))
-    mind_var[i] = np.var(np.array(mind[i]))
-    maxd_var[i] = np.var(np.array(maxd[i]))
+for i in range(a_size[1]):
+    for j in range(a_size[2]):
+        # print(steps[:,i,j])
+        # print(np.shape(steps[:,i]))
+        steps_avg[i][j] = np.average(np.array(steps[:,i,j]))
+        mind_avg[i][j] = np.average(np.array(mind[:,i,j]))
+        maxd_avg[i][j] = np.average(np.array(maxd[:,i,j]))
+
+        steps_var[i][j] = np.var(np.array(steps[:,i,j]))
+        mind_var[i][j] = np.var(np.array(mind[:,i,j]))
+        maxd_var[i][j] = np.var(np.array(maxd[:,i,j]))
+      
+# print(mind)  
+# print(mind_avg)
 
 ## PRINT --------------------------------------------------------
 
@@ -95,7 +119,8 @@ else:
 
 fig, ax = plt.subplots()
 # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-fig = plt.contourf(dims,alpha, steps_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+
+fig = plt.contourf(ddim,aalpha, steps_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
 plt.ylabel("alpha")
@@ -127,20 +152,20 @@ plt.savefig(fp + "figs/steps.png", format="png", bbox_inches="tight", pad_inches
 
 fig, ax = plt.subplots()
 # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-fig = plt.contourf(dims,alpha, mind_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+fig = plt.contourf(ddim,aalpha, mind_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
 plt.ylabel("alpha")
 plt.xlabel("distance")
 plt.title("MinD")
 # plt.axis('scaled')
-# plt.colorbar()
+plt.colorbar()
 
 plt.savefig(fp + "figs/mind.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(fp + "figs/mind.png", format="png", bbox_inches="tight", pad_inches=0.05)
 
 
-fig = plt.contourf(dims,alpha, maxd_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+fig = plt.contourf(ddim,aalpha, maxd_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
 plt.ylabel("alpha")
@@ -161,7 +186,7 @@ plt.savefig(fp + "figs/maxd.png", format="png", bbox_inches="tight", pad_inches=
 # # plt.pause(10)
             
 
-print(r)
+# print(r)
 
-with open(path, 'rb') as f:
-    np.load(f)
+# with open(path, 'rb') as f:
+#     np.load(f)

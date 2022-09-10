@@ -30,7 +30,7 @@ def get_distance( s1, s2):
 alg = 0
 #max_samples = [100, 500, 1e3, 5e3, 1e4]
 dims = [30, 35, 40, 50]
-n_trials = 50
+n_trials = 25
 maxD = 100
 test_type = 1
 p = 0.1
@@ -67,7 +67,6 @@ for i in range(len(dims)):
         act_select = act.action_selection(act.ambiguity_aware, [alpha[j]])
         planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds, _gamma = 0.99)
         s = env.get_observation()
-        
     
         for k in range(n_trials):
             env.reset()
@@ -97,9 +96,7 @@ for i in range(len(dims)):
                     max_d[k][i][j] = dist
                 d+=1
             with open(path, 'wb') as f:
-                np.save(f, n_steps)
-                np.save(f, min_d)
-                np.save(f, max_d)
+                np.save(f, (n_steps, min_d, max_d))
             
 
 # print(r)

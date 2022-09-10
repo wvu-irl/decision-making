@@ -32,7 +32,7 @@ def get_distance( s1, s2):
 alg = 0
 #max_samples = [100, 500, 1e3, 5e3, 1e4]
 dims = [30, 35, 40, 50]
-n_trials = 50
+n_trials = 100
 maxD = 100
 test_type = 1
 p = 0
@@ -106,6 +106,11 @@ for i in range(len(paths)):
         y.append(el[1])
 
     plt.plot(x,y)
+labels = []
+alpha.reverse()
+for a in alpha:
+        labels.append("a = " + str(a))
+plt.legend(labels, loc='upper left')    
 plt.show()
 plt.pause(1)
 
