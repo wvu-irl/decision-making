@@ -1,5 +1,6 @@
 from cmath import nan
 from re import I
+import re
 from unicodedata import name
 import numpy as np
 import random
@@ -27,8 +28,9 @@ def boundSolver(_s , _solver, _type):
             else:
                 kl = lambda x, A : -KL_divergence_Bernoulli(reward,x) + Cr
                 dkl = lambda x, A : -dKL_divergence_Bernoulli(reward,x)
-            b_ul = [.5,1] if _type == "upper" else [0,.5]
+            b_ul = [reward,1] if _type == "upper" else [0,reward]
             ul = newtons_method(kl,dkl,bounds=b_ul)
+            # print("ul",ul)
             #print(_type,ul)
             #Solve for Sum(p*U) for state action
             Cp = beta_p(a.N_,.9,_solver.B_,totalActions,_solver.H_)/a.N_
@@ -46,8 +48,15 @@ def boundSolver(_s , _solver, _type):
             for j,q in enumerate(C):
                 p += q*B[j]
             b = ul + _solver.gamma_*p
+            # print("b",b)
+            # print("q", q)
             if b > bound:
                 bound = b
+    if bound == -np.inf:
+        if _type == "upper":
+            bound = _s.U_
+        else:
+            bound = _s.L
     return bound
 
 def beta_r(_n, _delta, _B, _K, _H):
@@ -81,13 +90,14 @@ def MaxKL(_V,_p,_c,_bounds):
         a = 0
         b = 0
         for i in _args["Z_hat"]:
+            # print("V",_v-_args["V"][i]) 
             if  _v-_args["V"][i] != 0:
-                a += _args["p"][i]*np.log(_v-_args["V"][i])
+                a += _args["p"][i]*np.log(np.abs(_v-_args["V"][i]))
                 b += _args["p"][i]/(_v-_args["V"][i])
             else:
                 return np.infty
         if b > 0: 
-            return a+np.log(b)-_args["c"]
+            return a+np.log(np.abs(b))-_args["c"]
         else: 
             return a - _args["c"]
 
@@ -113,12 +123,14 @@ def MaxKL(_V,_p,_c,_bounds):
             I_star.append(i)
 
     # Solving for r, v and some q* values
+    # v = 0
     belowBounds = False
     for i in I_star:
         if f(_V[i],A) < 0:
             belowBounds = True
             v = _V[i]
-            break
+            break    
+    # print(v)
     if belowBounds:
         r = 1 - np.exp(f(v,_V,_p,Z_hat))
         for i in I_star:
@@ -131,7 +143,6 @@ def MaxKL(_V,_p,_c,_bounds):
         for i in Z_zero:
             q[i] = 0
         v = newtons_method(f,f_prime,A,_bounds) 
-
     #Solving for q*
     for i in Z_hat:
         q_hat[i] = _p[i]/(v-_V[i])
@@ -142,14 +153,18 @@ def MaxKL(_V,_p,_c,_bounds):
     return q
 
 
-def newtons_method(func,dfunc,_args = None,bounds = [0, 1],accuracy =.001,N = 1000,divExept = .001,weight = .9):
+def newtons_method(func,dfunc,_args = None,bounds = [0, 1],accuracy =.001,N = 10,divExept = .001,weight = .9):
     xNext = (bounds[1]-bounds[0])/2
+    # print("--------------")
     for _ in range(N):
         x = xNext
+        # print(x)
         fx = func(x,_args)
         dfx = dfunc(x,_args)
         if np.isnan(dfx):
             dfx = dfunc(x+divExept,_args)
+        # print("Fx", fx)
+        # print("dfx", dfx)
         xNext = x-fx/dfx
 
         if xNext < bounds[0]:

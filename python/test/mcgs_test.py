@@ -15,8 +15,8 @@ from select_action.actions import *
 ## Params
 alpha = 0
 #Env
-dim = [15,15]
-goal = [10,10]
+dim = [25,25]
+goal = [5,5]
 p = 0
 sailing_test = False
 if not sailing_test:
@@ -40,7 +40,7 @@ mcgs = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
 
 done = False
 while(not done):
-    a = mcgs.search(s,4,4, _timeout=timeout, _reinit=True )
+    a = mcgs.search(s,4,4, _timeout=timeout, _reinit=False )
     print("act " + str(a))
     mcgs.env_.reset(s)
     s, r , done, info = env.step(a)

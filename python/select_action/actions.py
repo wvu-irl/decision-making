@@ -63,7 +63,7 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
     ind_U = 0
     Us = []
     Ls = []
-    
+
     for a in _s.a_:
         if a.N_ == 0:
             low_b = L
@@ -73,18 +73,12 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
             low_b = boundSolver(_s,_solver,"lower")
         if up_b > U_max:
             U_max = up_b
-            #ind_U = [a.a_]
         if low_b < L_min:
             L_min = low_b
-            #ind_L = [a.a_]
-        # if up_b == U_max:
-        #     ind_U.append(a.a_)
-        # if low_b == L_min:
-        #     ind_L.append(a.a_)
             
         Us.append(up_b)
         Ls.append(low_b)
-
+    # print(U_max)
     return L_min, U_max
 
 def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
@@ -96,12 +90,25 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
         V = 0
         for s in a.s_prime_:
             s_p = _solver.graph_[_solver.gi_[hash(str(s))]]
-            V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
+            if _params[0] == 1:
+                V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
+                print("U",s_p.U_)
+            else:
+                V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.L_
+                print("L",s_p.L_)
+        if len(a.s_prime_) == 0:
+            if _params[0] == 1:
+                V = _solver.bounds_[1]
+            else:
+                V = _solver.bounds_[0]
+
         if V > bestValue:
             bestAction = a
             bestValue = V
         if bestAction == None:
             bestAction = a
+    print(_s.s_)
+    print("Value:",V)
     return bestAction.a_
 
 #assume that when initialized it gets alpha, but the

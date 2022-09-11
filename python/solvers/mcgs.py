@@ -67,7 +67,7 @@ class MCGS():
         self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _B :int ,_K : int, _H :int = 5, _timeout = 10, _reinit = False):
+    def search(self, _s : State, _B :int ,_K : int, _H :int = 10, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -111,6 +111,7 @@ class MCGS():
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 
                 s_p, r, is_terminal = self.simulate(str_s,a)
+
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
                     ind = self.gi_[str_sp]
@@ -133,6 +134,7 @@ class MCGS():
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                 t += 1
                 s = s_p
+                print(t)
                 print(self.n_)
 
         a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[0],self)

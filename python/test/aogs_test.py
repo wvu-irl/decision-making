@@ -22,9 +22,9 @@ else:
     fp = None
     
 alpha = 0
-timeout = 2
+timeout = 5
 p = 0
-test_type = 0
+test_type = 2
 D = 100
 # env = gym.make("GridWorld")
 if test_type == 0:
