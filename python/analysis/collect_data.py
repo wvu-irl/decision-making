@@ -16,7 +16,7 @@ from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
 from solvers.uct import UCT
-# from solvers.mcgs import MCGS
+from solvers.mcgs import MCGS
 from select_action import actions as act
 
 ## functions
@@ -25,7 +25,7 @@ def compute_min_time(d):
 
 
 ## Params ------------------------------------------------------------------------
-alg = 0
+alg = 2
 max_samples = [100, 500, 1e3, 5e3, 1e4]
 n_trials = 200
 D = 75
@@ -82,7 +82,11 @@ elif alg == 1:
     planner.render_ = True
     planner.seed = 5
 else:
-    pass # GBOP
+    act_select_bounds = act.action_selection(act.mcgs_dm)
+    act_select_move = act.action_selection(act.mcgs_best_action)
+    # s = env.get_observation()
+    # env.render()
+    planner = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
     
 ## Testing --------------------------------------------------
 for i in range(len(max_samples)):
@@ -105,7 +109,12 @@ for i in range(len(max_samples)):
                 planner.reinit(s)
                 a = planner.learn(s, _num_samples = max_samples[i])
             else:
-                pass
+                if planner.n_ > 5e4 or test_type == 2:
+                    do_reinit = True
+                else:
+                    do_reinit = False
+                a = planner.search(s,4,4, _H = D, _num_samples = max_samples[i])#,_timeout=timeout, _reinit=False )
+
             
             env.reset(s)
             s, reward ,done ,info = env.step(a)
