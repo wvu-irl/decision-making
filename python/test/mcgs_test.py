@@ -15,9 +15,9 @@ from select_action.actions import *
 ## Params
 alpha = 0
 #Env
-dim = [30,30]
-goal = [25,10]
-p = 0.1
+dim = [15,15]
+goal = [10,10]
+p = 0
 sailing_test = False
 if not sailing_test:
     env = GridWorld(dim, goal, p)
@@ -26,6 +26,7 @@ else:
     env = Sailing(dim, goal, p)
     bounds = [-1, 5000]
 
+import numpy as np
 #env2 = GridWorld(dim, goal, p)
 timeout = 10
 
@@ -39,9 +40,9 @@ mcgs = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
 
 done = False
 while(not done):
-    a = mcgs.search(s,4,4, _timeout=timeout, _reinit=True)
+    a = mcgs.search(s,4,4, _timeout=timeout, _reinit=True )
     print("act " + str(a))
-    env.reinit(s)
+    mcgs.env_.reset(s)
     s, r , done, info = env.step(a)
     env.render()
     print(r)

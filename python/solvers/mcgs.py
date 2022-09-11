@@ -67,7 +67,7 @@ class MCGS():
         self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _B :int ,_K : int, _H :int = 100, _timeout = 10, _reinit = False):
+    def search(self, _s : State, _B :int ,_K : int, _H :int = 5, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -90,56 +90,52 @@ class MCGS():
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
             # print("act ", self.env_.get_actions(_s))
-            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s))
+            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
         
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_:
+            
             s = _s
             str_s = hash(str(s))
-            self.env_.reset()
-            
+            self.env_.reset(s)
             t = 0
-            do_reset = True
             is_terminal = False
             is_leaf = False
             
-            while not is_leaf and not is_terminal and t < _H:
+            while not is_terminal and t < _H:
                 
-
-                self.bound_outcomes(str_s)
+                str_s = hash(str(s))
+                L, U= self.bound_outcomes(str_s)
 
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
-                
-                s_p, r, is_terminal= self.simulate(s,a)
 
+                s_p, r, is_terminal = self.simulate(str_s,a)
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
                     ind = self.gi_[str_sp]
                 else:
                     ind = self.n_
-
                 ind = self.graph_[self.gi_[str_s]].add_child(a, s_p, ind,r)
+
                 if ind == self.n_:
                     
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
                         v = r/(1-self.gamma_)
+                        L = v
+                        U = v
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal)
+                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     self.n_ += 1
                 else:
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                 t += 1
                 s = s_p
-                
-        print("n " + str(self.n_))
-        a, e_max, gap, exps = self.a_s_.return_action(self.graph_[self.gi_[_str_s]],[0],self)
-        print("emax ", e_max)
-        print(exps)
-        print("gap", gap)
-        print("m ", self.m_)
+                print(self.n_)
+
+        a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[0],self)
         return a
                
     def bound_outcomes(self, _s):
@@ -159,7 +155,8 @@ class MCGS():
                             parents.append(p)
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
-    
+        return L, U 
+                
 
     def select(self,_s):
         """
@@ -183,10 +180,10 @@ class MCGS():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
-        act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_a)
-
-        s_p, r, done, info = self.env_.step(act_ind)
+ 
+        s_p, r, done, info = self.env_.step(_a)
         self.m_+=1
 
         return s_p, r, done
+
 
