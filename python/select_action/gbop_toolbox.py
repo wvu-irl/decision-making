@@ -73,14 +73,20 @@ def KL_divergence(_p, _q):
 def KL_divergence_Bernoulli(_u,_v):
     a = 0
     b =  np.infty
-    if (_u/_v) > 0:
-        a = _u*np.log(_u/_v)
-    if ((1-_u)/(1-_v)) > 0:
-        b = (1-_u)*np.log((1-_u)/(1-_v))
+    if _v > 0:
+        if (_u/_v) > 0:
+            a = _u*np.log(_u/_v)
+    
+    if 1-_v > 0:
+        if ((1-_u)/(1-_v)) > 0:
+            b = (1-_u)*np.log((1-_u)/(1-_v))
     return a + b
 
 def dKL_divergence_Bernoulli(_u,_v):
-    return  (1-_u)/(1-_v) - _u/_v
+    if _v != 0 or _v != 1: 
+        return  (1-_u)/(1-_v) - _u/_v
+    else:
+        return np.infty
 
 def MaxKL(_V,_p,_c,_bounds): 
     if np.all(_p == 0):

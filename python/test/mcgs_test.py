@@ -16,14 +16,12 @@ from select_action.actions import *
 ## Params
 alpha = 0
 #Env
-dim = [25,25]
-goal = [5,5]
 p = 0
 test_type = 1
 if test_type == 0:
     #Env
     dim = [40,40]
-    goal = [10,10]
+    goal = [15,15]
     env = GridWorld(dim, goal, p)
     bounds = [0,1]
 elif test_type == 1:
@@ -53,7 +51,7 @@ mcgs = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
 
 done = False
 while(not done):
-    a = mcgs.search(s,4,4, _timeout=timeout, _reinit=False )
+    a = mcgs.search(s,4,4, _timeout=timeout, _reinit= False ,_H = 100)
     print("act " + str(a))
     mcgs.env_.reset(s)
     s, r , done, info = env.step(a)

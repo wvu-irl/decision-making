@@ -46,6 +46,7 @@ class MCGS():
         self.a_s_m_ : action_selection = _action_selection_move
 
         self.reinit()
+        self.m_ = 0
 
         self.rng_ = np.random.default_rng()
 
@@ -67,7 +68,7 @@ class MCGS():
         self.value_gap_ = self.performance_[0]
     ######################################################
               
-    def search(self, _s : State, _B :int ,_K : int, _H :int = 10, _timeout = 10, _reinit = False):
+    def search(self, _s : State, _B :int ,_K : int, _H :int = 10, _max_samples = 5e3, _timeout = 10, _reinit = False):
         """
         Conducts Graph search from root
         Args:
@@ -94,7 +95,7 @@ class MCGS():
             self.n_ += 1
         
         #N is the number of trajectories now    
-        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_:
+        while (time.perf_counter()-start_time < _timeout) and self.n_ < self.N_ and self.m_ < _max_samples:
             
             s = _s
             str_s = hash(str(s))
@@ -103,7 +104,7 @@ class MCGS():
             is_terminal = False
             is_leaf = False
             
-            while not is_terminal and t < _H:
+            while not is_terminal and t < _H and self.m_ < _max_samples:
                 
                 str_s = hash(str(s))
                 L, U= self.bound_outcomes(str_s)
@@ -142,6 +143,7 @@ class MCGS():
                
     def bound_outcomes(self, _s):
         parents = [_s]
+        t = 0
         while len(parents):
             s = parents.pop(0)
             if s != -1:
@@ -157,6 +159,10 @@ class MCGS():
                             parents.append(p)
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
+            t +=1
+            print(t)
+            if (t > 1000):
+                break
         return L, U 
                 
 

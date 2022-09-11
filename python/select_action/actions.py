@@ -107,8 +107,6 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
             bestValue = V
         if bestAction == None:
             bestAction = a
-    print(_s.s_)
-    print("Value:",V)
     return bestAction.a_
 
 #assume that when initialized it gets alpha, but the

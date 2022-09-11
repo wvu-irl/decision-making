@@ -100,7 +100,7 @@ for i in range(len(max_samples)):
             print("alg", alg, "test", test_type, "samples ", max_samples[i], "alpha", alpha, "trial", j, "depth", d, "ds", ds)
             
             if alg == 0:
-                if planner.n_ > 5e4 or test_type == 2:
+                if planner.n_ > 5e4:
                     do_reinit = True
                 else:
                     do_reinit = False
@@ -109,7 +109,7 @@ for i in range(len(max_samples)):
                 planner.reinit(s)
                 a = planner.learn(s, _num_samples = max_samples[i])
             else:
-                if planner.n_ > 5e4 or test_type == 2:
+                if planner.n_ > 5e4:
                     do_reinit = True
                 else:
                     do_reinit = False
