@@ -25,14 +25,16 @@ def compute_min_time(d):
 
 
 ## Params ------------------------------------------------------------------------
-alg = 2
-max_samples = [100, 500, 1e3, 5e3, 1e4]
-n_trials = 200
-D = 75
+alg = 0
+max_samples = [1e3]#[100, 500, 1e3]#, 5e3]#[], 1e4]
+#max_samples = [5e3]
+n_trials = 50
+D = 150
 test_type = 2
-ds = 0
+ds = 37
     
-alpha = 1
+alpha = 0
+p = 0.1
 
 if True:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
@@ -46,7 +48,7 @@ data = []
 data.append(max_samples)
 r = np.zeros([n_trials,len(max_samples)])
 #[0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
-p = 0.2 ###########################################-> P = 0.2!!!
+ ###########################################-> P = 0.2!!!
 # timeout = 10
 
 # env = gym.make("GridWorld")
@@ -56,6 +58,7 @@ if test_type == 0:
     goal = [10,10]
     env = GridWorld(dim, goal, p)
     bounds = [-0.01,1]
+    n_roll = 40
 elif test_type == 1:
     dim = [35,10]
     goal = [10,5]
@@ -67,6 +70,7 @@ else:
     dim = [50,50]
     goal = [12,12]
     env = Sailing(dim, goal, p)
+    n_roll = 20
     bounds = [-401.11, 1100.99]
 
 s = env.get_observation()
@@ -78,7 +82,7 @@ elif alg == 1:
     actionSelectionSelection = act.action_selection(act.UCB1,{"c":10}) 
     actionSelectionRollout = act.action_selection(act.randomAction)
 
-    planner = UCT(env,env.get_actions(s),actionSelectionSelection,actionSelectionRollout)
+    planner = UCT(env,env.get_actions(s),actionSelectionSelection,actionSelectionRollout, _n_rollout = n_roll)
     planner.render_ = True
     planner.seed = 5
 else:
@@ -104,7 +108,7 @@ for i in range(len(max_samples)):
                     do_reinit = True
                 else:
                     do_reinit = False
-                a = planner.search(s, _D = D, _num_samples = max_samples[i], _reinit = do_reinit)#, _timeout=timeout, _reinit=True)
+                a = planner.search(s, _D = 10, _num_samples = max_samples[i], _reinit = do_reinit)#, _timeout=timeout, _reinit=True)
             elif alg == 1:
                 planner.reinit(s)
                 a = planner.learn(s, _num_samples = max_samples[i])

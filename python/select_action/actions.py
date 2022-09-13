@@ -90,12 +90,13 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
         V = 0
         for s in a.s_prime_:
             s_p = _solver.graph_[_solver.gi_[hash(str(s))]]
-            if _params[0] == 1:
-                V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
-                print("U",s_p.U_)
-            else:
-                V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.L_
-                print("L",s_p.L_)
+            # if _params[0] == 1:
+            #     V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
+            #     # print("U",s_p.U_)
+            # else:
+            V += _params[0] * (sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_)
+            V += (1-_params[0]) * (sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.L_)
+                # print("L",s_p.L_)
         if len(a.s_prime_) == 0:
             if _params[0] == 1:
                 V = _solver.bounds_[1]
@@ -188,5 +189,9 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
 
 
 def randomAction(_s : State,_const,_param,solver = None):
-    return np.random.randint(len(_s.a_))
+    a = []
+    for a_t in _s.a_:
+        a.append(a_t.a_)
+    # print(a)
+    return np.random.choice(a)
     

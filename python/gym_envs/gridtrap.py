@@ -166,7 +166,7 @@ class GridTrap(gym.Env):
         return _action
     
     def step(self, _action):
-        self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
+        # self.map_[int(self.agent_[0])][int(self.agent_[1])]+=1
 
         # print("------")
         # print(_action)

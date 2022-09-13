@@ -75,7 +75,7 @@ class Sailing(gym.Env):
         self.p_ = _p
         self.reset()
         
-        self.a_ = [list(range(7))]
+        self.a_ = [-1,0,1]
         
         self.fig_ = plt.figure()
         self.ax_ = self.fig_.add_subplot(1,1,1)

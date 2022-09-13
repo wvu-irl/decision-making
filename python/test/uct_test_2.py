@@ -9,20 +9,23 @@ sys.path.append(parent)
 from solvers.uct import UCT
 from select_action import actions as act
 from gym_envs.gridworld import GridWorld
+from gym_envs.sailing import Sailing
 
 
-
-dim = [30,30]
+dim = [40,40]
 goal = [10,10]
 p = 0.1
 # env = GridWorld(dim, goal, p)
 env_sim = GridWorld(dim, goal, p)
+# dim = [50,50]
+# goal = [15,12]
+# env_sim = Sailing(dim, goal, p)
+# bounds = [-401.11, 1100.99]
 
-
-actionSelectionSelection = act.action_selection(act.UCB1,{"c":10}) 
+actionSelectionSelection = act.action_selection(act.UCB1,{"c":0.5}) 
 actionSelectionRollout = act.action_selection(act.randomAction)
 
-solverUCT = UCT(env_sim,env_sim.a_,actionSelectionSelection,actionSelectionRollout)
+solverUCT = UCT(env_sim,env_sim.a_,actionSelectionSelection,actionSelectionRollout, _n_rollout = 50)
 solverUCT.render_ = True
 solverUCT.seed = 5
 
@@ -32,8 +35,8 @@ d = False
 while(not d):
     print("-------")
     solverUCT.reinit(s)
-    a = solverUCT.learn(s)
-    print(s)
+    a = solverUCT.learn(s, _num_samples = 500)
+    # print(s)
     print("act " + str(a))
     env_sim.reset(s)
     s, r,d,info = env_sim.step(a)

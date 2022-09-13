@@ -3,3 +3,5 @@
 *.pyc
 *.gif
 *.npy
+*.svg
+*.xcf

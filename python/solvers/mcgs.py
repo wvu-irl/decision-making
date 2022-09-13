@@ -21,7 +21,7 @@ class MCGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection_bounds, _action_selection_move, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
+    def __init__(self, _env : gym.Env, _action_selection_bounds, _action_selection_move, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95, _alpha=0): # 
 
         """
          Constructor, initializes BMF-AST
@@ -41,7 +41,7 @@ class MCGS():
         self.performance_ = _performance
         self.bounds_ = [_bounds[0]/(1-_gamma), _bounds[1]/(1-_gamma)]
         self.gamma_ = _gamma
-
+        self.alpha_ = _alpha
         self.a_s_b_ : action_selection = _action_selection_bounds
         self.a_s_m_ : action_selection = _action_selection_move
 
@@ -135,10 +135,10 @@ class MCGS():
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                 t += 1
                 s = s_p
-                print(t)
-                print(self.n_)
+                # print(t)
+                # print(self.n_)
 
-        a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[0],self)
+        a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[self.alpha_],self)
         return a
                
     def bound_outcomes(self, _s):
@@ -147,7 +147,7 @@ class MCGS():
         while len(parents):
             s = parents.pop(0)
             if s != -1:
-                L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[],self)
+                L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[self.alpha_],self)
                 
                 lprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
                 uprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
@@ -160,7 +160,7 @@ class MCGS():
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
             t +=1
-            print(t)
+            # print(t)
             if (t > 1000):
                 break
         return L, U 

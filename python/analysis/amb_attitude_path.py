@@ -38,7 +38,9 @@ test_type = 1
 p = 0
 timeout = 1
     
-alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
+# alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
+alpha = [0, 0.5, 0.75, 0.95, 1]
+
 
 if True:
     fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
@@ -99,20 +101,26 @@ t_map = (env.map_)
 plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')            
 # plt.hold(True)
 for i in range(len(paths)):
-    x = []
-    y = []
+    x = [25]
+    y = [5]
     for el in paths[len(paths)-i-1]:
         x.append(el[0])
         y.append(el[1])
 
-    plt.plot(x,y)
+    plt.plot(x,y, linewidth=3)
 labels = []
+plt.xlabel("x",fontsize='xx-large')
+plt.ylabel("y",fontsize='xx-large')
 alpha.reverse()
 for a in alpha:
         labels.append("a = " + str(a))
-plt.legend(labels, loc='upper left')    
+plt.legend(labels, loc='center left', fontsize='xx-large')    
 plt.show()
 plt.pause(1)
+
+# img_num =0
+# plt.savefig(fp +"figs/%d.png" % img_num)
+# plt.savefig(fp +"figs/%d.eps" % img_num)
 
 while 1:
     pass

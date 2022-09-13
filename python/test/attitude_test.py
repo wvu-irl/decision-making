@@ -16,7 +16,7 @@ from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
 from solvers.aogs import AOGS
 from solvers.uct import UCT
-# from solvers.mcgs import MCGS
+from solvers.mcgs import MCGS
 from select_action import actions as act
 
 ## functions
@@ -27,13 +27,13 @@ def get_distance( s1, s2):
     return np.sqrt( (s1[0]-s2[0])**2 + (s1[1]-s2[1])**2 )
 
 ## Params ------------------------------------------------------------------------
-alg = 0
+alg = 1
 #max_samples = [100, 500, 1e3, 5e3, 1e4]
-dims = [30, 35, 40, 50]
+dims = [25, 30, 35, 40, 50]
 n_trials = 25
 maxD = 100
 test_type = 1
-p = 0.1
+p = 0
 timeout = 1
 ds = 0
     
@@ -44,7 +44,7 @@ if True:
 else:
     fp = None
     
-file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + ".npy"
+file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + "mcgs.npy"
 path = fp + file_name
 data = []
 # h = ["r_vi", "r_avi", "min_distance", "min_time", "distance_vi", "distance_avi", "time_vi",  "time_avi", "ambiguity", "probability"]
@@ -64,15 +64,21 @@ for i in range(len(dims)):
         D = 10
         env = GridTrap(dim, goal, p)
         bounds = [0,1]
-        act_select = act.action_selection(act.ambiguity_aware, [alpha[j]])
-        planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds, _gamma = 0.99)
-        s = env.get_observation()
+        # act_select = act.action_selection(act.ambiguity_aware, [alpha[j]])
+        # planner = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds, _gamma = 0.99)
+        act_select_bounds = act.action_selection(act.mcgs_dm)
+        act_select_move = act.action_selection(act.mcgs_best_action)
+    # s = env.get_observation()
+    # env.render()
+        planner = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds, _alpha = alpha[j])
     
+        s = env.get_observation()
+        
         for k in range(n_trials):
             env.reset()
             s = env.get_observation()
             done = False
-            planner.reinit()
+            planner.reinit(s)
             d = 0
             while not done and d < maxD:
                 print("dim", dims[i], "alpha", alpha[j], "trial", k, "depth", d)
@@ -81,13 +87,13 @@ for i in range(len(dims)):
                     do_reinit = True
                 else:
                     do_reinit = False
-                a = planner.search(s, _D = D, _num_samples = 5000, _timeout=timeout, _reinit=do_reinit)
+                a = planner.search(s,4,4, _H = D, _max_samples = 5000, _timeout=timeout, _reinit=do_reinit)
 
             
                 env.reset(s)
                 s, reward ,done ,info = env.step(a)
                 print(s[0:3], reward)
-            
+                # env.render()
                 n_steps[k][i][j] = d
                 dist = get_distance(s,goal)
                 if dist < min_d[k][i][j]:

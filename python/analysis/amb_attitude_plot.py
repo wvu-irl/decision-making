@@ -28,14 +28,16 @@ def compute_min_time(d):
 
 ## Params ------------------------------------------------------------------------
 alg = [0,1]
-dims = [30, 35, 40, 50]
+dims = [25, 30, 35, 40, 50]
+for i in range(len(dims)):
+    dims[i] -= 20
+# dims = dims - 20
 n_trials = 18
 D = 50
 test_type = 1
 ds = 0
-p = 0  
+p = 0
 alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
-
 
 if True:
     #fp = "/home/jared/amb_ws/src/ambiguous-decision-making/python/analysis/results/"
@@ -46,6 +48,8 @@ else:
     
 file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + ".npy"
 path = fp + file_name
+file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds+1) + ".npy"
+path2 = fp + file_name
 # file_name = "alg" + str(0) + "_test" + str(test_type) + "_alpha" + str(1) + "_ds_" + str(0) + ".npy"
 # mindpt_path = fp + file_name
 # file_name = "alg" + str(1) + "_test" + str(test_type) + "_alpha" + str(0) + "_ds_" + str(0) + ".npy"
@@ -64,10 +68,40 @@ for i in range(len(dims)):
 # print(np.shape(aalpha))
 
 with open(path, 'rb') as f:
-    steps, mind, maxd = np.load(f)
+    steps_aogs, mind, maxd = np.load(f)
+with open(path2, 'rb') as f:
+    steps2, mind2, maxd2 = np.load(f)
     
-steps+=1
+steps_aogs += 1
+steps2 += 1
+print(steps2)
+# print(steps)
+temp = steps_aogs.copy()
+steps_aogs = np.zeros([25,5,7])
+steps_aogs[:,1:5,:] =temp
+for i in range(25):
+    steps_aogs[i,0,:] = steps2[i]
+    
+## FP ALG 1 -----------------------------------------------------------------------------
+alg = 1
+#max_samples = [100, 500, 1e3, 5e3, 1e4]
+dims = [25, 30, 35, 40, 50]
+n_trials = 25
+maxD = 100
+test_type = 1
+p = 0
+timeout = 1
+ds = 0
+    
+alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
 
+file_name = "ambiguity_attitude_p" + str(p) + "_ds" + str(ds) + "mcgs.npy"
+path = fp + file_name
+
+with open(path, 'rb') as f:
+    steps_mcgs, mind, maxd = np.load(f)
+    
+steps_mcgs += 1
 
 # print(steps)
 # print("---------------")
@@ -77,14 +111,16 @@ steps+=1
 # print("---------------")
 # with open(path, 'rb') as f:
     # data = np.load(f)
-a_size = np.shape(steps)
-steps_avg = np.zeros([a_size[1],a_size[2]])
-mind_avg = np.zeros([a_size[1],a_size[2]])
-maxd_avg = np.zeros([a_size[1],a_size[2]])
+a_size = np.shape(steps_aogs)
+print(a_size)
+steps_aogs_avg = np.zeros([a_size[1],a_size[2]])
+# mind_avg = np.zeros([a_size[1],a_size[2]])
+# maxd_avg = np.zeros([a_size[1],a_size[2]])
+steps_mcgs_avg = np.zeros([a_size[1],a_size[2]])
 
 steps_var = np.zeros([a_size[1],a_size[2]])
-mind_var = np.zeros([a_size[1],a_size[2]])
-maxd_var = np.zeros([a_size[1],a_size[2]])
+# mind_var = np.zeros([a_size[1],a_size[2]])
+# maxd_var = np.zeros([a_size[1],a_size[2]])
 
 # print(a_size)      
 # print(a_size[1])
@@ -94,19 +130,20 @@ for i in range(a_size[1]):
     for j in range(a_size[2]):
         # print(steps[:,i,j])
         # print(np.shape(steps[:,i]))
-        steps_avg[i][j] = np.average(np.array(steps[:,i,j]))
-        mind_avg[i][j] = np.average(np.array(mind[:,i,j]))
-        maxd_avg[i][j] = np.average(np.array(maxd[:,i,j]))
+        steps_aogs_avg[i][j] = np.average(np.array(steps_aogs[:,i,j]))
+        # mind_avg[i][j] = np.average(np.array(mind[:,i,j]))
+        # maxd_avg[i][j] = np.average(np.array(maxd[:,i,j]))
+        steps_mcgs_avg[i][j] = np.average(np.array(steps_mcgs[:,i,j]))
 
-        steps_var[i][j] = np.var(np.array(steps[:,i,j]))
-        mind_var[i][j] = np.var(np.array(mind[:,i,j]))
-        maxd_var[i][j] = np.var(np.array(maxd[:,i,j]))
+        steps_var[i][j] = np.var(np.array(steps_aogs[:,i,j]))
+        # mind_var[i][j] = np.var(np.array(mind[:,i,j]))
+        # maxd_var[i][j] = np.var(np.array(maxd[:,i,j]))
       
 # print(mind)  
 # print(mind_avg)
-print(steps_avg)
-print(mind_avg)
-print(maxd_avg)
+print(steps_aogs)
+# print(mind_avg)
+# print(maxd_avg)
 ## PRINT --------------------------------------------------------
 
 #fig, ax = plt.subplots(1,2,sharey='row',figsize=(7.5, 3.75 ))
@@ -123,17 +160,25 @@ else:
     title_name = "Sailing" 
 
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(1,2,sharey=True, gridspec_kw={'width_ratios': [2.45, 3]})
 # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
 
-fig = plt.contourf(ddim,aalpha, steps_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+ax[0].contourf(ddim,aalpha, steps_aogs_avg, levels= 20, cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
-plt.ylabel("alpha")
-plt.xlabel("distance")
-plt.title("Steps")
+ax[0].set_ylabel("alpha")
+ax[0].set_xlabel("distance")
+ax[0].title.set_text("AOGS")
 # plt.axis('scaled')
-cb = plt.colorbar()
+
+im2 = ax[1].contourf(ddim,aalpha, steps_mcgs_avg, levels= 20,cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
+# plt.xticks(p)
+# plt.yticks(amb)
+# ax[1].ylabel("alpha")
+ax[1].set_xlabel("distance")
+ax[1].title.set_text("GBOP")
+# plt.axis('scaled')
+fig.colorbar(im2)
 
 # ax.plot(max_samples, steps_avg)
 # ax.plot(max_samples, mind_avg)
@@ -154,36 +199,36 @@ cb = plt.colorbar()
 
 plt.savefig(fp + "figs/steps.eps", format="eps", bbox_inches="tight", pad_inches=0)
 plt.savefig(fp + "figs/steps.png", format="png", bbox_inches="tight", pad_inches=0.05)
-cb.remove()
+# cb.remove()
 
 
-fig, ax = plt.subplots()
-# print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-fig = plt.contourf(ddim,aalpha, mind_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
-# plt.xticks(p)
-# plt.yticks(amb)
-plt.ylabel("alpha")
-plt.xlabel("distance")
-plt.title("MinD")
-# plt.axis('scaled')
-cb = plt.colorbar()
+# fig, ax = plt.subplots()
+# # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
+# fig = plt.contourf(ddim,aalpha, mind_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+# # plt.xticks(p)
+# # plt.yticks(amb)
+# plt.ylabel("alpha")
+# plt.xlabel("distance")
+# plt.title("MinD")
+# # plt.axis('scaled')
+# cb = plt.colorbar()
 
-plt.savefig(fp + "figs/mind.eps", format="eps", bbox_inches="tight", pad_inches=0)
-plt.savefig(fp + "figs/mind.png", format="png", bbox_inches="tight", pad_inches=0.05)
-cb.remove()
+# plt.savefig(fp + "figs/mind.eps", format="eps", bbox_inches="tight", pad_inches=0)
+# plt.savefig(fp + "figs/mind.png", format="png", bbox_inches="tight", pad_inches=0.05)
+# cb.remove()
 
-fig = plt.contourf(ddim,aalpha, maxd_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
-# plt.xticks(p)
-# plt.yticks(amb)
-plt.ylabel("alpha")
-plt.xlabel("distance")
-plt.title("MaxD")
-# plt.axis('scaled')
-# plt.colorbar()
-cb = plt.colorbar()
+# fig = plt.contourf(ddim,aalpha, maxd_avg)#, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+# # plt.xticks(p)
+# # plt.yticks(amb)
+# plt.ylabel("alpha")
+# plt.xlabel("distance")
+# plt.title("MaxD")
+# # plt.axis('scaled')
+# # plt.colorbar()
+# cb = plt.colorbar()
 
-plt.savefig(fp + "figs/maxd.eps", format="eps", bbox_inches="tight", pad_inches=0)
-plt.savefig(fp + "figs/maxd.png", format="png", bbox_inches="tight", pad_inches=0.05)
+# plt.savefig(fp + "figs/maxd.eps", format="eps", bbox_inches="tight", pad_inches=0)
+# plt.savefig(fp + "figs/maxd.png", format="png", bbox_inches="tight", pad_inches=0.05)
 # # plt.legend()
 # # fig.colorbar(ax=ax[0], extend='max')
 # # plt.show()

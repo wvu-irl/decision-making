@@ -58,7 +58,7 @@ class UCT():
         self.terminalActions = [] 
     
     def reinit(self,obs):
-        self.tree_ : list[State] = [State([],self.actions_,None,0) for i in range (self.N_)]
+        self.tree_ : list[State] = [State([],self.env_sim_.get_actions(obs),None,0) for i in range (self.N_)]
         self.n_vertices_ : int  = 1
 
     def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
@@ -104,7 +104,7 @@ class UCT():
         obs,reward,done = self.simulate(action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_vertices_,reward)
         if nextNodeIndex == self.n_vertices_:
-            self.tree_[nextNodeIndex] = State(obs,self.actions_,[nodeIndex],0)
+            self.tree_[nextNodeIndex] = State(obs,self.env_sim_.get_actions(obs),[nodeIndex],0)
             self.tree_[nextNodeIndex].N_ += 1 
             self.n_vertices_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
@@ -115,6 +115,7 @@ class UCT():
     def expand(self,nodeIndex):
         # print(self.actions_)
         action = random.choice(self.tree_[nodeIndex].a_unused)
+        # print(action)
         obs,reward,done = self.simulate(action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_vertices_,reward)
         self.tree_[nextNodeIndex] = State(obs,self.actions_,[nodeIndex],0)
@@ -165,6 +166,8 @@ class UCT():
 
     def simulate(self, _a):
         state, reward, done, info = self.env_sim_.step(_a)
+        # print(_a)
+
         self.m_ += 1
         return state,reward,done
 
@@ -183,6 +186,7 @@ class UCT():
         reward = 0
         for i in range(_n):
             a = self.as_r_.return_action(_s,_param)
+            # print(a)
             s,r,done = self.simulate(a)                
             reward += (gamma**i)*r
             if done or self.m_ >= self.n_samples_:
