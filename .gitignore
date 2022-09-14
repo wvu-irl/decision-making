@@ -1,3 +1,4 @@
+build/
 *.eps
 *.png
 *.pyc
@@ -5,4 +6,3 @@
 *.npy
 *.svg
 *.xcf
-/build/
