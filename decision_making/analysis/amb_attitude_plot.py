@@ -14,8 +14,8 @@ import gym
 from gym_envs.gridworld import GridWorld
 from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
-from solvers.aogs import AOGS
-from solvers.uct import UCT
+from planners.aogs import AOGS
+from planners.uct import UCT
 # from solvers.mcgs import MCGS
 from select_action import actions as act
 

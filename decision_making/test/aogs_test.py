@@ -12,7 +12,7 @@ import gym
 from gym_envs.gridworld import GridWorld
 from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
-from solvers.aogs import AOGS
+from planners.aogs import AOGS
 from select_action.actions import *
 
 ## Params

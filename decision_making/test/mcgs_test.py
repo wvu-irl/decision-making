@@ -10,7 +10,7 @@ import random
 from gym_envs.gridworld import GridWorld
 from gym_envs.gridtrap import GridTrap
 from gym_envs.sailing import Sailing
-from solvers.mcgs import MCGS
+from planners.mcgs import MCGS
 from select_action.actions import *
 
 ## Params

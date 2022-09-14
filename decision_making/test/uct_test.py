@@ -6,7 +6,7 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from solvers.uct import UCT
+from planners.uct import UCT
 from select_action import actions as act
 from optimizers.optimization import Bellman
 
