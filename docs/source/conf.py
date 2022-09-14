@@ -14,7 +14,7 @@ release = '1.0.0'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../decision_making'))
+sys.path.insert(0, os.path.abspath('../../decision_making'))
 
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon']
