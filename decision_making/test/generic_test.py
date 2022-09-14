@@ -11,6 +11,7 @@ sys.path.append(parent)
         
     
 """
+from decision_making.gym_envs.gridworld import GridWorld
 
 ## CONFIG -------------------------------------------------
 

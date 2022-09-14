@@ -13,7 +13,6 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 from problem.state_action import State, Action
-from optimizers.optimization import Optimizer
 
 class AOGS():
     """
