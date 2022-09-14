@@ -11,9 +11,9 @@ import random
 
 import gym
 
-from gym_envs.gridworld import GridWorld
-from gym_envs.gridtrap import GridTrap
-from gym_envs.sailing import Sailing
+from envs.gridworld import GridWorld
+from envs.gridtrap import GridTrap
+from envs.sailing import Sailing
 from planners.aogs import AOGS
 from planners.uct import UCT
 # from solvers.mcgs import MCGS

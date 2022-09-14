@@ -8,8 +8,8 @@ sys.path.append(parent)
 
 from planners.uct import UCT
 from select_action import actions as act
-from gym_envs.gridworld import GridWorld
-from gym_envs.sailing import Sailing
+from envs.gridworld import GridWorld
+from envs.sailing import Sailing
 
 
 dim = [40,40]

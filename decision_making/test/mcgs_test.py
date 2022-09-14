@@ -7,9 +7,9 @@ sys.path.append(parent)
 import numpy as np
 import random
 
-from gym_envs.gridworld import GridWorld
-from gym_envs.gridtrap import GridTrap
-from gym_envs.sailing import Sailing
+from envs.gridworld import GridWorld
+from envs.gridtrap import GridTrap
+from envs.sailing import Sailing
 from planners.mcgs import MCGS
 from select_action.actions import *
 
