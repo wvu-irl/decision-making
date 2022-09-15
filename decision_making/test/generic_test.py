@@ -20,34 +20,36 @@ from envs import *
 """
 
 ## CONFIG -------------------------------------------------
-algo = sys.argv[1]
-alg_config_file = sys.argv[2]
-env_config_file = sys.argv[3]
-if len(sys.argv) >= 5:
-    num_cores = sys.argv[4]
+alg_config_file = sys.argv[1]
+env_config_file = sys.argv[2]
+if len(sys.argv) >= 4:
+    num_cores = sys.argv[3]
 else:
     num_cores = 1
-if len(sys.argv) >= 6:
-    fp = sys.argv[5]
+if len(sys.argv) >= 5:
+    fp = sys.argv[4]
 else:
     fp = None
 
-f = open(current + "../config/algorithms/" + alg_config_file +  ".json")
+f = open(current + "/../config/algorithms/" + alg_config_file +  ".json")
 alg_config = json.load(f)
-f = open(current + "../config/envs/" + env_config_file +  ".json")
+f = open(current + "/../config/envs/" + env_config_file +  ".json")
 env_config = json.load(f)   
 
 # SETUP CONFIG -------------------
 
 # ENVS
-if env_config == "grid world":
+
+if env_config_file == "gridworld":
+    env = gridworld.GridWorld(env_config["dimensions"], env_config["goal"], env_config["probability"])
+elif env_config_file == "sailing":
     pass
-elif env_config == "sailing":
-    pass
-elif env_config == "grid trap":
+elif env_config_file == "gridtrap":
     pass
 
-
+env.render()
+while 1:
+    pass
 # ALGS
 if env_config == "grid world":
     pass
