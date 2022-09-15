@@ -9,9 +9,11 @@ sys.path.append(parent)
 from multiprocessing import Pool, Lock
 
 import json 
+import gym
 
 from planners import *
-from envs import *
+# from envs import *
+
 
 """_summary_ This file is intended to run a user specified
         decision making algorithm from those available in config
@@ -39,9 +41,10 @@ env_config = json.load(f)
 # SETUP CONFIG -------------------
 
 # ENVS
-
+# gym_examples:gym_examples/GridWorld-v0
 if env_config_file == "gridworld":
-    env = gridworld.GridWorld(env_config["dimensions"], env_config["goal"], env_config["probability"])
+    env = gym.make("decision_making:env/GridWorld-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
+    # env = gridworld.GridWorld(env_config["dimensions"], env_config["goal"], env_config["probability"])
 elif env_config_file == "sailing":
     pass
 elif env_config_file == "gridtrap":

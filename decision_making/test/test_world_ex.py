@@ -7,7 +7,7 @@ sys.path.append(parent)
 import numpy as np
 import random
 
-from envs.gridworld import GridWorld
+from decision_making.envs.grid_world import GridWorld
 from envs.sailing import Sailing
 
 

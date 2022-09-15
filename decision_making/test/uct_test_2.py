@@ -8,7 +8,7 @@ sys.path.append(parent)
 
 from planners.uct import UCT
 from select_action import actions as act
-from envs.gridworld import GridWorld
+from decision_making.envs.grid_world import GridWorld
 from envs.sailing import Sailing
 
 

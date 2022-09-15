@@ -7,8 +7,8 @@ sys.path.append(parent)
 import numpy as np
 import random
 
-from envs.gridworld import GridWorld
-from envs.gridtrap import GridTrap
+from decision_making.envs.grid_world import GridWorld
+from decision_making.envs.grid_tunnel import GridTrap
 from envs.sailing import Sailing
 from planners.mcgs import MCGS
 from select_action.actions import *
