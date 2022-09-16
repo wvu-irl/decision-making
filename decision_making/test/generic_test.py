@@ -10,6 +10,7 @@ from multiprocessing import Pool, Lock
 
 import json 
 import gym
+import custom_gym
 
 from planners import *
 # from envs import *
@@ -43,23 +44,24 @@ env_config = json.load(f)
 # ENVS
 # gym_examples:gym_examples/GridWorld-v0
 if env_config_file == "gridworld":
-    env = gym.make("decision_making:env/GridWorld-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
+    env = gym.make("custom_gym/GridWorld-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
     # env = gridworld.GridWorld(env_config["dimensions"], env_config["goal"], env_config["probability"])
 elif env_config_file == "sailing":
-    pass
+    env = gym.make("custom_gym/Sailing-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
 elif env_config_file == "gridtrap":
-    pass
+    env = gym.make("custom_gym/GridTunnel-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
 
-env.render()
-while 1:
-    pass
 # ALGS
-if env_config == "grid world":
+if alg_config == "aogs":
+    planner = aogs.AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
+    #aogs = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
+
+elif alg_config == "gbop":
+    #planner = gbop.GBOP(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
     pass
-elif env_config == "sailing":
-    pass
-elif env_config == "grid trap":
-    pass
+elif alg_config == "uct":
+    #planner = uct.UCT(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
+
 
 # PRINT CONFIG -------------------
     
