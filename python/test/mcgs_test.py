@@ -16,8 +16,8 @@ from select_action.actions import *
 ## Params
 alpha = 0
 #Env
-p = 0
-test_type = 1
+p = 0.1
+test_type = 0
 if test_type == 0:
     #Env
     dim = [40,40]
@@ -39,7 +39,7 @@ else:
 
 import numpy as np
 #env2 = GridWorld(dim, goal, p)
-timeout = 2
+timeout = 3
 
 #Solver
 act_select_bounds = action_selection(mcgs_dm)
@@ -51,10 +51,9 @@ mcgs = MCGS(env, act_select_bounds,act_select_move, _bounds = bounds)
 
 done = False
 while(not done):
-    a = mcgs.search(s,4,4, _timeout=timeout, _reinit= False ,_H = 100)
+    a = mcgs.search(s,4,4, _timeout=timeout, _reinit= False  ,_H = 30)
     print("act " + str(a))
     mcgs.env_.reset(s)
     s, r , done, info = env.step(a)
     env.render()
     print(r)
-

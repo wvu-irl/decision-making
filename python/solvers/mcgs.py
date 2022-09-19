@@ -107,7 +107,7 @@ class MCGS():
             while not is_terminal and t < _H and self.m_ < _max_samples:
                 
                 str_s = hash(str(s))
-                L, U= self.bound_outcomes(str_s)
+                L, U = self.bound_outcomes(str_s)
 
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 
@@ -143,9 +143,9 @@ class MCGS():
                
     def bound_outcomes(self, _s):
         parents = [_s]
-        t = 0
         while len(parents):
             s = parents.pop(0)
+            t =0
             if s != -1:
                 L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[self.alpha_],self)
                 
@@ -159,10 +159,7 @@ class MCGS():
                             parents.append(p)
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
-            t +=1
-            # print(t)
-            if (t > 1000):
-                break
+                t += 1
         return L, U 
                 
 
