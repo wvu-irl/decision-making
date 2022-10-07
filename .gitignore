@@ -1,5 +1,6 @@
 build/
 decision_making.egg-info/
+.vscode/
 *.eps
 *.png
 *.pyc

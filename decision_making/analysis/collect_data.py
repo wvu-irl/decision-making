@@ -16,7 +16,7 @@ from decision_making.envs.grid_tunnel import GridTrap
 from envs.sailing import Sailing
 from planners.aogs import AOGS
 from planners.uct import UCT
-from planners.mcgs import MCGS
+from decision_making.planners.gbop import MCGS
 from select_action import actions as act
 
 ## functions

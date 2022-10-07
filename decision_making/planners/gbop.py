@@ -15,7 +15,7 @@ from select_action.actions import action_selection
 from problem.state_action import State, Action
 
 
-class MCGS():
+class GBOP():
     """
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
@@ -32,7 +32,7 @@ class MCGS():
          Returns:
              MCTS: MCTS object
          """
-        super(MCGS, self).__init__()
+        super(GBOP, self).__init__()
 
         self.env_ = _env
         self.bounds_ = _bounds
@@ -71,7 +71,7 @@ class MCGS():
         """
         Conducts Graph search from root
         Args:
-            self (MCGS): MCGS Object
+            self (GBOP): GBOP Object
             _s (State): State to start search from
             _h (int) : Horizon to evaluate
 
@@ -167,9 +167,9 @@ class MCGS():
 
     def select(self,_s):
         """
-        Select action to take for MCGS Simulation
+        Select action to take for GBOP Simulation
         Args:
-            self (MCGS): MCGS Object
+            self (GBOP): GBOP Object
             _s (State): Current State
         Returns:
             Action: Best Action from Current state
@@ -178,9 +178,9 @@ class MCGS():
 
     def simulate(self, _s, _a):
         """
-        Simulate the MCGS object's Enviroment
+        Simulate the GBOP object's Enviroment
         Args:
-            self (MCGS): MCGS Object
+            self (GBOP): GBOP Object
             _a (State): Action to take
         Returns:
             obs: Observation of simulation

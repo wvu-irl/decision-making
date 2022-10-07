@@ -74,13 +74,13 @@ class AOGS():
         self.value_gap_ = 1
     ######################################################
               
-    def search(self, _s : State, _num_samples = 5e3, _D :int = 100, _timeout = 1000, _reinit = False):
+    def search(self, _s : State, _num_samples = 5e3, _max_depth :int = 100, _timeout = 1000, _reinit = False):
         """
         Conducts Graph search from root
         Args:
             self (AOGS): AOGS Object
             _s (State): State to start search from
-            _D (int) : Max depth to evaluate
+            _max_depth (int) : Max depth to evaluate
 
         Returns:
 
@@ -114,7 +114,7 @@ class AOGS():
                 # print("yee")
             s = _s
             
-            parents = [-1]*(_D*5+1)
+            parents = [-1]*(_max_depth*5+1)
             p_ind = 0
             self.d_ = 0
             do_reset = True
@@ -124,7 +124,7 @@ class AOGS():
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             self.is_not_converged_ = False
-            while not is_leaf and not is_terminal and self.d_ < _D and self.m_ < _num_samples:
+            while not is_leaf and not is_terminal and self.d_ < _max_depth and self.m_ < _num_samples:
                 
                 # print("n " + str(self.n_) + ", d " + str(d) )
                 # print("s ", s)
@@ -218,7 +218,7 @@ class AOGS():
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
             if _do_reset:     
-                self.env_.reset(_s)
+                self.env_.reset_state(_s)
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
             # self.d_+=1
