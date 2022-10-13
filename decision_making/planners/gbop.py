@@ -11,7 +11,7 @@ import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-from select_action.actions import action_selection
+from select_action.action_selection import action_selection
 from problem.state_action import State, Action
 
 

@@ -8,6 +8,14 @@
     "horizon": 5,
     "max_samples": 1e3,
     "max_time": 5,
-    "reinit": true 
+    "reinit": true,
+    "action_selection" : 
+    {
+        "function": "ambiguity_aware",
+        "params": 
+        {
+            "alpha": 0
+        }
+    }
 
 }

@@ -1,4 +1,4 @@
-import actions as act
+import decision_making.select_action.action_selection as act
 import numpy as np
 
 trials : int = 10000

@@ -17,7 +17,7 @@ from envs.sailing import Sailing
 from planners.aogs import AOGS
 from planners.uct import UCT
 # from solvers.mcgs import MCGS
-from select_action import actions as act
+from decision_making.select_action import action_selection as act
 
 import matplotlib.pyplot as plt
 

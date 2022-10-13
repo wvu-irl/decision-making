@@ -36,10 +36,10 @@ class State():
 
         self.N_ = 0
 
-        if type(_state) is list:
+        if type(_state) is dict:
             self.s_ = _state
         else:
-            self.s_ = [_state]
+            self.s_ = {"x":_state}
             
         if type(_action) is list:
             self.a_ = []

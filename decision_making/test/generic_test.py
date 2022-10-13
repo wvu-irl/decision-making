@@ -12,17 +12,13 @@ import json
 import gym
 import custom_gym
 
-from planners import *
-from select_action.actions import *
-# from envs import *
-
+from planners.utils import *
 
 """_summary_ This file is intended to run a user specified
         decision making algorithm from those available in config
         
     
 """
-
 ## CONFIG -------------------------------------------------
 alg_config_file = sys.argv[1]
 env_config_file = sys.argv[2]
@@ -48,42 +44,22 @@ env_config = json.load(f)
 
 # ENVS
 # gym_examples:gym_examples/GridWorld-v0
-if env_config["env"] == "gridworld":
-    env = gym.make("custom_gym/GridWorld-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
-    # env = gridworld.GridWorld(env_config["dimensions"], env_config["goal"], env_config["probability"])
-elif env_config["env"] == "sailing":
-    env = gym.make("custom_gym/Sailing-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
-elif env_config["env"] == "gridtrap":
-    env = gym.make("custom_gym/GridTunnel-v0",env_config["dimensions"], env_config["goal"], env_config["probability"])
-
-# ALGS
-if alg_config["alg"] == "aogs":
-    act_sel = action_selection(ambiguity_aware, [alg_config["ambiguity_attitude"]])
-    planner = aogs.AOGS(env, act_sel, alg_config["max_iter"], env_config["reward_bounds"], [alg_config["epsilon"], alg_config["delta"]], alg_config["gamma"])
-    #aogs = AOGS(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
-
-elif alg_config["alg"] == "gbop":
-    #planner = gbop.GBOP(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
-    pass
-elif alg_config["alg"] == "uct":
-    #planner = uct.UCT(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
-    pass
+env = gym.make(env_config["env"],max_episode_steps = env_config["max_time"], _params=env_config["params"])
+planner = utils.get_agent(alg_config,env_config)
 
 # Simulate
+print("-----------")
 s = env.reset()
-
-ts = 0
 done = False
-while(not done and ts < max_ts):
+while(not done):
     print("-----------")
     print("state ",s)
-    a = planner.search(s, alg_config["max_samples"], alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
-    print("act " + str(a))
-    
-    env.reset_step(s)
-    s, r,done,info = env.step(a)
+    s, r,done,info = env.step(0)
+    print(done)
+    planner.search(s, alg_config["search"])#, alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
+    # print("act " + str(a))
+    #env.reset(s)
+    # s, r,done,info = env.step(a)
     env.render()
-    ts += 1
-
-print("state ",s)
+    
 

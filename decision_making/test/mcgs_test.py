@@ -11,7 +11,7 @@ from decision_making.envs.grid_world import GridWorld
 from decision_making.envs.grid_tunnel import GridTrap
 from envs.sailing import Sailing
 from decision_making.planners.gbop import MCGS
-from select_action.actions import *
+from decision_making.select_action.action_selection import *
 
 ## Params
 alpha = 0

@@ -7,7 +7,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 from planners.uct import UCT
-from select_action import actions as act
+from decision_making.select_action import action_selection as act
 from decision_making.envs.grid_world import GridWorld
 from envs.sailing import Sailing
 

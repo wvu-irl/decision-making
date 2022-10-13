@@ -19,7 +19,7 @@ class AOGS():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and AOGS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
+    def __init__(self, alg_params, env_params):# _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95): # 
 
         """
          Constructor, initializes BMF-AST

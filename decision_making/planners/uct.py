@@ -15,7 +15,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # from optimizers.optimization import Optimizer, Bellman
-from select_action import actions as act
+from select_action import action_selection as act
 from problem.state_action import State, Action
 import gym
 

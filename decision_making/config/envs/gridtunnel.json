@@ -1,0 +1,13 @@
+{
+    "env": "custom_gym/GridTunnel-v0",
+    "max_time": 100,
+    "params":
+    {
+        "agent": [25,5],
+        "dimensions": [35,10],
+        "goal": [10,10],
+        "p": 0.1,
+        "prefix": "/home/jared/ambiguity_ws/data/gridtunnel/",
+        "reward_bounds": [0,1]
+    }
+}
