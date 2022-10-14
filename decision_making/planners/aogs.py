@@ -122,7 +122,7 @@ class AOGS():
             
         self.is_not_converged_ = True
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
-            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"]+1, _params=self.env_params_["params"])
+            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
             self.env_.reset()
             # print(len(self.U_))
             # print("------------")
@@ -263,7 +263,7 @@ class AOGS():
             if _do_reset: 
                 temp_params = self.env_params_.copy()
                 temp_params["state"] = _s
-                self.env_ = gym.make(temp_params["env"],max_episode_steps = self.search_params_["horizon"], _params=temp_params["params"])
+                self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=temp_params["params"])
                 self.env_.reset()
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
