@@ -12,7 +12,7 @@
     "search" :
     {
         "max_samples": 1e3,
-        "horizon": 40,
+        "horizon": 100,
         "timeout": 5,
         "reinit": false
     },

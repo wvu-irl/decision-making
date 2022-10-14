@@ -43,7 +43,7 @@ class AOGS():
         self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
         
         self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
-        
+
         self.m_ = 0
 
         self.reinit()
@@ -122,7 +122,7 @@ class AOGS():
             
         self.is_not_converged_ = True
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
-            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"]+1, _params=self.env_params_["params"])
             self.env_.reset()
             # print(len(self.U_))
             # print("------------")
@@ -229,10 +229,11 @@ class AOGS():
         print("m ", self.m_)
         print("n", self.n_)
         print("g---")
-        for s in self.graph_:
-            # print(s.s_)
-            if "pose" in s.s_:
-                self.map_[s.s_["pose"][0]][s.s_["pose"][1]]=1
+        plt.cla()
+        # for s in self.graph_:
+        #     # print(s.s_)
+        #     if "pose" in s.s_:
+        #         self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
         print("---g")
         t_map = (self.map_)
         print("max map ", np.max(np.max(self.map_)))
@@ -258,7 +259,7 @@ class AOGS():
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
-            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+            self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = self.env_params_.copy()
                 temp_params["state"] = _s
