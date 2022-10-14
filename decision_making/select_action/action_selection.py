@@ -19,7 +19,7 @@ class action_selection():
     Selects which actions to take through a function
     Description: Class that defines which action is selected. 
     """
-    def __init__(self, _func, _const : list = []):# -> None:
+    def __init__(self, _func, _const : dict = {}):# -> None:
         """
         Constructor
         Args:
@@ -30,7 +30,7 @@ class action_selection():
             actions_selection: Action Selection Object
         """
         self.func_ : function = _func
-        self.const_ : list = _const
+        self.const_ : dict = _const
     
     def return_action(self,_s,_param = [], _solver = None):
         return self.func_(_s, self.const_,_param,_solver)
@@ -125,7 +125,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         alpha = _params[0]
         # if _params[1] == None:
         #     no_c = True
-    
+    # print(alpha)
     exp_max = -inf
     ind = _s.a_[0].a_
     gap = 0
@@ -137,7 +137,10 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             low_exp = L
             up_exp = U
         else:
-            
+            # print("--")
+            # print(a.N_)
+            # print(a.n_)
+            # print("s", _s.s_, a.a_)
             dist, t = count_2_dist(a, gamma, _solver, True)
             # dist -> distribution (a, r+gamma V)
             # t -> number of samples
@@ -146,11 +149,12 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             up_exp = upper_expectation(bf)
             # print(bf)
             # print(up_exp)
-            
+            # print("bfu", bf)
             dist, t = count_2_dist(a, gamma, _solver, False)
+            # print(dist)
             #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
             bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
-
+            # print("bfl", bf)
             low_exp = lower_expectation(bf)
             # print(low_exp)
             
@@ -185,6 +189,7 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # print(U_exp)
             # print(exp_max)
             # print(L_exp)
+    
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 

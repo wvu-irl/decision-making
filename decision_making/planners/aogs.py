@@ -43,6 +43,7 @@ class AOGS():
         self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
         
         self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
+        print(self.bounds_)
         
         self.m_ = 0
 
@@ -54,6 +55,8 @@ class AOGS():
             self.rng_ = np.random.default_rng(_alg_params["rng_seed"])
         else:
             self.rng_ = np.random.default_rng()
+            
+        self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])
 
     def num_samples(self, _perf):
         num = math.log( 1/ (2/3*(1-_perf["delta"]+1/2) ) - 1)
@@ -145,10 +148,17 @@ class AOGS():
             # right now it may not terminate
             self.is_not_converged_ = False
             while not is_leaf and not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]:
-                
+                # print("---")
+                # print(s)
                 # print("n " + str(self.n_) + ", d " + str(d) )
                 # print("s ", s)
                 str_s = hash(str(s))
+                # print(str_s)
+                # if str_s in self.gi_ and self.graph_[self.gi_[str_s]].s_["pose"] != s["pose"]:
+                #     print("---")
+                #     print(s)
+                #     print(str_s)
+                #     print(self.graph_[self.gi_[str_s]].s_)
                 if str_s not in parents:     
                     parents[p_ind] = str_s
                     p_ind += 1
@@ -217,7 +227,17 @@ class AOGS():
         # print("emax ", e_max)
         # print(exps)
         # print("gap", U-L)
-        # print("m ", self.m_)
+        print("m ", self.m_)
+        print("n", self.n_)
+        for s in self.graph_:
+            # print(s.s_)
+            if "pose" in s.s_:
+                self.map_[s.s_["pose"][0]][s.s_["pose"][1]]=1
+        t_map = (self.map_)
+        print("max map ", np.max(np.max(self.map_)))
+        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        plt.pause(1)
+        print(len(self.gi_))
         # print("Usize", len(self.U_))
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
                
@@ -237,12 +257,12 @@ class AOGS():
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
+            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = self.env_params_.copy()
                 temp_params["state"] = _s
                 self.env_ = gym.make(temp_params["env"],max_episode_steps = self.search_params_["horizon"], _params=temp_params["params"])
                 self.env_.reset()
-
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
             # self.d_+=1

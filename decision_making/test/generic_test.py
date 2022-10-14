@@ -59,6 +59,7 @@ while(not done):
     # print("act " + str(a))
     #env.reset(s)
     # s, r,done,info = env.step(a)
+    print("action", a)
     s, r,done,info = env.step(a)
     # env.render()
     
