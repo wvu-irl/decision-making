@@ -53,9 +53,9 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     return optAction
 
 def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
-    delta = _solver.performance_[1]
-    L = _solver.bounds_[0]
-    U = _solver.bounds_[1]
+    delta = _solver.alg_params_["model_accuracy"]["delta"]
+    L = _solver.env_params_["params"]["reward_bounds"][0]
+    U = _solver.env_params_["params"]["reward_bounds"][1]
     
     U_max = -inf
     L_min = inf
@@ -99,9 +99,9 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
                 # print("L",s_p.L_)
         if len(a.s_prime_) == 0:
             if _params[0] == 1:
-                V = _solver.bounds_[1]
+                V = _solver.env_params_["reward_bounds"][1]
             else:
-                V = _solver.bounds_[0]
+                V = _solver.env_params_["reward_bounds"][0]
 
         if V > bestValue:
             bestAction = a
@@ -113,14 +113,14 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
 #assume that when initialized it gets alpha, but the
 #solver can override, for example when doing optimis    random.shuffle(_s.a_)tic search
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
-    epsilon = _solver.performance_[0]
-    delta = 1-_solver.performance_[1]
-    gamma = _solver.gamma_
-    L = _solver.bounds_[0]
-    U = _solver.bounds_[1]
+    delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
+    epsilon = _solver.alg_params_["model_accuracy"]["epsilon"]
+    L = _solver.env_params_["params"]["reward_bounds"][0]
+    U = _solver.env_params_["params"]["reward_bounds"][1]
+    gamma = _solver.alg_params_["gamma"]
     no_c = False
     if _params == []:
-        alpha = _const[0]
+        alpha = _const["alpha"]
     else:
         alpha = _params[0]
         # if _params[1] == None:

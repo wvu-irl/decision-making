@@ -1,14 +1,21 @@
 {
     "alg": "aogs",
-    "ambiguity_attitude": 0,
     "max_iter": 1e3,
-    "epsilon": 0.1,
-    "delta": 0.05,
+    "model_accuracy":
+    {
+        "epsilon": 0.1,
+        "delta": 0.05
+    },
     "gamma": 0.95,
-    "horizon": 5,
-    "max_samples": 1e3,
-    "max_time": 5,
-    "reinit": true,
+    "max_graph_size": 5e3,
+    "rng_seed": 234,
+    "search" :
+    {
+        "max_samples": 1e3,
+        "horizon": 40,
+        "timeout": 5,
+        "reinit": true
+    },
     "action_selection" : 
     {
         "function": "ambiguity_aware",

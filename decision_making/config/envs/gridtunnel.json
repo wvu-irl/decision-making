@@ -3,7 +3,7 @@
     "max_time": 100,
     "params":
     {
-        "agent": [25,5],
+        "state": [25,5],
         "dimensions": [35,10],
         "goal": [10,10],
         "p": 0.1,

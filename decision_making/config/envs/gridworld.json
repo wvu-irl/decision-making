@@ -3,10 +3,10 @@
     "max_time": 100,
     "params":
     {
-        "agent": [20,20],
+        "state": [20,20],
         "dimensions": [40,40],
         "goal": [10,10],
-        "p": 0.1,
+        "p": 0,
         "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
         "reward_bounds": [0,1]
     }

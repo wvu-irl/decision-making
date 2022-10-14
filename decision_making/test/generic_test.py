@@ -44,8 +44,8 @@ env_config = json.load(f)
 
 # ENVS
 # gym_examples:gym_examples/GridWorld-v0
-env = gym.make(env_config["env"],max_episode_steps = env_config["max_time"], _params=env_config["params"])
-planner = utils.get_agent(alg_config,env_config)
+env = gym.make(env_config["env"],max_episode_steps = max_ts, _params=env_config["params"])
+planner = get_agent(alg_config,env_config)
 
 # Simulate
 print("-----------")
@@ -54,12 +54,12 @@ done = False
 while(not done):
     print("-----------")
     print("state ",s)
-    s, r,done,info = env.step(0)
-    print(done)
-    planner.search(s, alg_config["search"])#, alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
+    # print(done)
+    a = planner.search(s, alg_config["search"])#, alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
     # print("act " + str(a))
     #env.reset(s)
     # s, r,done,info = env.step(a)
-    env.render()
+    s, r,done,info = env.step(a)
+    # env.render()
     
 
