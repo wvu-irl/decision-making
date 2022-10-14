@@ -43,7 +43,6 @@ class AOGS():
         self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
         
         self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
-        print(self.bounds_)
         
         self.m_ = 0
 
@@ -229,10 +228,12 @@ class AOGS():
         # print("gap", U-L)
         print("m ", self.m_)
         print("n", self.n_)
+        print("g---")
         for s in self.graph_:
             # print(s.s_)
             if "pose" in s.s_:
                 self.map_[s.s_["pose"][0]][s.s_["pose"][1]]=1
+        print("---g")
         t_map = (self.map_)
         print("max map ", np.max(np.max(self.map_)))
         plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
