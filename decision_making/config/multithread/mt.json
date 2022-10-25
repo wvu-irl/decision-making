@@ -1,0 +1,15 @@
+{
+    "file" : "test",
+    "n_threads" : 5,
+    "n_trials" : 5,
+    "max_timesteps" : 100,
+    "epsilon" : [],
+    "delta" : [],
+    "horizon" : [],
+    "alpha" : [],
+    "initial state" : [],
+    "goal state" : [],
+    "world size" : [],
+    "probabilities" : []
+
+}
