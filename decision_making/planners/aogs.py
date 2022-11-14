@@ -136,7 +136,7 @@ class AOGS():
                 # print("yee")
             s = _s
             
-            parents = [-1]*(self.search_params_["horizon"]*5+1)
+            parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
             self.d_ = 0
             do_reset = True
@@ -259,7 +259,7 @@ class AOGS():
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
-            self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = self.env_params_.copy()
                 temp_params["state"] = _s

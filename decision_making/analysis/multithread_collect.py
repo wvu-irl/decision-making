@@ -43,7 +43,8 @@ def runWrapper(params : dict):
         s, r,done,info = env.step(a)
         ts += 1
         accum_reward += r
-        # print(params["trial"], params["instance"], done)
+        
+    print(params["trial"], params["instance"], s, ts, accum_reward)
     params["data"] = {"time": ts, "accum_reward": accum_reward}
     return params
 
@@ -80,6 +81,7 @@ def poolHandler(alg_config, env_config, mt_config):
     temp.append(mt_config["epsilon"])
     temp.append(mt_config["delta"])
     temp.append(mt_config["horizon"])
+    temp.append(mt_config["max_samples"])
     temp.append(mt_config["alpha"])
     temp.append(mt_config["initial_state"]) # These should be provided as a bumber and sampled
     temp.append(mt_config["goal_state"])    # These should be prior sampled
@@ -92,14 +94,17 @@ def poolHandler(alg_config, env_config, mt_config):
     trials = []
     count = 0
     for el in temp:
+        print(el)
+
         alg_config["model_accuracy"]["epsilon"] = el[0]
         alg_config["model_accuracy"]["delta"] = el[1]
         alg_config["search"]["horizon"] = el[2]
-        alg_config["action_selection"]["params"]["alpha"] = el[3]
-        env_config["params"]["state"] = el[4]
-        env_config["params"]["goal"] = el[5]
+        alg_config["search"]["horizon"] = el[3]
+        alg_config["action_selection"]["params"]["alpha"] = el[4]
+        env_config["params"]["state"] = el[5]
+        env_config["params"]["goal"] = el[6]
         env_config["params"]["dimensions"] = el[6]
-        env_config["params"]["p"] = el[7]        
+        env_config["params"]["p"] = el[8]        
         
         for i in range(mt_config["n_trials"]):
             trials.append({"env": env_config, "alg": alg_config, "trial": count, "instance": i})
