@@ -11,6 +11,7 @@ from multiprocessing import Pool, Lock
 import itertools
 import json 
 import gym
+import numpy as np
 import custom_gym
 
 from planners.utils import *
@@ -27,22 +28,24 @@ from planners.utils import *
 
 ## Evaluation -------------------------------------------------
 def runWrapper(params : dict): 
-    env = gym.make(params["env"]["env"],max_episode_steps = params["mt"]["max_timesteps"], _params=params["env"]["params"])
+    env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], _params=params["env"]["params"])
     planner = get_agent(params["alg"],params["env"])
 
     # Simulate
-    print("-----------")
+    print(params["trial"], params["instance"])
     s = env.reset()
     done = False
     ts = 0
     accum_reward = 0
     while(not done):
+        # print(params["trial"], params["instance"], done)
         a = planner.search(s, alg_config["search"])
         s, r,done,info = env.step(a)
         ts += 1
         accum_reward += r
-
-    return [ts, accum_reward]
+        # print(params["trial"], params["instance"], done)
+    params["data"] = {"time": ts, "accum_reward": accum_reward}
+    return params
 
         # if save_prev_exp:
         #     lock.acquire()
@@ -87,32 +90,41 @@ def poolHandler(alg_config, env_config, mt_config):
 
 
     trials = []
-    for i in range(mt_config["n_trials"]):
-        for el in temp:
-            trials.append(el)()
+    count = 0
+    for el in temp:
+        alg_config["model_accuracy"]["epsilon"] = el[0]
+        alg_config["model_accuracy"]["delta"] = el[1]
+        alg_config["search"]["horizon"] = el[2]
+        alg_config["action_selection"]["params"]["alpha"] = el[3]
+        env_config["params"]["state"] = el[4]
+        env_config["params"]["goal"] = el[5]
+        env_config["params"]["dimensions"] = el[6]
+        env_config["params"]["p"] = el[7]        
+        
+        for i in range(mt_config["n_trials"]):
+            trials.append({"env": env_config, "alg": alg_config, "trial": count, "instance": i})
+        count += 1
 
-    fp = "" + mt_config["file"] + ".npy"
+    
     # Save this as a csv file.  or np file
 
     # Run pool of Monte Carlo trials
     print("Beginning Monte Carlo trials...")
-    if mt_config["N_threads"] > 1:
-        # Initialize multiprocessing pool and map objects' run methods to begin simulation
-        p = Pool(mt_config["N_threads"])
-        sim_worlds = p.map(runWrapper, sim_worlds)
+    if mt_config["n_threads"] > 1:
+        p = Pool(mt_config["n_threads"])
+        data = p.map(runWrapper, trials)
     else:
-        # Run each trial sequentially, for debugging purposes, with no multiprocessing
         for t in trials:
-            #update alg config
-            #update env_config
             runWrapper(t)
     print("Simulations complete.")
 
     # Save results
-    
-    saveResultsFile(results_filename, sim_worlds)
-    if save_prev_exp:
-        prev_exp_data.save(prev_exp_filepath)
+    fp = os.path.dirname(__file__) + "/multithread/" + mt_config["file"] + ".npy"
+    with open(fp, 'wb') as f:
+            np.save(f, data)
+    # saveResultsFile(results_filename, sim_worlds)
+    # if save_prev_exp:
+    #     prev_exp_data.save(prev_exp_filepath)
 
 
 
