@@ -13,6 +13,7 @@ import json
 import gym
 import numpy as np
 import custom_gym
+import copy
 
 from planners.utils import *
 
@@ -33,10 +34,13 @@ def runWrapper(params : dict):
 
     # Simulate
     print(params["trial"], params["instance"])
+    # print(params)
     s = env.reset()
     done = False
     ts = 0
     accum_reward = 0
+    print(params["trial"], params["instance"], params["alg"]["search"]["max_samples"])
+
     while(not done):
         # print(params["trial"], params["instance"], done)
         a = planner.search(s, alg_config["search"])
@@ -100,23 +104,32 @@ def poolHandler(alg_config, env_config, mt_config):
         alg_config["model_accuracy"]["delta"] = el[1]
         alg_config["search"]["horizon"] = el[2]
         alg_config["search"]["max_samples"] = el[3]
+        print("ms", alg_config["search"]["max_samples"])
         alg_config["action_selection"]["params"]["alpha"] = el[4]
         env_config["params"]["state"] = el[5]
         env_config["params"]["goal"] = el[6]
         env_config["params"]["dimensions"] = el[6]
-        env_config["params"]["p"] = el[8]        
+        env_config["params"]["p"] = el[8]    
         
+        # print({"env": env_config, "alg": alg_config})#, "trial": count, "instance": i})    
         for i in range(mt_config["n_trials"]):
-            trials.append({"env": env_config, "alg": alg_config, "trial": count, "instance": i})
+            # print({"env": env_config.copy(), "alg": alg_config.copy(), "trial": count, "instance": i})
+            trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i})
+            
         count += 1
 
-    
+    print("=================")
+    for i in range(len(trials)):
+        print("---",i,"---")
+        print(trials[i])
     # Save this as a csv file.  or np file
 
     # Run pool of Monte Carlo trials
     print("Beginning Monte Carlo trials...")
     if mt_config["n_threads"] > 1:
         p = Pool(mt_config["n_threads"])
+        for i in range(len(trials)):
+            print(trials[i]["trial"], trials[i]["instance"], trials[i]["alg"]["search"]["max_samples"])
         data = p.map(runWrapper, trials)
     else:
         for t in trials:
