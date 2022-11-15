@@ -263,9 +263,11 @@ class AOGS():
             # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = copy.deepcopy(self.env_params_)
-                temp_params["state"] = _s
-                self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=temp_params["params"])
+                temp_params["params"]["state"] = _s["pose"]
+                # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+                self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
                 self.env_.reset()
+                # print(_s, self.env_.get_observation())
             s_p, r, done, info = self.env_.step(_a)
             self.m_+=1
             # self.d_+=1
