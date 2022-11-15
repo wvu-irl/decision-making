@@ -9,4 +9,4 @@ data/
 *.npy
 *.svg
 *.xcf
-
+*.pkl

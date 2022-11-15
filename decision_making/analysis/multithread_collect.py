@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
+from genericpath import exists
 import sys
 import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+# from os.path import exists
 
 from multiprocessing import Pool, Lock
 
@@ -14,6 +16,7 @@ import gym
 import numpy as np
 import custom_gym
 import copy
+import pickle
 
 from planners.utils import *
 
@@ -25,7 +28,7 @@ from planners.utils import *
         
     
 """
-   
+lock = Lock()
 
 ## Evaluation -------------------------------------------------
 def runWrapper(params : dict): 
@@ -48,47 +51,39 @@ def runWrapper(params : dict):
         ts += 1
         accum_reward += r
         
+    if ts < params["env"]["max_time"]:
+        # print(D-d)
+        accum_reward += (params["env"]["max_time"]-ts)*r
+        
     print(params["trial"], params["instance"], params["alg"]["search"]["max_samples"], s, ts, accum_reward)
     params["data"] = {"time": ts, "accum_reward": accum_reward}
     
-    # Check to see if file of relevant name exists.
+    lock.acquire()
+    with open(params["fp"], "rb") as f:
+        data = pickle.load(f)
+    
+    if params["key"] in data:
+        data[params["key"]]["ts"].append(ts)
+        data[params["key"]]["R"].append(accum_reward)
+    else:
+        data[params["key"]] = {"ts": ts, "R": accum_reward}
+        print("oh")
+    
+    with open(params["fp"], 'wb') as f:
+        pickle.dump(data,f)      
+    
+    lock.release()
     # if so open
     # append ts, r
     # save
     # fp = os.path.dirname(__file__) + "/multithread/" + mt_config["file"] + ".npy"
     # with open(fp, 'wb') as f:
     #         np.save(f, data)
-    
-    return params
-
-        # if save_prev_exp:
-        #     lock.acquire()
-        #     prev_exp_data.record(obj, t)
-        #     lock.release()
-
-        # terminal_condition = obj.simulationStep(t)
-        # if slow_mode and num_threads == 1:
-        #     time.sleep(0.5)
-        
-        # if ((t == num_time_steps - 1) or (enable_terminal_condition and terminal_condition)):
-        #     # Save final step of prev exp if at final time step
-        #     if save_prev_exp:
-        #         lock.acquire()
-        #         prev_exp_data.record(obj, t)
-        #         lock.release()
-
-        #     # Display final map if at final time step
-        #     if config.enable_plots and num_threads == 1:
-        #         displayMap(obj, plt, map_fig, map_ax)
-        #         if save_plots == 1:
-        #             t = t+1
-        #             map_fig.savefig("figures/fig%d.png" % t)
-
-        # End simulation early if terminal condition reached
-        # if enable_terminal_condition and terminal_condition:
-        #     break
+    # return params
     
 def poolHandler(alg_config, env_config, mt_config):
+    env_str = env_config["env"].replace("custom_gym/", "")
+    fp = os.path.dirname(__file__) + "/multithread/" + alg_config["alg"] + "_" + env_str + ".pkl" #mt_config["file"] + ".npy"
 
     temp = []
     temp.append(mt_config["epsilon"])
@@ -107,13 +102,17 @@ def poolHandler(alg_config, env_config, mt_config):
     trials = []
     count = 0
     for el in temp:
-        print(el)
+        # print(el)
+        
+        data_key = ""
+        for itm in el:
+            data_key += str(itm) + "_"
 
         alg_config["model_accuracy"]["epsilon"] = el[0]
         alg_config["model_accuracy"]["delta"] = el[1]
         alg_config["search"]["horizon"] = el[2]
         alg_config["search"]["max_samples"] = el[3]
-        print("ms", alg_config["search"]["max_samples"])
+        # print("ms", alg_config["search"]["max_samples"])
         alg_config["action_selection"]["params"]["alpha"] = el[4]
         env_config["params"]["state"] = el[5]
         env_config["params"]["goal"] = el[6]
@@ -123,22 +122,39 @@ def poolHandler(alg_config, env_config, mt_config):
         # print({"env": env_config, "alg": alg_config})#, "trial": count, "instance": i})    
         for i in range(mt_config["n_trials"]):
             # print({"env": env_config.copy(), "alg": alg_config.copy(), "trial": count, "instance": i})
-            trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i})
+            trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
             
         count += 1
 
-    print("=================")
-    for i in range(len(trials)):
-        print("---",i,"---")
-        print(trials[i])
-    # Save this as a csv file.  or np file
-
+    # print("=================")
+    # for i in range(len(trials)):
+    #     print("---",i,"---")
+    #     print(trials[i])
+    # print("fp exists", exists(fp))
+    if exists(fp):
+        #load
+        with open(fp, "rb") as f:
+            data = pickle.load(f)
+        print(data)
+        # exit()
+    else:   
+        data = {}
+    print("-----", data)
+        
+    for el in trials:
+        if el["key"] not in data:
+            data[el["key"]] = {"ts": [], "R": []}
+            # print("hai")
+        
+    with open(fp, 'wb') as f:
+        pickle.dump(data,f)
+        
     # Run pool of Monte Carlo trials
     print("Beginning Monte Carlo trials...")
     if mt_config["n_threads"] > 1:
         p = Pool(mt_config["n_threads"])
-        for i in range(len(trials)):
-            print(trials[i]["trial"], trials[i]["instance"], trials[i]["alg"]["search"]["max_samples"])
+        # for i in range(len(trials)):
+        #     print(trials[i]["trial"], trials[i]["instance"], trials[i]["alg"]["search"]["max_samples"])
         data = p.map(runWrapper, trials)
     else:
         for t in trials:
