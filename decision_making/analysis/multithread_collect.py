@@ -50,6 +50,15 @@ def runWrapper(params : dict):
         
     print(params["trial"], params["instance"], params["alg"]["search"]["max_samples"], s, ts, accum_reward)
     params["data"] = {"time": ts, "accum_reward": accum_reward}
+    
+    # Check to see if file of relevant name exists.
+    # if so open
+    # append ts, r
+    # save
+    # fp = os.path.dirname(__file__) + "/multithread/" + mt_config["file"] + ".npy"
+    # with open(fp, 'wb') as f:
+    #         np.save(f, data)
+    
     return params
 
         # if save_prev_exp:

@@ -54,8 +54,8 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
 
 def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
     delta = _solver.alg_params_["model_accuracy"]["delta"]
-    L = _solver.env_params_["params"]["reward_bounds"][0]
-    U = _solver.env_params_["params"]["reward_bounds"][1]
+    L = _solver.bounds_[0]
+    U = _solver.bounds_[1]
     
     U_max = -inf
     L_min = inf
@@ -115,8 +115,8 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
     epsilon = _solver.alg_params_["model_accuracy"]["epsilon"]
-    L = _solver.env_params_["params"]["reward_bounds"][0]/(1-_solver.alg_params_["gamma"])
-    U = _solver.env_params_["params"]["reward_bounds"][1]/(1-_solver.alg_params_["gamma"])
+    L = _solver.bounds_[0]
+    U = _solver.bounds_[1]
     gamma = _solver.alg_params_["gamma"]
     no_c = False
     if _params == []:
