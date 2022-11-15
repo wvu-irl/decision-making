@@ -44,7 +44,7 @@ def runWrapper(params : dict):
         ts += 1
         accum_reward += r
         
-    print(params["trial"], params["instance"], s, ts, accum_reward)
+    print(params["trial"], params["instance"], params["alg"]["search"]["max_samples"], s, ts, accum_reward)
     params["data"] = {"time": ts, "accum_reward": accum_reward}
     return params
 
@@ -99,7 +99,7 @@ def poolHandler(alg_config, env_config, mt_config):
         alg_config["model_accuracy"]["epsilon"] = el[0]
         alg_config["model_accuracy"]["delta"] = el[1]
         alg_config["search"]["horizon"] = el[2]
-        alg_config["search"]["horizon"] = el[3]
+        alg_config["search"]["max_samples"] = el[3]
         alg_config["action_selection"]["params"]["alpha"] = el[4]
         env_config["params"]["state"] = el[5]
         env_config["params"]["goal"] = el[6]

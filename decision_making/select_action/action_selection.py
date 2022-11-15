@@ -115,8 +115,8 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
 def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
     epsilon = _solver.alg_params_["model_accuracy"]["epsilon"]
-    L = _solver.env_params_["params"]["reward_bounds"][0]
-    U = _solver.env_params_["params"]["reward_bounds"][1]
+    L = _solver.env_params_["params"]["reward_bounds"][0]/(1-_solver.alg_params_["gamma"])
+    U = _solver.env_params_["params"]["reward_bounds"][1]/(1-_solver.alg_params_["gamma"])
     gamma = _solver.alg_params_["gamma"]
     no_c = False
     if _params == []:
@@ -131,6 +131,8 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     gap = 0
     lexps = []
     uexps = []
+    # if _s.s_ == {"pose": [17,16]}:
+    #     print(_s)
     for a in _s.a_:
         if a.N_ == 0:
             expectation = (1-alpha)*L + (alpha)*U
@@ -163,15 +165,15 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # print(alpha)
             # print("exp", expectation)
             #exps.append(expectation)
-            uexps.append(up_exp)
-            lexps.append(low_exp)
+        uexps.append(up_exp)
+        lexps.append(low_exp)
         if expectation > exp_max:
             exp_max = expectation
             L_exp = low_exp
             U_exp = up_exp
             gap = up_exp-low_exp
             ind = [a.a_]
-            
+          
         elif expectation == exp_max:
             ind.append(a.a_)
         ldiff = 0
@@ -189,7 +191,13 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # print(U_exp)
             # print(exp_max)
             # print(L_exp)
-    
+    # if _s.s_ == {"pose": [20, 19]}:
+    #     print(L_exp)
+    #     print(U_exp)
+    # if _s.s_ == {"pose": [17,16]}:
+    # print(_s.s_)
+    # print(lexps)
+    # print(uexps)
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 

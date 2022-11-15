@@ -20,15 +20,15 @@ from planners.utils import *
     
 """
 ## CONFIG -------------------------------------------------
-# alg_config_file = sys.argv[1]
-# env_config_file = sys.argv[2]
-# if len(sys.argv) >= 4:
-#     max_ts = int(sys.argv[3])
-# else:
-#     max_ts = 100
-alg_config_file = "aogs"
-env_config_file = "gridworld"
-max_ts = 50
+alg_config_file = sys.argv[1]
+env_config_file = sys.argv[2]
+if len(sys.argv) >= 4:
+    max_ts = int(sys.argv[3])
+else:
+    max_ts = 100
+# alg_config_file = "aogs"
+# env_config_file = "gridworld"
+# max_ts = 50
 # if len(sys.argv) >= 4:
 #     num_cores = sys.argv[3]
 # else:
@@ -54,6 +54,7 @@ planner = get_agent(alg_config,env_config)
 print("-----------")
 s = env.reset()
 done = False
+
 while(not done):
     print("-----------")
     print("state ",s)
@@ -64,6 +65,6 @@ while(not done):
     # s, r,done,info = env.step(a)
     print("action", a)
     s, r,done,info = env.step(a)
-    # env.render()
+#     env.render()
     
 

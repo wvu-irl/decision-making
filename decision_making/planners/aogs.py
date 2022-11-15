@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 import time
+import copy
 
 import sys
 import os
@@ -107,7 +108,7 @@ class AOGS():
             }
         if self.search_params_["reinit"]:
             self.reinit()
-            
+                        
         self.m_ = 0
         start_time = time.perf_counter()
         s = None
@@ -229,16 +230,16 @@ class AOGS():
         # print("m ", self.m_)
         # print("n", self.n_)
         # print("g---")
-        # plt.cla()
-        # for s in self.graph_:
-        #     # print(s.s_)
-        #     if "pose" in s.s_:
-        #         self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        plt.cla()
+        for s in self.graph_:
+            # print(s.s_)
+            if "pose" in s.s_:
+                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
         # print("---g")
-        # t_map = (self.map_)
+        t_map = (self.map_)
         # print("max map ", np.max(np.max(self.map_)))
-        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        # plt.pause(1)
+        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        plt.pause(1)
         # print(len(self.gi_))
         # print("Usize", len(self.U_))
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
@@ -259,9 +260,9 @@ class AOGS():
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
-            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+            self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
-                temp_params = self.env_params_.copy()
+                temp_params = copy.deepcopy(self.env_params_)
                 temp_params["state"] = _s
                 self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=temp_params["params"])
                 self.env_.reset()
@@ -276,7 +277,8 @@ class AOGS():
             _do_reset = True
             # self.d_+=0.2
             # self.is_converged_ = self.is_converged_ and True
-        return s_p, r, done, _do_reset 
+        # print(s_p)
+        return s_p, r, done, _do_reset
     
     def backpropagate(self, _parents):
         
