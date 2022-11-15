@@ -134,6 +134,8 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     # if _s.s_ == {"pose": [17,16]}:
     #     print(_s)
     counta = 0
+    # print(";;;;;;;;;;;;;;;;;;")
+    # print(_s.s_)
     for a in _s.a_:
         if a.N_ == 0:
             expectation = (1-alpha)*L + (alpha)*U
@@ -149,6 +151,8 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
             # dist -> distribution (a, r+gamma V)
             # t -> number of samples
             #bf = dist_2_bf(dist, t, epsilon, L, U, no_c)
+            # print("------------")
+            # print("dist", dist)
             bf = generate_bf_conf(dist, delta, t, L, U, epsilon)
             up_exp = upper_expectation(bf)
             # print(bf)
@@ -197,10 +201,10 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     #     print(L_exp)
     #     print(U_exp)
     # if _s.s_ == {"pose": [17,16]}:
-    if _s.s_["pose"][0] <15 and _s.s_["pose"][1] <15 and alpha == 1:
-        print(_s.s_, counta)
-        print(lexps)
-        print(uexps)
+    # if _s.s_["pose"][0] <15 and _s.s_["pose"][1] <15 and alpha == 1:
+    #     print(_s.s_, counta)
+    #     print(lexps)
+    #     print(uexps)
         
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 

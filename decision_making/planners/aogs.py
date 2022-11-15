@@ -166,7 +166,7 @@ class AOGS():
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],[1],self)
-                
+
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
                 # print("l151 ",s)
@@ -273,8 +273,8 @@ class AOGS():
             self.is_not_converged_ = True
             # if s_p == {"pose":[10,10]}:
             #     print(done)
-            if r >= 0:
-                print(_s,s_p,r)
+            # if r >= 0:
+            #     print(_s,s_p,r)
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
             done = self.graph_[self.gi_[hash(str(s_p))]].is_terminal_
