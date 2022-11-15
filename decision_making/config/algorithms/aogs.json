@@ -3,16 +3,16 @@
     "max_iter": 1e3,
     "model_accuracy":
     {
-        "epsilon": 0.05,
-        "delta": 0.1
+        "epsilon": 0.1,
+        "delta": 0.05
     },
-    "gamma": 0.95,
+    "gamma": 0.99,
     "max_graph_size": 5e3,
     "rng_seed": 234,
     "search" :
     {
         "max_samples": 1e3,
-        "horizon": 40,
+        "horizon": 30,
         "timeout": 5,
         "reinit": false
     },

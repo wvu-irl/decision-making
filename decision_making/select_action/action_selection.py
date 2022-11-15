@@ -133,11 +133,13 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     uexps = []
     # if _s.s_ == {"pose": [17,16]}:
     #     print(_s)
+    counta = 0
     for a in _s.a_:
         if a.N_ == 0:
             expectation = (1-alpha)*L + (alpha)*U
             low_exp = L
             up_exp = U
+            counta += 1
         else:
             # print("--")
             # print(a.N_)
@@ -195,9 +197,11 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
     #     print(L_exp)
     #     print(U_exp)
     # if _s.s_ == {"pose": [17,16]}:
-    # print(_s.s_)
-    # print(lexps)
-    # print(uexps)
+    if _s.s_["pose"][0] <15 and _s.s_["pose"][1] <15 and alpha == 1:
+        print(_s.s_, counta)
+        print(lexps)
+        print(uexps)
+        
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 

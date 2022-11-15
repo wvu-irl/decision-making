@@ -271,6 +271,10 @@ class AOGS():
             # self.d_+=1
             _do_reset = False
             self.is_not_converged_ = True
+            # if s_p == {"pose":[10,10]}:
+            #     print(done)
+            if r >= 0:
+                print(_s,s_p,r)
         else:
             s_p, r = self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].sample_transition_model(self.rng_)
             done = self.graph_[self.gi_[hash(str(s_p))]].is_terminal_
