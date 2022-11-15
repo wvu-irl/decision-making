@@ -1,0 +1,13 @@
+{
+    "env": "custom_gym/GridWorld-v0",
+    "max_time": 100,
+    "params":
+    {
+        "state": [20,20],
+        "dimensions": [40,40],
+        "goal": [10,10],
+        "p": 0,
+        "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
+        "reward_bounds": [-0.01,1]
+    }
+}

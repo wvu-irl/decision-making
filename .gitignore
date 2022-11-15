@@ -1,3 +1,7 @@
+build/
+decision_making.egg-info/
+.vscode/
+data/
 *.eps
 *.png
 *.pyc
@@ -5,3 +9,4 @@
 *.npy
 *.svg
 *.xcf
+
