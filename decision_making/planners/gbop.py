@@ -115,7 +115,7 @@ class GBOP():
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             
-            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
+            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]), _params=self.env_params_["params"])
             self.env_.reset()
             
             s = _s
