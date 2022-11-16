@@ -44,7 +44,7 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     for a in actions:
         Q = 0
         for r,s_p_i,n in zip(a.r_, a.s_prime_i_, a.n_):
-            Q += n*(r + _solver.gamma_*_solver.tree_[s_p_i].V_)#/_solver.tree_[s_p_i].N_  #UCB1 Equation
+            Q += n*(r + _solver.alg_params_["gamma"]*_solver.tree_[s_p_i].V_)#/_solver.tree_[s_p_i].N_  #UCB1 Equation
         Q /= a.N_
         Q += 2*_const["c"]*np.sqrt(((np.log(_s.N_))/a.N_))
         if Q > UCB or np.isnan(UCB):
@@ -52,7 +52,7 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
                 optAction = a.a_
     return optAction
 
-def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
+def gbop_dm(_s,_const = 1,_params=[], _solver = None):
     delta = _solver.alg_params_["model_accuracy"]["delta"]
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
@@ -81,7 +81,7 @@ def mcgs_dm(_s,_const = 1,_params=[], _solver = None):
     # print(U_max)
     return L_min, U_max
 
-def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
+def gbop_best_action(_s,_const = [],_params=[], _solver = None):
     bestAction = None
     bestValue = -np.inf
     actions = _s.a_ 
@@ -94,14 +94,14 @@ def mcgs_best_action(_s,_const = [],_params=[], _solver = None):
             #     V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
             #     # print("U",s_p.U_)
             # else:
-            V += _params[0] * (sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_)
-            V += (1-_params[0]) * (sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.L_)
+            V += _params[0] * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.U_)
+            V += (1-_params[0]) * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.L_)
                 # print("L",s_p.L_)
         if len(a.s_prime_) == 0:
             if _params[0] == 1:
-                V = _solver.env_params_["reward_bounds"][1]
+                V = _solver.bounds_[1]
             else:
-                V = _solver.env_params_["reward_bounds"][0]
+                V = _solver.bounds_[0]
 
         if V > bestValue:
             bestAction = a

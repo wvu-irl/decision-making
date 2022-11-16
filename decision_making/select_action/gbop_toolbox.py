@@ -19,7 +19,7 @@ def boundSolver(_s , _solver, _type):
     for a in actions:
         if len(a.s_prime_i_) > 0:
             #Solve for U for State-Action
-            Cr = beta_r(a.N_,.9,_solver.B_,totalActions,_solver.H_)/a.N_
+            Cr = beta_r(a.N_,.9,_solver.search_params_["branch_factor_s"],totalActions,_solver.search_params_["horizon"])/a.N_
             reward = np.sum(a.r_)/len(a.r_)
             if _type == "upper": 
                 kl = lambda x, A : KL_divergence_Bernoulli(reward,x) - Cr
@@ -30,7 +30,7 @@ def boundSolver(_s , _solver, _type):
                 
             b_ul = [reward,1] if _type == "upper" else [0,reward]
             ul = newtons_method(kl,dkl,bounds=b_ul)
-            Cp = beta_p(a.N_,.9,_solver.B_,totalActions,_solver.H_)/a.N_
+            Cp = beta_p(a.N_,.9,_solver.search_params_["branch_factor_s"],totalActions,_solver.search_params_["horizon"])/a.N_
             _, T, _ = a.get_transition_model()
 
             p = 0
@@ -44,7 +44,7 @@ def boundSolver(_s , _solver, _type):
             C = MaxKL(B,T,Cp,_solver.bounds_)
             for j,q in enumerate(C):
                 p += q*B[j]
-            b = ul + _solver.gamma_*p
+            b = ul + _solver.alg_params_["gamma"]*p
             if b > bound:
                 bound = b
     if bound == -np.inf:
