@@ -111,20 +111,25 @@ class GBOP():
             self.gi_[_str_s] = self.n_
             self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
-        
+        print("-----------")
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             
-            self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]), _params=self.env_params_["params"])
+            temp_params = copy.deepcopy(self.env_params_)
+            temp_params["params"]["state"] = _s["pose"]
+            # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+            self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
+            # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
             self.env_.reset()
             
-            s = _s
+            s = self.env_.get_observation()
+            # print(s)
             
             self.d_ = 0
             is_terminal = False
             
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]:
-                
+                print(s)
                 str_s = hash(str(s))
                 L, U = self.bound_outcomes(str_s)
 
