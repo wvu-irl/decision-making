@@ -86,6 +86,10 @@ def gbop_best_action(_s,_const = [],_params=[], _solver = None):
     bestValue = -np.inf
     actions = _s.a_ 
     random.shuffle(actions)
+    if _params == []:
+        alpha = _const["alpha"]
+    else:
+        alpha = _params[0]
     for a in actions:
         V = 0
         for s in a.s_prime_:
@@ -94,11 +98,11 @@ def gbop_best_action(_s,_const = [],_params=[], _solver = None):
             #     V += sum(a.r_)/len(a.r_) + _solver.gamma_*s_p.U_
             #     # print("U",s_p.U_)
             # else:
-            V += _params[0] * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.U_)
-            V += (1-_params[0]) * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.L_)
+            V += alpha * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.U_)
+            V += (1-alpha) * (sum(a.r_)/len(a.r_) + _solver.alg_params_["gamma"]*s_p.L_)
                 # print("L",s_p.L_)
         if len(a.s_prime_) == 0:
-            if _params[0] == 1:
+            if alpha == 1:
                 V = _solver.bounds_[1]
             else:
                 V = _solver.bounds_[0]
