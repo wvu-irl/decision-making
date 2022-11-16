@@ -13,7 +13,7 @@ sys.path.append(parent)
 def boundSolver(_s , _solver, _type):
     # Solve l for all actions
     bound = -np.inf
-    totalActions = len(_s.a_)
+    totalActions = _solver.search_params_["branch_factor_s"]#len(_s.a_)
     actions = _s.a_
     random.shuffle(actions)
     for a in actions:
