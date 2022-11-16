@@ -193,18 +193,6 @@ class GBOP():
                 self.graph_[self.gi_[s]].U_ = U
                 t += 1
         return L, U 
-                
-
-    def select(self,_s):
-        """
-        Select action to take for GBOP Simulation
-        Args:
-            self (GBOP): GBOP Object
-            _s (State): Current State
-        Returns:
-            Action: Best Action from Current state
-        """
-        return self.as_s_.return_action(_s,self.a_,self._select_param)
 
     def simulate(self, _s, _a):
         """
