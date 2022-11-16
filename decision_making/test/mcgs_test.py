@@ -16,7 +16,7 @@ from decision_making.select_action.action_selection import *
 ## Params
 alpha = 0
 #Env
-p = 0.1
+p = 0
 test_type = 0
 if test_type == 0:
     #Env
