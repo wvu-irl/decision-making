@@ -39,6 +39,7 @@ class GBOP():
         self.env_params_ = _env_params
         if "search" in _alg_params:
             self.search_params_ = _alg_params["search"]
+        self.alpha_ = _alg_params["action_selection"]["move_params"]["alpha"]
             
         self.a_s_b_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["bound_function"]], _alg_params["action_selection"]["bound_params"])
         self.a_s_m_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["move_function"]], _alg_params["action_selection"]["move_params"])
@@ -129,7 +130,7 @@ class GBOP():
 
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 
-                s_p, r, is_terminal = self.simulate(a)
+                s_p, r, is_terminal = self.simulate(s, a)
 
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
@@ -142,7 +143,7 @@ class GBOP():
                     
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
-                        v = r/(1-self.gamma_)
+                        v = r/(1-self.alg_params_["gamma"])
                         L = v
                         U = v
                     else:
@@ -155,7 +156,15 @@ class GBOP():
                 s = s_p
                 # print(t)
                 # print(self.n_)
-
+        plt.cla()
+        for s in self.graph_:
+            # print(s.s_)
+            if "pose" in s.s_:
+                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        t_map = (self.map_)
+        print("max map ", np.max(np.max(self.map_)))
+        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        plt.pause(1)
         a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[self.alpha_],self)
         return a
                
@@ -167,8 +176,8 @@ class GBOP():
             if s != -1:
                 L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[self.alpha_],self)
                 
-                lprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
-                uprecision = ((1-self.gamma_)/self.gamma_)*self.performance_[0]
+                lprecision = ((1-self.alg_params_["gamma"])/self.alg_params_["gamma"])*self.alg_params_["model_accuracy"]["epsilon"]
+                uprecision = ((1-self.alg_params_["gamma"])/self.alg_params_["gamma"])*self.alg_params_["model_accuracy"]["epsilon"]
 
                 if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
                     temp = self.graph_[self.gi_[s]].parent_
@@ -192,7 +201,7 @@ class GBOP():
         """
         return self.as_s_.return_action(_s,self.a_,self._select_param)
 
-    def simulate(self, _a):
+    def simulate(self, _s, _a):
         """
         Simulate the GBOP object's Enviroment
         Args:
@@ -203,7 +212,7 @@ class GBOP():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
- 
+        self.map_[_s["pose"][0]][_s["pose"][1]] += 1
         s_p, r, done, info = self.env_.step(_a)
         self.m_+=1
 
