@@ -1,0 +1,28 @@
+{
+    "alg": "gbop",
+    "max_iter": 6e3,
+    "model_accuracy":
+    {
+        "epsilon": 0.1,
+        "delta": 0.05
+    },
+    "gamma": 0.95,
+    "max_graph_size": 5e4,
+    "rng_seed": 45,
+    "search" :
+    {
+        "max_samples": 5e3,
+        "horizon": 40,
+        "timeout": 5,
+        "reinit": false
+    },
+    "action_selection" : 
+    {
+        "function": "ambiguity_aware",
+        "params": 
+        {
+            "alpha": 0
+        }
+    }
+
+}

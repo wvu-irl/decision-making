@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 import time
+import copy
 
 import sys
 import os
@@ -20,7 +21,8 @@ class GBOP():
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and MCTS solves the MDP policy to some confidence.
     """
-    def __init__(self, _env : gym.Env, _action_selection_bounds, _action_selection_move, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95, _alpha=0): # 
+    def __init__(self, _alg_params, _env_params): # 
+    #def __init__(self, _env : gym.Env, _action_selection_bounds, _action_selection_move, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95, _alpha=0): # 
 
         """
          Constructor, initializes BMF-AST
