@@ -53,7 +53,6 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     return optAction
 
 def gbop_dm(_s,_const = 1,_params=[], _solver = None):
-    delta = _solver.alg_params_["model_accuracy"]["delta"]
     L = _solver.bounds_[0]
     U = _solver.bounds_[1]
     

@@ -146,12 +146,12 @@ class AOGS():
             self.d_ = 0
             do_reset = True
             is_terminal = False
-            is_leaf = False
+            # is_leaf = False
             # print("n " + str(self.n_) + ", d " + str(d) )
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             self.is_not_converged_ = False
-            while not is_leaf and not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]:
+            while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]: #check if leaf
                 # print("---")
                 # print(s)
                 # print("n " + str(self.n_) + ", d " + str(d) )

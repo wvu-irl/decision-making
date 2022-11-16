@@ -129,7 +129,7 @@ class GBOP():
             is_terminal = False
             
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]:
-                print(s)
+                # print(s)
                 str_s = hash(str(s))
                 L, U = self.bound_outcomes(str_s)
 

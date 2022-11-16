@@ -4,7 +4,7 @@
     "model_accuracy":
     {
         "epsilon": 0.1,
-        "delta": 0.05
+        "delta": 0.1
     },
     "gamma": 0.95,
     "max_graph_size": 5e4,
