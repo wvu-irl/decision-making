@@ -117,7 +117,7 @@ class UCT():
                 nextNode,done = self.treeStep(nextNode)
                 treePrintList.append(nextNode)
             if not(self.tree_[nextNode].is_terminal_):
-                rolloutReward = self.rollout(self.tree_[nextNode],self.search_params_["rollout"],self.alg_params_["gamma"])
+                rolloutReward = self.rollout(self.tree_[nextNode],self.search_params_["rollout"])
             else:
                 rolloutReward = self.bounds_[1]/(1-self.alg_params_["gamma"])
             
