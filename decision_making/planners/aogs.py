@@ -99,7 +99,9 @@ class AOGS():
         """
         if _search_params != None:
             self.search_params_ = _search_params
-        elif "search" not in self.alg_params_:
+        elif "search" in self.alg_params_:
+            self.search_params_ = self.alg_params_["search"]
+        else:
             self.search_params_ = {
                 "max_samples": 1e3,
                 "horizon": 5,

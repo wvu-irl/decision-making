@@ -14,7 +14,7 @@
         "branch_factor_s": 4,
         "branch_factor_a": 4,
         "max_samples": 5e3,
-        "horizon": 40,
+        "horizon": 15,
         "timeout": 5,
         "reinit": false
     },

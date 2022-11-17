@@ -91,7 +91,9 @@ class GBOP():
         """
         if _search_params != None:
             self.search_params_ = _search_params
-        elif "search" not in self.alg_params_:
+        elif "search" in self.alg_params_:
+            self.search_params_ = self.alg_params_["search"]
+        else:
             self.search_params_ = {
                 "branch_factor_s": 10,
                 "branch_factor_a": 10,
