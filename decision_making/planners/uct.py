@@ -174,9 +174,10 @@ class UCT():
             self.tree_[nextNodeIndex].N_ += 1 
             self.n_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
-        #move to line above if statement and add done = true to if statement.
         if done:
-            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.alg_params_["gamma"])           
+            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.alg_params_["gamma"])  
+         #add if nextNodeIndex == self.n_: done = true to before the return
+         
         return nextNodeIndex, action, done
     
     def expand(self,nodeIndex):
