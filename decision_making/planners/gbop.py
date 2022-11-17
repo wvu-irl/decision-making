@@ -123,15 +123,21 @@ class GBOP():
             self.env_.reset()
             
             s = self.env_.get_observation()
-            # print(s)
             
             self.d_ = 0
             is_terminal = False
             
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]:
                 # print(s)
+                
+                
                 str_s = hash(str(s))
                 L, U = self.bound_outcomes(str_s)
+                
+                # if (s["pose"] == [20,20]):
+                #     print(s)
+                #     print(L,U)
+                #     plt.pause(0.05)
 
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 

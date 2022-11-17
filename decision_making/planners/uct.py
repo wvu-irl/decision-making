@@ -214,7 +214,7 @@ class UCT():
         self.m_ += 1
         return state,reward,done
 
-    def rollout(self, _s,_n = 0,gamma=.9,_param = None):
+    def rollout(self, _s,_n = 0,_param = None):
         """
         Performs rollout on UCT
         Args:from solvers.uct import UCT
@@ -231,9 +231,9 @@ class UCT():
             a = self.as_r_.return_action(_s,_param)
             # print(a)
             s,r,done = self.simulate(_s.s_, a)                
-            reward += (gamma**i)*r
+            reward += (self.alg_params_["gamma"]**i)*r
             if done or self.m_ >= self.alg_params_["search"]["max_samples"]:
-                reward += r/(1-gamma)
+                reward += r/(1-self.alg_params_["gamma"])
                 break
         return reward
 
