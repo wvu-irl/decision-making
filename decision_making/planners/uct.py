@@ -1,11 +1,12 @@
 import copy
 from email.mime import base
-from multiprocessing import parent_process
-from platform import node
 import random
 from unittest.case import _BaseTestCaseContext
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+
+
 import sys
 import os
 import copy
@@ -15,8 +16,10 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # from optimizers.optimization import Optimizer, Bellman
-from select_action import action_selection as act
+
 from problem.state_action import State, Action
+from select_action.utils import * 
+
 import gym
 
 class UCT():
@@ -24,7 +27,7 @@ class UCT():
     Perform Upper Confidence Tree Search 
     Description: User specifies problem and UCT solves for the policy
     """
-    def __init__(self, _env_sim : gym.Env,actions : int ,_action_selection_select : act.action_selection, _action_selection_rollout: act.action_selection, _N : int = 10000, _c : float = 0.5, _n_rollout : int = 15, _bounds = [0,1]):
+    def __init__(self, _alg_params, _env_params):# _env : gym.Env, _action_selection, _N = 1e5, _bounds = [0, 1], _performance = [0.05, 0.05], _gamma = 0.95):\
         """
          Constructor, initializes BMF-AST
          Args:
@@ -38,58 +41,121 @@ class UCT():
              UCT: UCT object
          """
         super(UCT, self).__init__()
-        # self.env_ = _env
-        self.env_sim_ = _env_sim
-        self.actions_ = actions
-        self.as_s_ = _action_selection_select
-        self.as_r_ = _action_selection_rollout
-        
+
+        self.alg_params_ = _alg_params
+        self.env_params_ = _env_params
+        if "search" in _alg_params:
+            self.search_params_ = _alg_params["search"]
+
+        self.as_s_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["decision_function"]], _alg_params["action_selection"]["decision_params"])
+        self.as_r_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["rollout_function"]], _alg_params["action_selection"]["rollout_params"])
+
+        self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
+
         self.m_ = 0
-        self.bounds_ = _bounds
+
+        self.reinit()
+
+        if "rng_seed" in _alg_params:
+            self.rng_ = np.random.default_rng(_alg_params["rng_seed"])
+        else:
+            self.rng_ = np.random.default_rng()
+            
+        self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])        
     
-        self.N_ : int = int(_N)
-        self.c_ : float = _c
-        self.n_rollout_ : int = _n_rollout
-        self.tree_ : list[State] = [State([],self.actions_,None,0) for i in range (self.N_)]
-        self.n_vertices_ : int  = 1
-        self.seed = np.random.randint(0,200)
+    def reinit(self):
+        self.tree_ = [State(1)] * int(self.alg_params_["max_graph_size"])
+        self.n_ = 0   
         self.render_ = False
         self.terminalStates = []
         self.terminalActions = [] 
-    
-    def reinit(self,obs):
-        self.tree_ : list[State] = [State([],self.env_sim_.get_actions(obs),None,0) for i in range (self.N_)]
-        self.n_vertices_ : int  = 1
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
 
-    def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
+
+    # def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
+    def search(self, _s : State, _search_params = None):
+        
+        if _search_params != None:
+            self.search_params_ = _search_params
+        elif "search" not in self.alg_params_:
+            self.search_params_ = {
+                "rollout": 100,
+                "max_samples": 1e3,
+                "horizon": 5,
+                "timeout": 5,
+                "reinit": True
+            }
+        if self.search_params_["reinit"]:
+            self.reinit()
+
         self.m_ = 0
-        self.n_samples_ = _num_samples
-        self.gamma_ = gamma
-        for i in range(budget):
-            if i >= self.N_-1 or self.m_ >= self.n_samples_:
-                break
-            self.env_sim_.reset(_state = s_)#, seed = self.seed) #_state = s_
-            nodeTrajectory = self.search(0,gamma)
-            nodeTrajectory[0] = "Iteration" + " " + i.__str__() + ": " + nodeTrajectory[0].__str__()
+        self.n_ += 1
+        start_time = time.perf_counter()
+        s = _s
+        
+        self.tree_[0] = State(_s,self.env_.get_actions(_s),None,0)
+
+        while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
+            temp_params = copy.deepcopy(self.env_params_)
+            temp_params["params"]["state"] = _s["pose"]
+            # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+            self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
+            # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
+            self.env_.reset()
+
+            nextNode = 0
+            treePrintList = []
+            done = False
+
+            ######
+            #
+            #
+            # Currently this does not reset at leaf nodes. It should
+            #
+            ########
+            while not(self.tree_[nextNode].is_terminal_) and not(done) and self.m_ < self.alg_params_["search"]["max_samples"]:
+                nextNode,done = self.treeStep(nextNode)
+                treePrintList.append(nextNode)
+            if not(self.tree_[nextNode].is_terminal_):
+                rolloutReward = self.rollout(self.tree_[nextNode],self.search_params_["rollout"],self.alg_params_["gamma"])
+            else:
+                rolloutReward = self.bounds_[1]/(1-self.alg_params_["gamma"])
+            
+            #rolloutReward += distance to goal()
+            self.tree_[nextNode].V_ = rolloutReward
+            self.backpropagate(nextNode,rolloutReward)
+            # return treePrintList
+            # treePrintList[0] = "Iteration" + " " + self.m_.__str__() + ": " + nodeTrajectory[0].__str__()
             # print(*nodeTrajectory, sep = " -> ")
-        Q = -np.inf
-        for a in self.tree_[0].a_:
-            Qn = 0
-            for r,s,n in  zip(a.r_, a.s_prime_i_,a.n_):
-                Qn += (r + self.gamma_*self.tree_[s].V_)*n 
-            if a.N_ != 0:
-               Qn /= a.N_
-            if Qn > Q:
-                Q = Qn
-                bestAction = a
+        # Q = -np.inf
+        # for a in self.tree_[0].a_:
+        #     Qn = 0
+        #     for r,s,n in  zip(a.r_, a.s_prime_i_,a.n_):
+        #         Qn += (r + self.alg_params_["gamma"]*self.tree_[s].V_)*n 
+        #     if a.N_ != 0:
+        #        Qn /= a.N_
+        #     if Qn > Q:
+        #         Q = Qn
+        #         bestAction = a
             # print("Q:", Qn, "R:", a.r_, "N:", a.N_, "n:", a.n_, "s':", a.s_prime_, "action:", a.a_)#, "V:",self.tree_[s].V_, "action:", a.a_)#, "State", s)
             # for sp in a.s_prime_i_:
             #     print ("V:", self.tree_[sp].V_, self.tree_[sp].V_/self.tree_[sp].N_)
         #bestAction = self.as_s_.return_action(self.tree_[0],[],self)
+        plt.cla()
+        for s in self.tree_:
+            # print(s.s_)
+            if "pose" in s.s_:
+                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        # print("---g")
+        t_map = (self.map_)
+        # print("max map ", np.max(np.max(self.map_)))
+        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        plt.pause(1)
 
-        return bestAction.a_
+        return self.as_s_.return_action(self.tree_[0],[0],self)
 
-    def select(self, nodeIndex,_param = None):
+
+    def select(self, nodeIndex,_param = []):
         """
         Expand tree at given state
         Args:
@@ -101,57 +167,31 @@ class UCT():
         """
         done = False
         action = self.as_s_.return_action(self.tree_[nodeIndex],_param,self)
-        obs,reward,done = self.simulate(action)
-        nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_vertices_,reward)
-        if nextNodeIndex == self.n_vertices_:
-            self.tree_[nextNodeIndex] = State(obs,self.env_sim_.get_actions(obs),[nodeIndex],0)
+        obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
+        nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
+        if nextNodeIndex == self.n_:
+            self.tree_[nextNodeIndex] = State(obs,self.env_.get_actions(obs),[nodeIndex],0)
             self.tree_[nextNodeIndex].N_ += 1 
-            self.n_vertices_ += 1
+            self.n_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
+        #move to line above if statement and add done = true to if statement.
         if done:
-            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.gamma_)           
+            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.alg_params_["gamma"])           
         return nextNodeIndex, action, done
     
     def expand(self,nodeIndex):
-        # print(self.actions_)
         action = random.choice(self.tree_[nodeIndex].a_unused)
         # print(action)
-        obs,reward,done = self.simulate(action)
-        nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_vertices_,reward)
-        self.tree_[nextNodeIndex] = State(obs,self.actions_,[nodeIndex],0)
+        obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
+        nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
+        self.tree_[nextNodeIndex] = State(obs,self.env_.get_actions(obs),[nodeIndex],0)
         self.tree_[nextNodeIndex].is_terminal_ = done
         self.tree_[nextNodeIndex].N_ += 1 
-        self.n_vertices_ += 1
+        self.n_ += 1
         if done:
-            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.gamma_)     
+            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.alg_params_["gamma"])     
         return nextNodeIndex
 
-
-    def search(self, baseNode = 0, gamma = .9):
-        
-        """
-        Conducts tree search from root
-        Args:
-            self (UCT): UCT Object
-            _s (State): State to start search from
-        Returns:
-            Action: Best Action from Current state
-        """
-        nextNode = baseNode
-        treePrintList = []
-        done = False
-        while not(self.tree_[nextNode].is_terminal_) and not(done) and self.m_ < self.n_samples_:
-           nextNode,done = self.treeStep(nextNode)
-           treePrintList.append(nextNode)
-        if not(self.tree_[nextNode].is_terminal_):
-            rolloutReward = self.rollout(self.tree_[nextNode],self.n_rollout_,gamma)
-        else:
-            rolloutReward = self.bounds_[1]/(1-self.gamma_)
-            
-        #rolloutReward += distance to goal()
-        self.tree_[nextNode].V_ = rolloutReward
-        self.backpropagate(nextNode,rolloutReward)
-        return treePrintList
 
     def treeStep(self, nextNode = 0):
         done = False
@@ -164,8 +204,10 @@ class UCT():
 
 
 
-    def simulate(self, _a):
-        state, reward, done, info = self.env_sim_.step(_a)
+    def simulate(self, _s, _a):
+        self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+
+        state, reward, done, info = self.env_.step(_a)
         # print(_a)
 
         self.m_ += 1
@@ -187,9 +229,9 @@ class UCT():
         for i in range(_n):
             a = self.as_r_.return_action(_s,_param)
             # print(a)
-            s,r,done = self.simulate(a)                
+            s,r,done = self.simulate(_s.s_, a)                
             reward += (gamma**i)*r
-            if done or self.m_ >= self.n_samples_:
+            if done or self.m_ >= self.alg_params_["search"]["max_samples"]:
                 reward += r/(1-gamma)
                 break
         return reward
@@ -204,30 +246,10 @@ class UCT():
                 for si,s in enumerate(a.s_prime_i_):
                     if s == _v_i:
                         r = a.r_[si]
-        nodeValue = self.gamma_* _val + r #)/self.tree_[i_parent[0]].N_
+        nodeValue = self.alg_params_["gamma"]* _val + r #)/self.tree_[i_parent[0]].N_
         N = self.tree_[i_parent[0]].N_
         self.tree_[i_parent[0]].V_ = self.tree_[i_parent[0]].V_*(N-1)/N +nodeValue/N
 
         if i_parent[0] != 0:
             self.backpropagate(i_parent[0],self.tree_[i_parent[0]].V_)
             #print(self.tree_[i_parent[0]].V_)
-            
-    def playGame(self, stateIndex = 0):
-        state = self.env_.reset(seed = self.seed)
-        self.tree_[0].s_ = state
-        done = False
-        self.env_.render()
-        while True:
-            if not(self.tree_[stateIndex].is_terminal_) and not(done):
-                self.reinit(state)
-                bestAction = self.learn(state)
-                state, reward, done, info  = self.env_.step(bestAction.a_)
-                print(bestAction.a_)
-                self.env_.render()
-                # for s in bestAction.s_prime_i_:
-                #     if self.tree_[s].s_[0] == state:
-                #         stateIndex = s
-            else:
-                self.env_.reset(seed = self.seed)
-                stateIndex = 0
-                done = False

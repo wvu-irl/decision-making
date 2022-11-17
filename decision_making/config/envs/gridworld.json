@@ -8,6 +8,7 @@
         "goal": [10,10],
         "p": 0,
         "prefix": "/home/jared/ambiguity_ws/data/gridworld/",
-        "reward_bounds": [-0.01,1]
+        "reward_bounds": [-0.01,1],
+        "seed": 234
     }
 }

@@ -41,12 +41,16 @@ def UCB1(_s : State,_const,_param=[],_solver = None):
     optAction = math.nan
     actions = _s.a_ 
     random.shuffle(actions)
+    if _param == []:
+        c = _const["c"] 
+    else:
+        c = _param[0]
     for a in actions:
         Q = 0
         for r,s_p_i,n in zip(a.r_, a.s_prime_i_, a.n_):
             Q += n*(r + _solver.alg_params_["gamma"]*_solver.tree_[s_p_i].V_)#/_solver.tree_[s_p_i].N_  #UCB1 Equation
         Q /= a.N_
-        Q += 2*_const["c"]*np.sqrt(((np.log(_s.N_))/a.N_))
+        Q += 2*c*np.sqrt(((np.log(_s.N_))/a.N_))
         if Q > UCB or np.isnan(UCB):
                 UCB = Q
                 optAction = a.a_
@@ -58,8 +62,7 @@ def gbop_dm(_s,_const = 1,_params=[], _solver = None):
     
     U_max = -inf
     L_min = inf
-    ind_L = 0
-    ind_U = 0
+
     Us = []
     Ls = []
 

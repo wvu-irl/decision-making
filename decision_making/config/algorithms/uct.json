@@ -1,27 +1,28 @@
 {
-    "alg": "aogs",
+    "alg": "uct",
     "max_iter": 6e3,
-    "model_accuracy":
-    {
-        "epsilon": 0.1,
-        "delta": 0.05
-    },
     "gamma": 0.95,
     "max_graph_size": 5e4,
     "rng_seed": 45,
     "search" :
     {
+        "rollout": 15,
         "max_samples": 5e3,
         "horizon": 40,
         "timeout": 5,
-        "reinit": false
+        "reinit": true
     },
     "action_selection" : 
     {
-        "function": "ambiguity_aware",
-        "params": 
+        "decision_function": "ucb1",
+        "decision_params": 
         {
-            "alpha": 0
+            "c": 0.5
+        },
+        "rollout_function": "random_action",
+        "rollout_params": 
+        {
+            
         }
     }
 
