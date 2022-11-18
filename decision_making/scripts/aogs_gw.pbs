@@ -21,4 +21,4 @@ PBS -j oe
 cd $PBS_O_WORKDIR
 
 # Run the program
-python3 analysis/multithread_collect.py aogs gridworld mt_aogs
+python3 analysis/multithread_collect.py aogs gridworld mt_aogs 80

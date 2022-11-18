@@ -19,8 +19,10 @@ import copy
 import pickle
 
 from planners.utils import *
-import utils as u
+# import utils as u
 
+def get_distance(s1, s2):
+        return ((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)**0.5
 # Unrelated note: Sample MCTS graph like RRT. Then try to move twoards that subgoal, instead of normal sim. (similar to planning trees IROS paper)
 
 
@@ -91,8 +93,9 @@ def poolHandler(alg_config, env_config, mt_config):
     fp = os.path.dirname(__file__) + "/multithread/" + alg_config["alg"] + "_" + env_str + ".pkl" #mt_config["file"] + ".npy"
 
     temp = []
-    temp.append(mt_config["epsilon"])
-    temp.append(mt_config["delta"])
+    if alg_config["alg"] != "uct":
+        temp.append(mt_config["epsilon"])
+        temp.append(mt_config["delta"])
     temp.append(mt_config["horizon"])
     temp.append(mt_config["max_samples"])
     if alg_config["alg"] == "uct":
@@ -117,35 +120,55 @@ def poolHandler(alg_config, env_config, mt_config):
         for itm in el:
             data_key += str(itm) + "_"
 
-        alg_config["model_accuracy"]["epsilon"] = el[0]
-        alg_config["model_accuracy"]["delta"] = el[1]
-        alg_config["search"]["horizon"] = el[2]
-        alg_config["search"]["max_samples"] = el[3]
-        # print("ms", alg_config["search"]["max_samples"])
-        if alg_config["alg"] == "uct":
-           alg_config["action_selection"]["params"]["c"] = el[4]
+        if alg_config["alg"] != "uct": 
+            alg_config["model_accuracy"]["epsilon"] = el[0]
+            alg_config["model_accuracy"]["delta"] = el[1]
+            alg_config["search"]["horizon"] = el[2]
+            alg_config["search"]["max_samples"] = el[3]
+            # print("ms", alg_config["search"]["max_samples"])
+            if alg_config["alg"] == "uct":
+                alg_config["action_selection"]["params"]["c"] = el[4]
+            else:
+                alg_config["action_selection"]["params"]["alpha"] = el[4]
+            if not mt_config["randomize_states"]:
+                env_config["params"]["state"] = el[5]
+                env_config["params"]["goal"] = el[6]
+                env_config["params"]["dimensions"] = el[7]
+                env_config["params"]["p"] = el[8]   
+            else: 
+                env_config["params"]["dimensions"] = el[6]
+                env_config["params"]["p"] = el[7]
         else:
-            alg_config["action_selection"]["params"]["alpha"] = el[4]
-        if not mt_config["randomize_states"]:
-            env_config["params"]["state"] = el[5]
-            env_config["params"]["goal"] = el[6]
-            env_config["params"]["dimensions"] = el[7]
-            env_config["params"]["p"] = el[8]   
-        else: 
-            env_config["params"]["dimensions"] = el[6]
-            env_config["params"]["p"] = el[7]   
+            alg_config["search"]["horizon"] = el[0]
+            alg_config["search"]["max_samples"] = el[1]
+            # print("ms", alg_config["search"]["max_samples"])
+            if alg_config["alg"] == "uct":
+                alg_config["action_selection"]["decision_params"]["c"] = el[2]
+            elif alg_config["alg"] == "uct":
+                alg_config["action_selection"]["move_params"]["alpha"] = el[2]
+            else:
+                alg_config["action_selection"]["params"]["alpha"] = el[2]
+            if not mt_config["randomize_states"]:
+                env_config["params"]["state"] = el[3]
+                env_config["params"]["goal"] = el[4]
+                env_config["params"]["dimensions"] = el[5]
+                env_config["params"]["p"] = el[6]   
+            else: 
+                env_config["params"]["dimensions"] = el[3]
+                env_config["params"]["p"] = el[4]    
         
         # print({"env": env_config, "alg": alg_config})#, "trial": count, "instance": i})    
         for i in range(mt_config["n_trials"]):
             # print({"env": env_config.copy(), "alg": alg_config.copy(), "trial": count, "instance": i})
             if mt_config["randomize_states"]:
-                s = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
-                g = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
-                while u.get_distance(s,g) < 5:
-                    g = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
+                s = [rng.integers(0,mt_config["world_size"][0][0]), rng.integers(0,mt_config["world_size"][0][1])]
+                g = [rng.integers(0,mt_config["world_size"][0][0]), rng.integers(0,mt_config["world_size"][0][1])]
+                while get_distance(s,g) < 5:
+                    g = [rng.integers(0,mt_config["world_size"][0][0]), rng.integers(0,mt_config["world_size"][0][1])]
 
                 env_config["params"]["state"] = s
                 env_config["params"]["goal"] = g
+            print(i)
             trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
             
         count += 1
@@ -207,6 +230,7 @@ if __name__=='__main__':
     env_config = json.load(f)  
     f = open(current + "/../config/multithread/" + mt_config_file +  ".json")
     mt_config = json.load(f)    
+    mt_config["n_threads"] = sys.argv[4]
 
     poolHandler(alg_config, env_config, mt_config)
 

@@ -143,16 +143,16 @@ class UCT():
             # for sp in a.s_prime_i_:
             #     print ("V:", self.tree_[sp].V_, self.tree_[sp].V_/self.tree_[sp].N_)
         #bestAction = self.as_s_.return_action(self.tree_[0],[],self)
-        plt.cla()
-        for s in self.tree_:
-            # print(s.s_)
-            if "pose" in s.s_:
-                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
-        # print("---g")
-        t_map = (self.map_)
-        # print("max map ", np.max(np.max(self.map_)))
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        plt.pause(1)
+        # plt.cla()
+        # for s in self.tree_:
+        #     # print(s.s_)
+        #     if "pose" in s.s_:
+        #         self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        # # print("---g")
+        # t_map = (self.map_)
+        # # print("max map ", np.max(np.max(self.map_)))
+        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        # plt.pause(1)
 
         return self.as_s_.return_action(self.tree_[0],[0],self)
 
@@ -208,7 +208,7 @@ class UCT():
 
 
     def simulate(self, _s, _a):
-        self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+        # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
 
         state, reward, done, info = self.env_.step(_a)
         # print(_a)

@@ -169,15 +169,15 @@ class GBOP():
                 s = s_p
                 # print(t)
                 # print(self.n_)
-        plt.cla()
-        for s in self.graph_:
-            # print(s.s_)
-            if "pose" in s.s_:
-                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
-        t_map = (self.map_)
-        print("max map ", np.max(np.max(self.map_)))
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        plt.pause(1)
+        # plt.cla()
+        # for s in self.graph_:
+        #     # print(s.s_)
+        #     if "pose" in s.s_:
+        #         self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        # t_map = (self.map_)
+        # print("max map ", np.max(np.max(self.map_)))
+        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        # plt.pause(1)
         a = self.a_s_m_.return_action(self.graph_[self.gi_[_str_s]],[self.alpha_],self)
         return a
                
@@ -213,7 +213,7 @@ class GBOP():
             r: reward collected from simulation
             done (bool): Flag for simulation completion
         """
-        self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+        # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
         s_p, r, done, info = self.env_.step(_a)
         self.m_+=1
 
