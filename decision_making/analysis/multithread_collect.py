@@ -72,7 +72,7 @@ def runWrapper(params : dict):
         data[params["key"]]["goal"].append(params["env"]["params"]["goal"])
     else:
         data[params["key"]] = {"ts": ts, "R": accum_reward}
-        print("oh")
+        # print("oh")
     
     with open(params["fp"], 'wb') as f:
         pickle.dump(data,f)      
@@ -170,7 +170,7 @@ def poolHandler(alg_config, env_config, mt_config):
 
                 env_config["params"]["state"] = s
                 env_config["params"]["goal"] = g
-            print(i)
+            # print(i)
             trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
             
         count += 1
