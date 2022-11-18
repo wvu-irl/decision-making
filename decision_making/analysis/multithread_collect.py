@@ -128,6 +128,8 @@ def poolHandler(alg_config, env_config, mt_config):
             # print("ms", alg_config["search"]["max_samples"])
             if alg_config["alg"] == "uct":
                 alg_config["action_selection"]["params"]["c"] = el[4]
+            elif alg_config["alg"] == "gbop":
+                alg_config["action_selection"]["move_params"]["alpha"] = el[4]    
             else:
                 alg_config["action_selection"]["params"]["alpha"] = el[4]
             if not mt_config["randomize_states"]:
@@ -136,15 +138,15 @@ def poolHandler(alg_config, env_config, mt_config):
                 env_config["params"]["dimensions"] = el[7]
                 env_config["params"]["p"] = el[8]   
             else: 
-                env_config["params"]["dimensions"] = el[6]
-                env_config["params"]["p"] = el[7]
+                env_config["params"]["dimensions"] = el[5]
+                env_config["params"]["p"] = el[6]
         else:
             alg_config["search"]["horizon"] = el[0]
             alg_config["search"]["max_samples"] = el[1]
             # print("ms", alg_config["search"]["max_samples"])
             if alg_config["alg"] == "uct":
                 alg_config["action_selection"]["decision_params"]["c"] = el[2]
-            elif alg_config["alg"] == "uct":
+            elif alg_config["alg"] == "gbop":
                 alg_config["action_selection"]["move_params"]["alpha"] = el[2]
             else:
                 alg_config["action_selection"]["params"]["alpha"] = el[2]
@@ -230,7 +232,7 @@ if __name__=='__main__':
     env_config = json.load(f)  
     f = open(current + "/../config/multithread/" + mt_config_file +  ".json")
     mt_config = json.load(f)    
-    mt_config["n_threads"] = sys.argv[4]
+    mt_config["n_threads"] = int(sys.argv[4])
 
     poolHandler(alg_config, env_config, mt_config)
 
