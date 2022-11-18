@@ -1,0 +1,15 @@
+{
+    "file" : "test",
+    "n_threads" : 80,
+    "n_trials" : 10,
+    "epsilon": [0.1],
+    "delta": [0.05],
+    "max_samples": [500],
+    "horizon": [50],
+    "alpha": [0],
+    "randomize_states": false,
+    "initial_state": [[20,20]],
+    "goal_state": [[10,10]],    
+    "world_size": [[50,50]],
+    "probabilities": [0, 0.1]
+}

@@ -211,9 +211,9 @@ def poolHandler(alg_config, env_config, mt_config):
     print("Simulations complete.")
 
     # Save results
-    fp = os.path.dirname(__file__) + "/multithread/" + mt_config["file"] + ".npy"
-    with open(fp, 'wb') as f:
-            np.save(f, data)
+    #fp = os.path.dirname(__file__) + "/multithread/" + mt_config["file"] + ".npy"
+    #with open(fp, 'wb') as f:
+    #        np.save(f, data)
     # saveResultsFile(results_filename, sim_worlds)
     # if save_prev_exp:
     #     prev_exp_data.save(prev_exp_filepath)
