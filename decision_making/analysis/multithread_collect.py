@@ -19,6 +19,7 @@ import copy
 import pickle
 
 from planners.utils import *
+import utils as u
 
 # Unrelated note: Sample MCTS graph like RRT. Then try to move twoards that subgoal, instead of normal sim. (similar to planning trees IROS paper)
 
@@ -65,6 +66,8 @@ def runWrapper(params : dict):
     if params["key"] in data:
         data[params["key"]]["ts"].append(ts)
         data[params["key"]]["R"].append(accum_reward)
+        data[params["key"]]["init"].append(params["env"]["params"]["state"])
+        data[params["key"]]["goal"].append(params["env"]["params"]["goal"])
     else:
         data[params["key"]] = {"ts": ts, "R": accum_reward}
         print("oh")
@@ -82,6 +85,8 @@ def runWrapper(params : dict):
     # return params
     
 def poolHandler(alg_config, env_config, mt_config):
+    
+    rng = np.random.default_rng()
     env_str = env_config["env"].replace("custom_gym/", "")
     fp = os.path.dirname(__file__) + "/multithread/" + alg_config["alg"] + "_" + env_str + ".pkl" #mt_config["file"] + ".npy"
 
@@ -90,9 +95,13 @@ def poolHandler(alg_config, env_config, mt_config):
     temp.append(mt_config["delta"])
     temp.append(mt_config["horizon"])
     temp.append(mt_config["max_samples"])
-    temp.append(mt_config["alpha"])
-    temp.append(mt_config["initial_state"]) # These should be provided as a bumber and sampled
-    temp.append(mt_config["goal_state"])    # These should be prior sampled
+    if alg_config["alg"] == "uct":
+       temp.append(mt_config["c"]) 
+    else:
+        temp.append(mt_config["alpha"])
+    if not mt_config["randomize_states"]:
+        temp.append(mt_config["initial_state"]) # These should be provided as a bumber and sampled
+        temp.append(mt_config["goal_state"])    # These should be prior sampled
     temp.append(mt_config["world_size"])
     temp.append(mt_config["probabilities"])
 
@@ -113,15 +122,30 @@ def poolHandler(alg_config, env_config, mt_config):
         alg_config["search"]["horizon"] = el[2]
         alg_config["search"]["max_samples"] = el[3]
         # print("ms", alg_config["search"]["max_samples"])
-        alg_config["action_selection"]["params"]["alpha"] = el[4]
-        env_config["params"]["state"] = el[5]
-        env_config["params"]["goal"] = el[6]
-        env_config["params"]["dimensions"] = el[6]
-        env_config["params"]["p"] = el[8]    
+        if alg_config["alg"] == "uct":
+           alg_config["action_selection"]["params"]["c"] = el[4]
+        else:
+            alg_config["action_selection"]["params"]["alpha"] = el[4]
+        if not mt_config["randomize_states"]:
+            env_config["params"]["state"] = el[5]
+            env_config["params"]["goal"] = el[6]
+            env_config["params"]["dimensions"] = el[7]
+            env_config["params"]["p"] = el[8]   
+        else: 
+            env_config["params"]["dimensions"] = el[6]
+            env_config["params"]["p"] = el[7]   
         
         # print({"env": env_config, "alg": alg_config})#, "trial": count, "instance": i})    
         for i in range(mt_config["n_trials"]):
             # print({"env": env_config.copy(), "alg": alg_config.copy(), "trial": count, "instance": i})
+            if mt_config["randomize_states"]:
+                s = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
+                g = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
+                while u.get_distance(s,g) < 5:
+                    g = [rng.np.random.choice(list(range(mt_config["world_size"][0]))), rng.np.random.choice(list(range(mt_config["world_size"][1])))]
+
+                env_config["params"]["state"] = s
+                env_config["params"]["goal"] = g
             trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
             
         count += 1
@@ -143,7 +167,7 @@ def poolHandler(alg_config, env_config, mt_config):
         
     for el in trials:
         if el["key"] not in data:
-            data[el["key"]] = {"ts": [], "R": []}
+            data[el["key"]] = {"ts": [], "R": [], "init":[], "goal": []}
             # print("hai")
         
     with open(fp, 'wb') as f:
