@@ -143,13 +143,7 @@ def poolHandler(alg_config, env_config, mt_config):
         else:
             alg_config["search"]["horizon"] = el[0]
             alg_config["search"]["max_samples"] = el[1]
-            # print("ms", alg_config["search"]["max_samples"])
-            if alg_config["alg"] == "uct":
-                alg_config["action_selection"]["decision_params"]["c"] = el[2]
-            elif alg_config["alg"] == "gbop":
-                alg_config["action_selection"]["move_params"]["alpha"] = el[2]
-            else:
-                alg_config["action_selection"]["params"]["alpha"] = el[2]
+            alg_config["action_selection"]["decision_params"]["c"] = el[2]
             if not mt_config["randomize_states"]:
                 env_config["params"]["state"] = el[3]
                 env_config["params"]["goal"] = el[4]
