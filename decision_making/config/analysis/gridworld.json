@@ -1,0 +1,5 @@
+{
+    "aogs_file": "aogs_GridWorld-v0.pkl",
+    "gbop_file": "gbop_GridWorld-v0.pkl",
+    "uct_file":  "uct_GridWorld-v0.pkl"
+}
