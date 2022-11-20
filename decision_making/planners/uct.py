@@ -237,7 +237,7 @@ class UCT():
             if done or self.m_ >= self.alg_params_["search"]["max_samples"]:
                 reward += r/(1-self.alg_params_["gamma"])
                 break
-        return reward
+        return reward   
 
     def backpropagate(self, _v_i, _val):
 

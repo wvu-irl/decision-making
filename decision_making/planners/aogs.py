@@ -124,6 +124,7 @@ class AOGS():
             self.n_ += 1
             
         self.is_not_converged_ = True
+        print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = copy.deepcopy(self.env_params_)
             temp_params["params"]["state"] = _s["pose"]
@@ -141,8 +142,10 @@ class AOGS():
             #     s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
             # else:
                 # print("yee")
+
             s = _s
             
+            print(hash(str(s)))
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
             self.d_ = 0
@@ -171,8 +174,8 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 
+                a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
                 # print("l151 ",s)

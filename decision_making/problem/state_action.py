@@ -181,7 +181,7 @@ class Action():
             _r (float): reward
         """
         ind = -1
-        if _s in self.s_prime_:
+        if np.isin(_s,self.s_prime_):
             for x in range(len(self.s_prime_)): 
                 if _s == self.s_prime_[x]:
                     i = x
