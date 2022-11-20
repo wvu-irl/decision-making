@@ -43,142 +43,116 @@ if test_env["uct_file"] != "":
     with open(current + "/../analysis/multithread/" + test_env["uct_file"] , "rb") as f:
             uct_pickle = pickle.load(f)
 
-# aogs_keys = []
-# temp = []
-# temp.append(var_config["epsilon"])
-# temp.append(var_config["delta"])
-# temp.append(var_config["horizon"])
-# temp.append(var_config["max_samples"])
-# temp.append(var_config["alpha"])
-# temp.append(var_config["probabilities"])
-# temp = list(itertools.product(*temp))
- 
-# for el in temp:
-#     data_key = ""
-#     for itm in el:
-#         data_key += str(itm) + "_"
-#     aogs_keys.append(data_key)
-
-
-# temp = copy.deepcopy(aogs_data)
-# for el in aogs_data: 
-#     add_el = True
-#     if el["alg"]["model_accuracy"]["epsilon"] not in var_config["epsilon"]:
-#         add_el = False
-#     if el["alg"]["model_accuracy"]["delta"] not in var_config["delta"]:
-#         add_el = False
-#     if el["alg"]["search"]["horizon"] not in var_config["horizon"]:
-#         add_el = False
-#     if el["alg"]["search"]["max_samples"] not in var_config["max_samples"]:
-#         add_el = False
-#     if el["alg"]["action_selection"]["params"]["alpha"] not in var_config["alpha"]:
-#         add_el = False
-#     if el["env"]["params"]["p"] not in var_config["probabilities"]:
-#         add_el = False      
-        
-#     if add_el:
-#         temp.append(el)
-# aogs_data = copy.deepcopy(aogs_data)
-
-# temp = copy.deepcopy(gbop_data)
-# for el in gbop_data: 
-#     add_el = True
-#     if el["alg"]["model_accuracy"]["epsilon"] not in var_config["epsilon"]:
-#         add_el = False
-#     if el["alg"]["model_accuracy"]["delta"] not in var_config["delta"]:
-#         add_el = False
-#     if el["alg"]["search"]["horizon"] not in var_config["horizon"]:
-#         add_el = False
-#     if el["alg"]["search"]["max_samples"] not in var_config["max_samples"]:
-#         add_el = False
-#     if el["alg"]["action_selection"]["move_params"]["alpha"] not in var_config["alpha"]:
-#         add_el = False
-#     if el["env"]["params"]["p"] not in var_config["probabilities"]:
-#         add_el = False      
-        
-#     if add_el:
-#         temp.append(el)
-# gbop_data = copy.deepcopy(gbop_data)
-
-# temp = copy.deepcopy(uct_data)
-# for el in uct_data: 
-#     add_el = True
-#     if el["alg"]["search"]["horizon"] not in var_config["horizon"]:
-#         add_el = False
-#     if el["alg"]["search"]["max_samples"] not in var_config["max_samples"]:
-#         add_el = False
-#     if el["alg"]["action_selection"]["decision_params"]["c"] not in var_config["c"]:
-#         add_el = False
-#     if el["env"]["params"]["p"] not in var_config["probabilities"]:
-#         add_el = False      
-        
-#     if add_el:
-#         temp.append(el)
-# uct_data = copy.deepcopy(uct_data)
-
-#for each load corresponding mt_config params (except distance which must be computed)
-#bin according to param. 
-
 aogs_data = []
 gbop_data = []
 uct_data = []
-
 for d in aogs_pickle:
-    params = re.split((r'_+', d["data_key"]))
+    params = re.split(r'_+', d)
     params.pop()
     
-    temp = {}
-    temp["epsilon"] = params[0]
-    temp["delta"] = params[1]
-    temp["horizon"] = params[2]
-    temp["samples"] = params[3]
-    temp["alpha"] = params[4]
-    temp["p"] = params[5]
-    temp["init"] = d["init"]
-    temp["goal"] = d["goal"]
-    temp["r"] = d["R"]
-    temp["t"] = d["ts"]
-    temp["d"] = get_distance(d["init"], d["goal"])
-    
-    aogs_data.append(temp)
+    if len(aogs_pickle[d]["R"]) != 0:
+        temp = {}
+        temp["epsilon"] = params[0]
+        temp["delta"] = params[1]
+        temp["horizon"] = params[2]
+        temp["samples"] = params[3]
+        temp["alpha"] = params[4]
+        temp["p"] = params[5]
+        temp["init"] = aogs_pickle[d]["init"]
+        temp["goal"] = aogs_pickle[d]["goal"]
+        temp["r"] = aogs_pickle[d]["R"]
+        temp["t"] = aogs_pickle[d]["ts"]
+        l = []
+        for s1, s2 in zip(aogs_pickle[d]["init"], aogs_pickle[d]["goal"]):
+            l.append(get_distance(s1,s2))
+        temp["d"] = l
+        
+        aogs_data.append(temp)
     
 for d in gbop_pickle:
-    params = re.split((r'_+', d["data_key"]))
+    params = re.split(r'_+', d)
     params.pop()
     
-    temp = {}
-    temp["epsilon"] = params[0]
-    temp["delta"] = params[1]
-    temp["horizon"] = params[2]
-    temp["samples"] = params[3]
-    temp["alpha"] = params[4]
-    temp["p"] = params[5]
-    temp["init"] = d["init"]
-    temp["goal"] = d["goal"]
-    temp["r"] = d["R"]
-    temp["t"] = d["ts"]
-    temp["d"] = get_distance(d["init"], d["goal"])
-    
-    gbop_data.append(temp)
+    if len(gbop_pickle[d]["R"]) != 0:
+        temp = {}
+        temp["epsilon"] = params[0]
+        temp["delta"] = params[1]
+        temp["horizon"] = params[2]
+        temp["samples"] = params[3]
+        temp["alpha"] = params[4]
+        temp["p"] = params[5]
+        temp["init"] = gbop_pickle[d]["init"]
+        temp["goal"] = gbop_pickle[d]["goal"]
+        temp["r"] = gbop_pickle[d]["R"]
+        temp["t"] = gbop_pickle[d]["ts"]
+        l = []
+        for s1, s2 in zip(gbop_pickle[d]["init"], gbop_pickle[d]["goal"]):
+            l.append(get_distance(s1,s2))
+        temp["d"] = l        
+        gbop_data.append(temp)
     
 
-for d in aogs_pickle:
-    params = re.split((r'_+', d["data_key"]))
+for d in uct_pickle:
+    params = re.split(r'_+', d)
     params.pop()
     
-    temp = {}
-    temp["horizon"] = params[0]
-    temp["samples"] = params[1]
-    temp["c"] = params[2]
-    temp["p"] = params[3]
-    temp["init"] = d["init"]
-    temp["goal"] = d["goal"]
-    temp["r"] = d["R"]
-    temp["t"] = d["ts"]
-    temp["d"] = get_distance(d["init"], d["goal"])
-    
-    aogs_data.append(temp)
+    if len(uct_pickle[d]["R"]) != 0:
+        temp = {}
+        temp["horizon"] = params[0]
+        temp["samples"] = params[1]
+        temp["c"] = params[2]
+        temp["p"] = params[3]
+        temp["init"] = uct_pickle[d]["init"]
+        temp["goal"] = uct_pickle[d]["goal"]
+        temp["r"] = uct_pickle[d]["R"]
+        temp["t"] = uct_pickle[d]["ts"]
+        l = []
+        for s1, s2 in zip(uct_pickle[d]["init"], uct_pickle[d]["goal"]):
+            l.append(get_distance(s1,s2))
+        temp["d"] = l        
+        uct_data.append(temp)
             
+
+x = var_config[indep_variable]
+
+data = {}
+for el in x:
+    data[str(el)] = []
+    
+aogs_y = copy.deepcopy(data)
+gbop_y = copy.deepcopy(data)
+uct_y = copy.deepcopy(data)
+
+for el in aogs_data:
+    aogs_y[el[indep_variable]] += el[dep_variable]
+# for el in gbop_data:
+#     gbop_y[el[indep_variable]].append(el[dep_variable])
+# for el in uct_data:
+#     uct_y[el[indep_variable]].append(el[dep_variable])
+
+y = []
+for el in x:
+    print(aogs_y[str(el)])
+    y.append(np.average(np.array(aogs_y[str(el)])))
+
+ 
+plt.plot(x,y) 
+plt.show()
+plt.pause(1)
+while 1:
+    plt.pause(1)  
+# plt.ylabel("Average Reward")
+# plt.xlabel("Budget (n)")
+# plt.title(title_name)
+# plt.legend(["aogs_c", "aogs_o", "ucb", "gbop"])
+# ax.axis('scaled')
+# plt.autoscale(enable=False)
+# cb = plt.colorbar()
+# plt.legend()
+
+# plt.savefig(fp + "figs/" + title_name + "_avg_reward.eps", format="eps", bbox_inches="tight", pad_inches=0)
+# plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_inches="tight", pad_inches=0.05)
+# cb.remove()
 
 # cross_ref -> alg, param, p
 # indep_variable -> param, d, horizon, samples, p, e,d
