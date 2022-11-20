@@ -7,6 +7,7 @@ sys.path.append(parent)
 import json
 import pickle
 
+import re
 import numpy as np
 import random
 import copy
@@ -23,22 +24,24 @@ def compute_min_time(d):
     return np.ceil(d/(2**(1/2)))
 
 var_file = sys.argv[1]
-test_env = sys.argv[2]
+test_file = sys.argv[2]
 dep_variable = sys.argv[3]
 indep_variable = sys.argv[4]
 
-f = open(current + "/../config/multithread/" + var_file +  ".json")
+f = open(current + "/../config/analysis/" + var_file +  ".json")
 var_config = json.load(f)
+f = open(current + "/../config/analysis/" + test_file +  ".json")
+test_env = json.load(f)
 
 if test_env["aogs_file"] != "":
-    with open(current + "/analysis/multithread/" + test_env["aogs_file"] , "rb") as f:
-            aogs_data = pickle.load(f)
+    with open(current + "/../analysis/multithread/" + test_env["aogs_file"] , "rb") as f:
+            aogs_pickle = pickle.load(f)
 if test_env["gbop_file"] != "":
-    with open(current + "/analysis/multithread/" + test_env["gbop_file"] , "rb") as f:
-            gbop_data = pickle.load(f)
+    with open(current + "/../analysis/multithread/" + test_env["gbop_file"] , "rb") as f:
+            gbop_pickle = pickle.load(f)
 if test_env["uct_file"] != "":
-    with open(current + "/analysis/multithread/" + test_env["uct_file"] , "rb") as f:
-            uct_data = pickle.load(f)
+    with open(current + "/../analysis/multithread/" + test_env["uct_file"] , "rb") as f:
+            uct_pickle = pickle.load(f)
 
 # aogs_keys = []
 # temp = []
@@ -115,202 +118,156 @@ if test_env["uct_file"] != "":
 
 #for each load corresponding mt_config params (except distance which must be computed)
 #bin according to param. 
-aogs_keys = []
-gbop_keys = []
-uct_keys = []
 
-aogs_rewards = {}
-aogs_ts = {}
-aogs_init = {}
-aogs_goal = {}
-aogs_dist = {}
+aogs_data = []
+gbop_data = []
+uct_data = []
 
-gbop_rewards = {}
-gbop_ts = {}
-gbop_init = {}
-gbop_goal = {}
-gbop_dist = {}
+for d in aogs_pickle:
+    params = re.split((r'_+', d["data_key"]))
+    params.pop()
+    
+    temp = {}
+    temp["epsilon"] = params[0]
+    temp["delta"] = params[1]
+    temp["horizon"] = params[2]
+    temp["samples"] = params[3]
+    temp["alpha"] = params[4]
+    temp["p"] = params[5]
+    temp["init"] = d["init"]
+    temp["goal"] = d["goal"]
+    temp["r"] = d["R"]
+    temp["t"] = d["ts"]
+    temp["d"] = get_distance(d["init"], d["goal"])
+    
+    aogs_data.append(temp)
+    
+for d in gbop_pickle:
+    params = re.split((r'_+', d["data_key"]))
+    params.pop()
+    
+    temp = {}
+    temp["epsilon"] = params[0]
+    temp["delta"] = params[1]
+    temp["horizon"] = params[2]
+    temp["samples"] = params[3]
+    temp["alpha"] = params[4]
+    temp["p"] = params[5]
+    temp["init"] = d["init"]
+    temp["goal"] = d["goal"]
+    temp["r"] = d["R"]
+    temp["t"] = d["ts"]
+    temp["d"] = get_distance(d["init"], d["goal"])
+    
+    gbop_data.append(temp)
+    
 
-uct_rewards = {}
-uct_ts = {}
-uct_init = {}
-uct_goal = {}
-uct_dist = {}
-
-if indep_variable == "distance":
-    pass
-else:
-    if indep_variable == "param":
-        indep_key = "alpha"
-        indep_key_uct = "c"
-    elif indep_variable == "samples":
-        indep_key = "n_samples"
-        indep_key_uct = "n_samples"
-    elif indep_variable == "horizon":
-        indep_key = "horizon"
-        indep_key_uct = "horizon"
-        
-    for el in var_config[indep_key]:
-        aogs_rewards[str(el)] = []
-        aogs_ts[str(el)] = []
-        aogs_init[str(el)] = []
-        aogs_goal[str(el)] = []
-        aogs_dist[str(el)] = []
-    for el in var_config[indep_key]:
-        gbop_rewards[str(el)] = []
-        gbop_ts[str(el)] = []
-        gbop_init[str(el)] = []
-        gbop_goal[str(el)] = []
-        gbop_dist[str(el)] = []
-    for el in var_config[indep_key_uct]:
-        uct_rewards[str(el)] = []
-        uct_ts[str(el)] = []
-        uct_init[str(el)] = []
-        uct_goal[str(el)] = []
-        uct_dist[str(el)] = []
-        
-    for el in var_config[indep_key]:
-        temp = []
-        temp.append(var_config["epsilon"])
-        temp.append(var_config["delta"])
-        temp.append(var_config["horizon"])
-        temp.append(var_config["max_samples"])
-        temp.append([el])
-        temp.append(var_config["probabilities"])
-        temp = list(itertools.product(*temp))
-        
-        for itm in temp:
-            data_key = ""
-            for param in itm:
-                data_key += str(param) + "_"
+for d in aogs_pickle:
+    params = re.split((r'_+', d["data_key"]))
+    params.pop()
+    
+    temp = {}
+    temp["horizon"] = params[0]
+    temp["samples"] = params[1]
+    temp["c"] = params[2]
+    temp["p"] = params[3]
+    temp["init"] = d["init"]
+    temp["goal"] = d["goal"]
+    temp["r"] = d["R"]
+    temp["t"] = d["ts"]
+    temp["d"] = get_distance(d["init"], d["goal"])
+    
+    aogs_data.append(temp)
             
-            aogs_rewards[str(el)].append(aogs_data[data_key]["R"])
-            aogs_ts[str(el)].append(aogs_data[data_key]["ts"])
-            aogs_init[str(el)].append(aogs_data[data_key]["init"])
-            aogs_goal[str(el)].append(aogs_data[data_key]["goal"])
 
-            gbop_rewards[str(el)].append(gbop_data[data_key]["R"])
-            gbop_ts[str(el)].append(gbop_data[data_key]["ts"])
-            gbop_init[str(el)].append(gbop_data[data_key]["init"])
-            gbop_goal[str(el)].append(gbop_data[data_key]["goal"])
-        
-        aogs_keys.append(temp)
-        gbop_keys.append(temp)
-        
-    for el in var_config[indep_key_uct]:
-        temp = []
-        temp.append(var_config["horizon"])
-        temp.append(var_config["max_samples"])
-        temp.append([el])
-        temp.append(var_config["probabilities"])
-        temp = list(itertools.product(*temp))
-        
-        for itm in temp:
-            data_key = ""
-            for param in itm:
-                data_key += str(param) + "_"
-            
-            uct_rewards[str(el)].append(uct_data[data_key]["R"])
-            uct_ts[str(el)].append(uct_data[data_key]["ts"])
-            uct_init[str(el)].append(uct_data[data_key]["init"])
-            uct_goal[str(el)].append(uct_data[data_key]["goal"])
-        
-        uct_keys.append(temp)
-            
-# do distance computation
+# cross_ref -> alg, param, p
+# indep_variable -> param, d, horizon, samples, p, e,d
+# dep_variable -> r, t
 
-#do reward and num timesteps to reach goal
-if dep_variable == "ed":
-    pass
-elif dep_variable == "alg":
-    #compare each alg with best performance
-    pass
-elif dep_variable == "raw":
-    # compare reward of each alg with their own params
-    pass  
 
 #will have separate file to compare and collect data on grid tunnel  
 
 
-aogs_c_avg = np.zeros(len(aogs_opt_data[0]))
-aogs_o_avg = np.zeros(len(aogs_opt_data[0]))
-ucb_avg = np.zeros(len(ucb_data[0]))
-gbop_avg = np.zeros(len(gbop_data[0]))
 
-aogs_c_var = np.zeros(len(aogs_opt_data[0]))
-aogs_o_var = np.zeros(len(aogs_opt_data[0]))
-ucb_var = np.zeros(len(ucb_data[0]))
-gbop_var = np.zeros(len(gbop_data[0]))
+# aogs_c_avg = np.zeros(len(aogs_opt_data[0]))
+# aogs_o_avg = np.zeros(len(aogs_opt_data[0]))
+# ucb_avg = np.zeros(len(ucb_data[0]))
+# gbop_avg = np.zeros(len(gbop_data[0]))
+
+# aogs_c_var = np.zeros(len(aogs_opt_data[0]))
+# aogs_o_var = np.zeros(len(aogs_opt_data[0]))
+# ucb_var = np.zeros(len(ucb_data[0]))
+# gbop_var = np.zeros(len(gbop_data[0]))
 
             
-for i in range(len(aogs_opt_data[0])):
-    aogs_c_avg[i] = np.average(np.array(aogs_con_data[i]))
-    aogs_o_avg[i] = np.average(np.array(aogs_opt_data[i]))
-    ucb_avg[i] = np.average(np.array(ucb_data[i]))
-    gbop_avg[i] = np.average(np.array(gbop_data[i]))
+# for i in range(len(aogs_opt_data[0])):
+#     aogs_c_avg[i] = np.average(np.array(aogs_con_data[i]))
+#     aogs_o_avg[i] = np.average(np.array(aogs_opt_data[i]))
+#     ucb_avg[i] = np.average(np.array(ucb_data[i]))
+#     gbop_avg[i] = np.average(np.array(gbop_data[i]))
 
-    aogs_c_var[i] = np.var(np.array(aogs_con_data[i]))
-    aogs_o_var[i] = np.var(np.array(aogs_opt_data[i]))
-    ucb_var[i] = np.var(np.array(ucb_data[i]))
-    gbop_var[i] = np.var(np.array(gbop_data[i]))
+#     aogs_c_var[i] = np.var(np.array(aogs_con_data[i]))
+#     aogs_o_var[i] = np.var(np.array(aogs_opt_data[i]))
+#     ucb_var[i] = np.var(np.array(ucb_data[i]))
+#     gbop_var[i] = np.var(np.array(gbop_data[i]))
 
-## PRINT --------------------------------------------------------
+# ## PRINT --------------------------------------------------------
 
-#fig, ax = plt.subplots(1,2,sharey='row',figsize=(7.5, 3.75 ))
-# fig, axs = plt.subplots(1)
-# fig = plt.contourf(amb,p, t_diff, vmin=np.min(np.min(t_diff)), vmax=np.max(np.max(t_diff)))
-# ax[0].set_xticks(p)
-# ax[0].set_yticks(amb)
+# #fig, ax = plt.subplots(1,2,sharey='row',figsize=(7.5, 3.75 ))
+# # fig, axs = plt.subplots(1)
+# # fig = plt.contourf(amb,p, t_diff, vmin=np.min(np.min(t_diff)), vmax=np.max(np.max(t_diff)))
+# # ax[0].set_xticks(p)
+# # ax[0].set_yticks(amb)
 
-if test_type == 0:
-    title_name = "Grid World"
-elif test_type == 1:
-    title_name = "Grid Trap"
-else:
-    title_name = "Sailing" 
+# if test_type == 0:
+#     title_name = "Grid World"
+# elif test_type == 1:
+#     title_name = "Grid Trap"
+# else:
+#     title_name = "Sailing" 
 
-fig, ax = plt.subplots()
+# fig, ax = plt.subplots()
 
-ax.plot(max_samples, aogs_c_avg)
-ax.plot(max_samples, aogs_o_avg)
-ax.plot(max_samples, ucb_avg)
-ax.plot(max_samples, gbop_avg)
-
-
-# ax.fill_between(max_samples, (aogs_c_avg-aogs_c_var), (aogs_c_avg+aogs_c_var), color='b', alpha=.1)
-# ax.fill_between(max_samples, (aogs_o_avg-aogs_o_var), (aogs_o_avg+aogs_o_var), color='y', alpha=.1)
-# ax.fill_between(max_samples, (ucb_avg-ucb_var), (ucb_avg+ucb_var), color='g', alpha=.1)
-# ax.fill_between(max_samples, (gbop_avg-gbop_var), (gbop_avg+gbop_var), color='g', alpha=.1)
+# ax.plot(max_samples, aogs_c_avg)
+# ax.plot(max_samples, aogs_o_avg)
+# ax.plot(max_samples, ucb_avg)
+# ax.plot(max_samples, gbop_avg)
 
 
-plt.ylabel("Average Reward")
-plt.xlabel("Budget (n)")
-plt.title(title_name)
-plt.legend(["aogs_c", "aogs_o", "ucb", "gbop"])
-# ax.axis('scaled')
-# plt.autoscale(enable=False)
-# cb = plt.colorbar()
-# plt.legend()
+# # ax.fill_between(max_samples, (aogs_c_avg-aogs_c_var), (aogs_c_avg+aogs_c_var), color='b', alpha=.1)
+# # ax.fill_between(max_samples, (aogs_o_avg-aogs_o_var), (aogs_o_avg+aogs_o_var), color='y', alpha=.1)
+# # ax.fill_between(max_samples, (ucb_avg-ucb_var), (ucb_avg+ucb_var), color='g', alpha=.1)
+# # ax.fill_between(max_samples, (gbop_avg-gbop_var), (gbop_avg+gbop_var), color='g', alpha=.1)
 
-plt.savefig(fp + "figs/" + title_name + "_avg_reward.eps", format="eps", bbox_inches="tight", pad_inches=0)
-plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_inches="tight", pad_inches=0.05)
-# cb.remove()
 
-# # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-# fig = plt.contourf(amb,p, d_diff, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
-# # plt.xticks(p)
-# # plt.yticks(amb)
-# plt.ylabel("Transition probability p")
-# plt.xlabel("Transition ambiguity c")
-# plt.title("Percent increase in distance")
-# # plt.axis('scaled')
-# plt.colorbar()
-
+# plt.ylabel("Average Reward")
+# plt.xlabel("Budget (n)")
+# plt.title(title_name)
+# plt.legend(["aogs_c", "aogs_o", "ucb", "gbop"])
+# # ax.axis('scaled')
+# # plt.autoscale(enable=False)
+# # cb = plt.colorbar()
 # # plt.legend()
-# # fig.colorbar(ax=ax[0], extend='max')
-# # plt.show()
 
-# plt.savefig(prefix + "figs/d_diff.eps", format="eps", bbox_inches="tight", pad_inches=0)
-# plt.savefig(prefix + "figs/d_diff.png", format="png", bbox_inches="tight", pad_inches=0.05)
+# plt.savefig(fp + "figs/" + title_name + "_avg_reward.eps", format="eps", bbox_inches="tight", pad_inches=0)
+# plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_inches="tight", pad_inches=0.05)
+# # cb.remove()
 
-# # plt.pause(10)
+# # # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
+# # fig = plt.contourf(amb,p, d_diff, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
+# # # plt.xticks(p)
+# # # plt.yticks(amb)
+# # plt.ylabel("Transition probability p")
+# # plt.xlabel("Transition ambiguity c")
+# # plt.title("Percent increase in distance")
+# # # plt.axis('scaled')
+# # plt.colorbar()
+
+# # # plt.legend()
+# # # fig.colorbar(ax=ax[0], extend='max')
+# # # plt.show()
+
+# # plt.savefig(prefix + "figs/d_diff.eps", format="eps", bbox_inches="tight", pad_inches=0)
+# # plt.savefig(prefix + "figs/d_diff.png", format="png", bbox_inches="tight", pad_inches=0.05)
+
+# # # plt.pause(10)
