@@ -1,5 +1,7 @@
 import sys
 import os
+
+from numpy import var
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -27,6 +29,14 @@ var_file = sys.argv[1]
 test_file = sys.argv[2]
 dep_variable = sys.argv[3]
 indep_variable = sys.argv[4]
+if indep_variable == "alpha":
+    uct_indep = "c"
+else:
+    uct_indep = indep_variable
+if len(sys.argv) > 5:
+    crossref_variable = sys.argv[5]
+else:
+    crossref_variable = None
 
 f = open(current + "/../config/analysis/" + var_file +  ".json")
 var_config = json.load(f)
@@ -111,137 +121,112 @@ for d in uct_pickle:
             l.append(get_distance(s1,s2))
         temp["d"] = l        
         uct_data.append(temp)
-            
 
+# for el in aogs_data: 
+#     print(el)
+            
+### Plot
 x = var_config[indep_variable]
+if indep_variable == "alpha":
+    x_uct = var_config[uct_indep]
+else:
+    x_uct = x.copy()
 
-data = {}
-for el in x:
-    data[str(el)] = []
+if crossref_variable == None:
+    num_plots = 1
+else:
+    num_plots = len(var_config[crossref_variable]) + 1
+
+splt_len = [int(np.floor(np.sqrt(num_plots))), int(np.ceil(np.sqrt(num_plots)))]
+fig, ax = plt.subplots(splt_len[0],splt_len[1],figsize=(7.5, 7.5 ))
+# fig.title(dep_variable)
+
+if crossref_variable != None:
+    trials = copy.deepcopy(var_config[crossref_variable])
+    trials.append(copy.deepcopy(var_config[crossref_variable]))
+
+for i in range(num_plots):
     
-aogs_y = copy.deepcopy(data)
-gbop_y = copy.deepcopy(data)
-uct_y = copy.deepcopy(data)
+    data = {}
+    for el in x:
+        data[str(el)] = []
+        
+    aogs_temp = copy.deepcopy(data)
+    gbop_temp = copy.deepcopy(data)
+    uct_temp = {}
+    data = {}
+    for el in x_uct:
+        uct_temp[str(el)] = []
+    
+    if crossref_variable != None:
+        if type(trials[i]) == list:
+            filtered_vars = trials[i]
+        else:
+            filtered_vars = [trials[i]]
 
-for el in aogs_data:
-    aogs_y[el[indep_variable]] += el[dep_variable]
-# for el in gbop_data:
-#     gbop_y[el[indep_variable]].append(el[dep_variable])
-# for el in uct_data:
-#     uct_y[el[indep_variable]].append(el[dep_variable])
+        for el in aogs_data:
+            # print(el)
+            # print(type(el[crossref_variable]), type(filtered_vars[0]),(el[crossref_variable] in filtered_vars))
+            if float(el[crossref_variable]) in filtered_vars:
+                # print(dep_variable)
+                # print(el[dep_variable])
+                aogs_temp[el[indep_variable]] += el[dep_variable]
+        for el in gbop_data:
+            if float(el[crossref_variable]) in filtered_vars:
+                gbop_temp[el[indep_variable]] += el[dep_variable]
+        for el in uct_data:
+            if indep_variable not in ["epsilon", "delta"] and float(el[crossref_variable]) in filtered_vars:
+                uct_temp[el[uct_indep]] += el[dep_variable]
+    else:
+        for el in aogs_data:
+            aogs_temp[el[indep_variable]] += el[dep_variable]
+        for el in gbop_data:
+            gbop_temp[el[indep_variable]] += el[dep_variable]
+        for el in uct_data:
+            if indep_variable not in ["epsilon", "delta"]:
+                uct_temp[el[uct_indep]] += el[dep_variable]
+                
+    # print("------------")
+    # print(crossref_variable)
+    # for el in aogs_temp:
+    #     print(el)
 
-y = []
-for el in x:
-    print(aogs_y[str(el)])
-    y.append(np.average(np.array(aogs_y[str(el)])))
+    aogs_y = []
+    gbop_y = []
+    uct_y = []
 
- 
-plt.plot(x,y) 
+    for el in x:
+        aogs_y.append(np.average(np.array(aogs_temp[str(el)])))
+        print("aogs", len(aogs_temp[str(el)]))
+        gbop_y.append(np.average(np.array(gbop_temp[str(el)])))
+        print("gbop", len(gbop_temp[str(el)]))
+    if indep_variable not in ["epsilon", "delta"]:
+        for el in x_uct:
+            print("uct", len(uct_temp[str(el)]))
+            uct_y.append(np.average(np.array(uct_temp[str(el)])))
+    
+    if num_plots == 1:
+        ax.plot(x,aogs_y)
+        ax.plot(x,gbop_y)
+        if indep_variable not in ["epsilon", "delta"]: 
+            ax.plot(x_uct,uct_y) 
+        
+        ax.set_title(str(indep_variable + " vs " + dep_variable))
+        ax.legend(["aogs", "gbop", "uct"])
+    else:
+        ax[int(np.floor(i/splt_len[0])), int(i % splt_len[0])].plot(x,aogs_y)
+        ax[int(np.floor(i/splt_len[0])), int(i % splt_len[0])].plot(x,gbop_y) 
+        if indep_variable not in ["epsilon", "delta"]: 
+            ax[int(np.floor(i/splt_len[0])), int(i % splt_len[0])].plot(x_uct,uct_y) 
+        
+        ax[int(np.floor(i/splt_len[0])), int(i % splt_len[0])].set_title(crossref_variable + " " + str(trials[i]))
+        ax[int(np.floor(i/splt_len[0])), int(i % splt_len[0])].legend(["aogs", "gbop", "uct"])
+  
+    
+    
 plt.show()
-plt.pause(1)
 while 1:
-    plt.pause(1)  
-# plt.ylabel("Average Reward")
-# plt.xlabel("Budget (n)")
-# plt.title(title_name)
-# plt.legend(["aogs_c", "aogs_o", "ucb", "gbop"])
-# ax.axis('scaled')
-# plt.autoscale(enable=False)
-# cb = plt.colorbar()
-# plt.legend()
+    plt.pause(1)
 
-# plt.savefig(fp + "figs/" + title_name + "_avg_reward.eps", format="eps", bbox_inches="tight", pad_inches=0)
-# plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_inches="tight", pad_inches=0.05)
-# cb.remove()
-
-# cross_ref -> alg, param, p
-# indep_variable -> param, d, horizon, samples, p, e,d
-# dep_variable -> r, t
-
-
-#will have separate file to compare and collect data on grid tunnel  
-
-
-
-# aogs_c_avg = np.zeros(len(aogs_opt_data[0]))
-# aogs_o_avg = np.zeros(len(aogs_opt_data[0]))
-# ucb_avg = np.zeros(len(ucb_data[0]))
-# gbop_avg = np.zeros(len(gbop_data[0]))
-
-# aogs_c_var = np.zeros(len(aogs_opt_data[0]))
-# aogs_o_var = np.zeros(len(aogs_opt_data[0]))
-# ucb_var = np.zeros(len(ucb_data[0]))
-# gbop_var = np.zeros(len(gbop_data[0]))
-
-            
-# for i in range(len(aogs_opt_data[0])):
-#     aogs_c_avg[i] = np.average(np.array(aogs_con_data[i]))
-#     aogs_o_avg[i] = np.average(np.array(aogs_opt_data[i]))
-#     ucb_avg[i] = np.average(np.array(ucb_data[i]))
-#     gbop_avg[i] = np.average(np.array(gbop_data[i]))
-
-#     aogs_c_var[i] = np.var(np.array(aogs_con_data[i]))
-#     aogs_o_var[i] = np.var(np.array(aogs_opt_data[i]))
-#     ucb_var[i] = np.var(np.array(ucb_data[i]))
-#     gbop_var[i] = np.var(np.array(gbop_data[i]))
-
-# ## PRINT --------------------------------------------------------
-
-# #fig, ax = plt.subplots(1,2,sharey='row',figsize=(7.5, 3.75 ))
-# # fig, axs = plt.subplots(1)
-# # fig = plt.contourf(amb,p, t_diff, vmin=np.min(np.min(t_diff)), vmax=np.max(np.max(t_diff)))
-# # ax[0].set_xticks(p)
-# # ax[0].set_yticks(amb)
-
-# if test_type == 0:
-#     title_name = "Grid World"
-# elif test_type == 1:
-#     title_name = "Grid Trap"
-# else:
-#     title_name = "Sailing" 
-
-# fig, ax = plt.subplots()
-
-# ax.plot(max_samples, aogs_c_avg)
-# ax.plot(max_samples, aogs_o_avg)
-# ax.plot(max_samples, ucb_avg)
-# ax.plot(max_samples, gbop_avg)
-
-
-# # ax.fill_between(max_samples, (aogs_c_avg-aogs_c_var), (aogs_c_avg+aogs_c_var), color='b', alpha=.1)
-# # ax.fill_between(max_samples, (aogs_o_avg-aogs_o_var), (aogs_o_avg+aogs_o_var), color='y', alpha=.1)
-# # ax.fill_between(max_samples, (ucb_avg-ucb_var), (ucb_avg+ucb_var), color='g', alpha=.1)
-# # ax.fill_between(max_samples, (gbop_avg-gbop_var), (gbop_avg+gbop_var), color='g', alpha=.1)
-
-
-# plt.ylabel("Average Reward")
-# plt.xlabel("Budget (n)")
-# plt.title(title_name)
-# plt.legend(["aogs_c", "aogs_o", "ucb", "gbop"])
-# # ax.axis('scaled')
-# # plt.autoscale(enable=False)
-# # cb = plt.colorbar()
-# # plt.legend()
-
-# plt.savefig(fp + "figs/" + title_name + "_avg_reward.eps", format="eps", bbox_inches="tight", pad_inches=0)
-# plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_inches="tight", pad_inches=0.05)
-# # cb.remove()
-
-# # # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-# # fig = plt.contourf(amb,p, d_diff, vmin=np.min(np.min(d_diff)), vmax=np.max(np.max(d_diff)))#, cmap='binary')
-# # # plt.xticks(p)
-# # # plt.yticks(amb)
-# # plt.ylabel("Transition probability p")
-# # plt.xlabel("Transition ambiguity c")
-# # plt.title("Percent increase in distance")
-# # # plt.axis('scaled')
-# # plt.colorbar()
-
-# # # plt.legend()
-# # # fig.colorbar(ax=ax[0], extend='max')
-# # # plt.show()
-
-# # plt.savefig(prefix + "figs/d_diff.eps", format="eps", bbox_inches="tight", pad_inches=0)
-# # plt.savefig(prefix + "figs/d_diff.png", format="png", bbox_inches="tight", pad_inches=0.05)
-
-# # # plt.pause(10)
+fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
+fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
