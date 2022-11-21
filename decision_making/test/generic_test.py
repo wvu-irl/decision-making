@@ -9,6 +9,7 @@ sys.path.append(parent)
 from multiprocessing import Pool, Lock
 
 import json 
+import copy
 import gym
 import custom_gym
 
@@ -41,18 +42,21 @@ else:
 f = open(current + "/../config/algorithms/" + alg_config_file +  ".json")
 alg_config = json.load(f)
 f = open(current + "/../config/envs/" + env_config_file +  ".json")
-env_config = json.load(f)   
+env_config = json.load(f)  
 
 # SETUP CONFIG -------------------
 
 # ENVS
 # gym_examples:gym_examples/GridWorld-v0
 env = gym.make(env_config["env"],max_episode_steps = max_ts, _params=env_config["params"])
+s = env.reset()
+env_config["state"] = copy.deepcopy(s)
+# print(env_config, "--------")
 planner = get_agent(alg_config,env_config)
 
 # Simulate
 print("-----------")
-s = env.reset()
+
 done = False
 
 while(not done):

@@ -146,7 +146,5 @@ plt.savefig(fp + "figs/" + title_name + "_avg_reward.png", format="png", bbox_in
 # # fig.colorbar(ax=ax[0], extend='max')
 # # plt.show()
 
-# plt.savefig(prefix + "figs/d_diff.eps", format="eps", bbox_inches="tight", pad_inches=0)
-# plt.savefig(prefix + "figs/d_diff.png", format="png", bbox_inches="tight", pad_inches=0.05)
 
 # # plt.pause(10)

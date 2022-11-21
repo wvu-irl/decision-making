@@ -124,10 +124,10 @@ class AOGS():
             self.n_ += 1
             
         self.is_not_converged_ = True
-        print('lol')
+        # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = copy.deepcopy(self.env_params_)
-            temp_params["params"]["state"] = _s["pose"]
+            temp_params["params"]["state"] = _s
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
@@ -145,7 +145,7 @@ class AOGS():
 
             s = _s
             
-            print(hash(str(s)))
+            # print(hash(str(s)))
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
             self.d_ = 0
@@ -272,7 +272,7 @@ class AOGS():
             # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = copy.deepcopy(self.env_params_)
-                temp_params["params"]["state"] = _s["pose"]
+                temp_params["params"]["state"] = _s
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
                 self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
                 self.env_.reset()

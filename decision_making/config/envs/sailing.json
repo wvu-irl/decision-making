@@ -3,7 +3,10 @@
     "max_time": 100,
     "params":
     {
-        "state": [20,20,0],
+        "state": 
+        {
+            "pose" : [20,20,0]
+        },
         "dimensions": [40,40],
         "goal": [10,10],
         "p": 0.1,
