@@ -12,6 +12,8 @@
         "p": 0.1,
         "prefix": "/home/jared/ambiguity_ws/data/sailing/",
         "reward_bounds": [0,1],
-        "seed": 234
+        "seed": 234,
+        "render" : false,
+        "print" : false
     }
 }

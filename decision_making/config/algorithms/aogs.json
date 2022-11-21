@@ -12,9 +12,9 @@
     "search" :
     {
         "max_samples": 5e3,
-        "horizon": 40,
+        "horizon": 25,
         "timeout": 5,
-        "reinit": false
+        "reinit": true
     },
     "action_selection" : 
     {
