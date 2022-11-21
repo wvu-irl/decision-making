@@ -4,10 +4,10 @@
 #PBS -N uct_gw0
  
 # Where to write stderr:
-#PBS -e uct_gw.err
+#PBS -e log/uct_gw.err
  
 # Where to write stdout: 
-#PBS -o uct_gw.out
+#PBS -o log/uct_gw.out
  
 # Specify number of nodes, processors (really threads) per node, and the maximum allowed run time for the job
 # Can also specify max memory requested with something like mem=10gb

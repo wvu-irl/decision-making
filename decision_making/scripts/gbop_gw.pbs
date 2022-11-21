@@ -4,10 +4,10 @@
 #PBS -N gbop_gw0
  
 # Where to write stderr:
-#PBS -e gbop_gw.err
+#PBS -e log/gbop_gw.err
  
 # Where to write stdout: 
-#PBS -o gbop_gw.out
+#PBS -o log/gbop_gw.out
  
 # Specify number of nodes, processors (really threads) per node, and the maximum allowed run time for the job
 # Can also specify max memory requested with something like mem=10gb
