@@ -36,12 +36,14 @@ lock = Lock()
 ## Evaluation -------------------------------------------------
 def runWrapper(params : dict): 
     env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], _params=params["env"]["params"])
+    s = env.reset()
+    params["env"]["state"] = copy.deepcopy(s)
     planner = get_agent(params["alg"],params["env"])
 
     # Simulate
     print(params["trial"], params["instance"])
     # print(params)
-    s = env.reset()
+    
     done = False
     ts = 0
     accum_reward = 0
@@ -145,7 +147,7 @@ def poolHandler(alg_config, env_config, mt_config):
             alg_config["search"]["max_samples"] = el[1]
             alg_config["action_selection"]["decision_params"]["c"] = el[2]
             if not mt_config["randomize_states"]:
-                env_config["params"]["state"] = el[3]
+                env_config["params"]["state"]["pose"] = el[3]
                 env_config["params"]["goal"] = el[4]
                 env_config["params"]["dimensions"] = el[5]
                 env_config["params"]["p"] = el[6]   
@@ -162,7 +164,7 @@ def poolHandler(alg_config, env_config, mt_config):
                 while get_distance(s,g) < 5:
                     g = [rng.integers(0,mt_config["world_size"][0][0]), rng.integers(0,mt_config["world_size"][0][1])]
 
-                env_config["params"]["state"] = s
+                env_config["params"]["state"]["pose"] = s
                 env_config["params"]["goal"] = g
             # print(i)
             trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
