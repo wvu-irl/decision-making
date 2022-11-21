@@ -1,7 +1,9 @@
 {
     "file" : "test",
     "n_threads" : 80,
-    "n_trials" : 10,
+    "n_trials" : 20,
+    "epsilon": [0.05, 0.1, 0.2],
+    "delta": [0.05, 0.1, 0.2],
     "max_samples": [500, 1e3, 5e3, 1e4],
     "horizon": [15, 50, 100],
     "c": [0, 0.1, 0.5, 1, 2, 5],
