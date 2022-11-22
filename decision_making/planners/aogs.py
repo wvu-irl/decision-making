@@ -119,7 +119,7 @@ class AOGS():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            self.graph_[self.n_] = State(copy.deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
             
@@ -197,7 +197,7 @@ class AOGS():
                         U = v
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    self.graph_[self.gi_[str_sp]] = State(copy.deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     # print("s ", s_p)
                     # print("act ", self.env_.get_actions(s_p))
                     # for a in self.graph_[self.gi_[str_sp]].a_:

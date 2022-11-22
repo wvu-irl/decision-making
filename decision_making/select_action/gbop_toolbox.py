@@ -16,6 +16,7 @@ def boundSolver(_s , _solver, _type):
     totalActions = _solver.search_params_["branch_factor_s"]#len(_s.a_)
     actions = _s.a_
     random.shuffle(actions)
+    # print("parent", _s.s_, hash(str(_s.s_)))
     for a in actions:
         if len(a.s_prime_i_) > 0:
             #Solve for U for State-Action
@@ -37,6 +38,7 @@ def boundSolver(_s , _solver, _type):
             B = []
             if _type == "upper":
                 for s in a.s_prime_:
+                    # print("child", s, hash(str(s)))
                     B.append(_solver.graph_[_solver.gi_[hash(str(s))]].U_)
             else:
                 for s in a.s_prime_:

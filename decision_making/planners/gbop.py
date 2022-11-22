@@ -111,14 +111,15 @@ class GBOP():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(_s, self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            self.graph_[self.n_] = State(copy.deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
-        print("-----------")
+        # print("-----------")
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             
             temp_params = copy.deepcopy(self.env_params_)
             temp_params["params"]["state"] = _s
+            # print(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
@@ -134,6 +135,7 @@ class GBOP():
                 
                 
                 str_s = hash(str(s))
+                # print(s, str_s)
                 L, U = self.bound_outcomes(str_s)
                 
                 # if (s["pose"] == [20,20]):
@@ -144,7 +146,7 @@ class GBOP():
                 a = self.a_s_m_.return_action(self.graph_[self.gi_[str_s]],[1],self)
 
                 s_p, r, is_terminal = self.simulate(s, a)
-
+                # print("       ",s_p, hash(str(s_p)))
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
                     ind = self.gi_[str_sp]
@@ -161,8 +163,14 @@ class GBOP():
                         U = v
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(s_p, self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    # temp_sp = {}
+                    # for el in s_p:
+                    #     temp_sp[el] = copy.deepcopy(s_p[el])
+                    #     print(s_p[el])
+                    self.graph_[self.gi_[str_sp]] = State(copy.deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     self.n_ += 1
+                    # print("save_par", self.graph_[self.gi_[str_s]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))
+                    # print("save", self.graph_[self.gi_[str_sp]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))
                 else:
                     self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                 self.d_ += 1
@@ -187,6 +195,8 @@ class GBOP():
             s = parents.pop(0)
             t =0
             if s != -1:
+                # print(s)
+                # print(self.gi_[s])
                 L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[self.alpha_],self)
                 
                 lprecision = ((1-self.alg_params_["gamma"])/self.alg_params_["gamma"])*self.alg_params_["model_accuracy"]["epsilon"]

@@ -95,7 +95,7 @@ class UCT():
         start_time = time.perf_counter()
         s = _s
         
-        self.tree_[0] = State(_s,self.env_.get_actions(_s),None,0)
+        self.tree_[0] = State(copy.deepcopy(_s),self.env_.get_actions(_s),None,0)
 
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             temp_params = copy.deepcopy(self.env_params_)
@@ -172,7 +172,7 @@ class UCT():
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
         if nextNodeIndex == self.n_:
-            self.tree_[nextNodeIndex] = State(obs,self.env_.get_actions(obs),[nodeIndex],0)
+            self.tree_[nextNodeIndex] = State(copy.deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
             self.tree_[nextNodeIndex].N_ += 1 
             self.n_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
@@ -187,7 +187,7 @@ class UCT():
         # print(action)
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
-        self.tree_[nextNodeIndex] = State(obs,self.env_.get_actions(obs),[nodeIndex],0)
+        self.tree_[nextNodeIndex] = State(copy.deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
         self.tree_[nextNodeIndex].is_terminal_ = done
         self.tree_[nextNodeIndex].N_ += 1 
         self.n_ += 1
