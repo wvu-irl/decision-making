@@ -35,6 +35,10 @@ else:
     uct_indep = indep_variable
 if len(sys.argv) > 5:
     crossref_variable = sys.argv[5]
+    if crossref_variable == "alpha":
+        uct_cr = "c"
+    else:
+        uct_cr = crossref_variable
 else:
     crossref_variable = None
 
@@ -209,7 +213,7 @@ for i in range(num_plots):
             # print(uct_temp)
             # print(el)
             # print(el[uct_indep])
-            if indep_variable not in ["epsilon", "delta"] and el[crossref_variable] in filtered_vars:
+            if indep_variable not in ["epsilon", "delta"] and el[uct_cr] in filtered_vars:
                 uct_temp[el[uct_indep]].append(el[dep_variable])
     else:
         for el in aogs_data:
