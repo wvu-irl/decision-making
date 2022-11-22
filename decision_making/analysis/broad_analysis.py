@@ -73,7 +73,7 @@ for d in aogs_pickle:
             temp_d["horizon"] = params[2]
             temp_d["max_samples"] = params[3]
             temp_d["alpha"] = params[4]
-            temp_d["p"] = params[6]
+            temp_d["probabilities"] = params[6]
             temp_d["init"] = aogs_pickle[d]["init"][i]
             temp_d["goal"] = aogs_pickle[d]["goal"][i]
             temp_d["r"] = aogs_pickle[d]["R"][i]
@@ -98,7 +98,7 @@ for d in gbop_pickle:
             temp_d["horizon"] = params[2]
             temp_d["max_samples"] = params[3]
             temp_d["alpha"] = params[4]
-            temp_d["p"] = params[6]
+            temp_d["probabilities"] = params[6]
             temp_d["init"] = gbop_pickle[d]["init"][i]
             temp_d["goal"] = gbop_pickle[d]["goal"][i]
             temp_d["r"] = gbop_pickle[d]["R"][i]
@@ -112,7 +112,6 @@ for d in gbop_pickle:
 for d in uct_pickle:
     params = re.split(r'_+', d)
     params.pop()
-    
     if len(uct_pickle[d]["R"]) != 0:
         temp = []
         for i in range(len(uct_pickle[d]["R"])):
@@ -120,7 +119,7 @@ for d in uct_pickle:
             temp_d["horizon"] = params[0]
             temp_d["max_samples"] = params[1]
             temp_d["c"] = params[2]
-            temp_d["p"] = params[4]
+            temp_d["probabilities"] = params[4]
             temp_d["init"] = uct_pickle[d]["init"][i]
             temp_d["goal"] = uct_pickle[d]["goal"][i]
             temp_d["r"] = uct_pickle[d]["R"][i]
@@ -169,9 +168,11 @@ else:
     num_plots = len(var_config[crossref_variable]) + 1
 
 splt_len = [int(np.ceil(np.sqrt(num_plots))), int(np.floor(np.sqrt(num_plots)))]
+if splt_len[0]*splt_len[1] < num_plots:
+    splt_len = [int(np.ceil(np.sqrt(num_plots))), int(np.ceil(np.sqrt(num_plots)))]
 fig, ax = plt.subplots(splt_len[0],splt_len[1],figsize=(7.5, 7.5 ))
 # fig.title(dep_variable)
-# print(ax)
+print(ax)
 # print(splt_len)
 # print(num_plots)
 if crossref_variable != None:
@@ -190,7 +191,7 @@ for i in range(num_plots):
     data = {}
     for el in uct_x:
         uct_temp[str(el)] = []
-    print(uct_temp)
+    # print(uct_temp)
     
     if crossref_variable != None:
         if type(trials[i]) == list:
@@ -242,12 +243,12 @@ for i in range(num_plots):
     for el in x:
         
         aogs_y.append(np.average(np.array(aogs_temp[str(el)])))
-        # print("aogs", len(aogs_temp[str(el)]))
+        print("aogs", len(aogs_temp[str(el)]))
         gbop_y.append(np.average(np.array(gbop_temp[str(el)])))
-        # print("gbop", len(gbop_temp[str(el)]))
+        print("gbop", len(gbop_temp[str(el)]))
     if indep_variable not in ["epsilon", "delta"]:
         for el in uct_x:
-            # print("uct", len(uct_temp[str(el)]))
+            print("uct", len(uct_temp[str(el)]))
             uct_y.append(np.average(np.array(uct_temp[str(el)])))
     
     ind = np.argwhere( np.invert( np.isnan(aogs_y)) )
