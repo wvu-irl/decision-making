@@ -186,6 +186,7 @@ for i in range(num_plots):
     data = {}
     for el in uct_x:
         uct_temp[str(el)] = []
+    print(uct_temp)
     
     if crossref_variable != None:
         if type(trials[i]) == list:
@@ -204,7 +205,11 @@ for i in range(num_plots):
             if float(el[crossref_variable]) in filtered_vars:
                 gbop_temp[el[indep_variable]].append(el[dep_variable])
         for el in uct_data:
-            if indep_variable not in ["epsilon", "delta"] and float(el[crossref_variable]) in filtered_vars:
+            # print("--------")
+            # print(uct_temp)
+            # print(el)
+            # print(el[uct_indep])
+            if indep_variable not in ["epsilon", "delta"] and el[crossref_variable] in filtered_vars:
                 uct_temp[el[uct_indep]].append(el[dep_variable])
     else:
         for el in aogs_data:
