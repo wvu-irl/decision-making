@@ -338,5 +338,5 @@ fig.subplots_adjust(hspace=0.5, wspace=0.3)
 if crossref_variable == None:
     crossref_variable = ""
 
-fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
-fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
+fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
+fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
