@@ -1,0 +1,88 @@
+/usr/lib/python3/dist-packages/apport/report.py:13: DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import fnmatch, glob, traceback, errno, sys, atexit, locale, imp, stat
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 48, in mapstar
+    return list(map(*args))
+  File "analysis/multithread_collect.py", line 38, in runWrapper
+    env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], _params=params["env"]["params"])
+  File "/localhome/jared_beard/.local/lib/python3.8/site-packages/gym/envs/registration.py", line 662, in make
+    env = env_creator(**_kwargs)
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 89, in __init__
+    self.reset()
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 160, in reset
+    return self.get_observation()
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 202, in get_observation
+    return copy.deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_})
+IndexError: list index out of range
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "analysis/multithread_collect.py", line 233, in <module>
+    poolHandler(alg_config, env_config, mt_config)
+  File "analysis/multithread_collect.py", line 203, in poolHandler
+    data = p.map(runWrapper, trials)
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 364, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 771, in get
+    raise self._value
+IndexError: list index out of range
+/usr/lib/python3/dist-packages/apport/report.py:13: DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import fnmatch, glob, traceback, errno, sys, atexit, locale, imp, stat
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 48, in mapstar
+    return list(map(*args))
+  File "analysis/multithread_collect.py", line 38, in runWrapper
+    env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], _params=params["env"]["params"])
+  File "/localhome/jared_beard/.local/lib/python3.8/site-packages/gym/envs/registration.py", line 662, in make
+    env = env_creator(**_kwargs)
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 89, in __init__
+    self.reset()
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 160, in reset
+    return self.get_observation()
+  File "/home/projects/ambiguous_dm/custom-gym/custom_gym/envs/sailing.py", line 202, in get_observation
+    return copy.deepcopy({"pose": [int(self.agent_[0]), int(self.agent_[1]), int(self.agent_[2])], "wind": self.wind_})
+IndexError: list index out of range
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "analysis/multithread_collect.py", line 233, in <module>
+    poolHandler(alg_config, env_config, mt_config)
+  File "analysis/multithread_collect.py", line 203, in poolHandler
+    data = p.map(runWrapper, trials)
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 364, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+  File "/usr/lib/python3.8/multiprocessing/pool.py", line 771, in get
+    raise self._value
+IndexError: list index out of range
+  File "analysis/multithread_collect.py", line 172
+    trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
+    ^
+SyntaxError: invalid syntax
+  File "analysis/multithread_collect.py", line 173
+    trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
+    ^
+SyntaxError: invalid syntax
+  File "analysis/multithread_collect.py", line 173
+    trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
+    ^
+SyntaxError: invalid syntax
+/usr/lib/python3/dist-packages/apport/report.py:13: DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+  import fnmatch, glob, traceback, errno, sys, atexit, locale, imp, stat
+Traceback (most recent call last):
+  File "analysis/multithread_collect.py", line 236, in <module>
+    poolHandler(alg_config, env_config, mt_config)
+  File "analysis/multithread_collect.py", line 171, in poolHandler
+    env_config["params"]["state"]["pose"] = [s[0], s[1], rng.integers[0,7]]
+TypeError: 'builtin_function_or_method' object is not subscriptable
