@@ -74,12 +74,23 @@ for d in aogs_pickle:
             temp_d["max_samples"] = params[3]
             temp_d["alpha"] = params[4]
             temp_d["probabilities"] = params[6]
-            temp_d["init"] = aogs_pickle[d]["init"][i]
+            
+            do_append = True
+            for el in temp_d:
+                if float(temp_d[el]) not in var_config[el]:
+                    # print(el, temp_d[el], var_config[el], float(temp_d[el]) not in var_config[el] )
+                    do_append = False
+                # plt.pause(1)
+                    
+            temp_d["init"] = aogs_pickle[d]["init"][i]["pose"]
             temp_d["goal"] = aogs_pickle[d]["goal"][i]
             temp_d["r"] = aogs_pickle[d]["R"][i]
             temp_d["t"] = aogs_pickle[d]["ts"][i]
+            # print(temp_d["init"],temp_d["goal"])
             temp_d["d"] = str(get_distance(temp_d["init"],temp_d["goal"]))
-            temp.append(copy.deepcopy(temp_d))
+            # print(do_append, temp_d["alpha"])
+            if do_append:
+                temp.append(copy.deepcopy(temp_d))
         
         aogs_data = aogs_data + temp
 # for el in aogs_data:
@@ -99,13 +110,22 @@ for d in gbop_pickle:
             temp_d["max_samples"] = params[3]
             temp_d["alpha"] = params[4]
             temp_d["probabilities"] = params[6]
-            temp_d["init"] = gbop_pickle[d]["init"][i]
+            
+            do_append = True
+            for el in temp_d:
+                if float(temp_d[el]) not in var_config[el]:
+                    # print(el, temp_d[el], var_config[el], float(temp_d[el]) not in var_config[el] )
+                    do_append = False
+                    
+            temp_d["init"] = gbop_pickle[d]["init"][i]["pose"]
             temp_d["goal"] = gbop_pickle[d]["goal"][i]
             temp_d["r"] = gbop_pickle[d]["R"][i]
             temp_d["t"] = gbop_pickle[d]["ts"][i]
             temp_d["d"] = str(get_distance(temp_d["init"],temp_d["goal"]))
-            temp.append(copy.deepcopy(temp_d))
-        
+
+            if do_append:
+                temp.append(copy.deepcopy(temp_d))
+                        
         gbop_data = gbop_data + temp
     
 
@@ -120,12 +140,21 @@ for d in uct_pickle:
             temp_d["max_samples"] = params[1]
             temp_d["c"] = params[2]
             temp_d["probabilities"] = params[4]
-            temp_d["init"] = uct_pickle[d]["init"][i]
+            
+            do_append = True
+            for el in temp_d:
+                if float(temp_d[el]) not in var_config[el]:
+                    # print(el, temp_d[el], var_config[el], float(temp_d[el]) not in var_config[el] )
+                    do_append = False
+                    
+            temp_d["init"] = uct_pickle[d]["init"][i]#["pose"]
             temp_d["goal"] = uct_pickle[d]["goal"][i]
             temp_d["r"] = uct_pickle[d]["R"][i]
             temp_d["t"] = uct_pickle[d]["ts"][i]
             temp_d["d"] = str(get_distance(temp_d["init"],temp_d["goal"]))
-            temp.append(copy.deepcopy(temp_d))
+            
+            if do_append:
+                temp.append(copy.deepcopy(temp_d))
         
         uct_data = uct_data + temp
 
@@ -172,6 +201,7 @@ if splt_len[0]*splt_len[1] < num_plots:
     splt_len = [int(np.ceil(np.sqrt(num_plots))), int(np.ceil(np.sqrt(num_plots)))]
 fig, ax = plt.subplots(splt_len[0],splt_len[1],figsize=(7.5, 7.5 ))
 # fig.title(dep_variable)
+
 print(ax)
 # print(splt_len)
 # print(num_plots)
@@ -295,12 +325,18 @@ for i in range(num_plots):
         
         ax[x_ind, y_ind].set_title(crossref_variable + " " + str(trials[i]))
         ax[x_ind, y_ind].legend(["aogs", "gbop", "uct"])
+        ax[x_ind, y_ind].set_xlabel(indep_variable)
+        ax[x_ind, y_ind].set_ylabel(dep_variable)
   
     
-    
-plt.show()
-while 1:
-    plt.pause(1)
+# fig.tight_layout()  
+fig.subplots_adjust(hspace=0.5, wspace=0.3)
+# plt.show()
+# while 1:
+#     plt.pause(1)
 
-fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
-fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
+if crossref_variable == None:
+    crossref_variable = ""
+
+fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
+fig.savefig(current + "/plots/" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
