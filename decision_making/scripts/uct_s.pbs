@@ -1,13 +1,13 @@
 #!/bin/bash
  
 # Name of job:
-# PBS -N aogs_gw0
+# PBS -N uct_s0
  
 # Where to write stderr:
-# PBS -e aogs_gw.err
+# PBS -e log/uct_s.err
  
 # Where to write stdout: 
-# PBS -o aogs_gw.out
+# PBS -o log/uct_s.out
  
 # Specify number of nodes, processors (really threads) per node, and the maximum allowed run time for the job
 # Can also specify max memory requested with something like mem=10gb
