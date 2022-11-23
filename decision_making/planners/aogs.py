@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 import time
-import copy
+from copy import deepcopy
 
 import sys
 import os
@@ -56,7 +56,7 @@ class AOGS():
         else:
             self.rng_ = np.random.default_rng()
             
-        self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])
+        # self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])
 
     def num_samples(self, _perf):
         num = math.log( 1/ (2/3*(1-_perf["delta"]+1/2) ) - 1)
@@ -119,14 +119,14 @@ class AOGS():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(copy.deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
             
         self.is_not_converged_ = True
         # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
-            temp_params = copy.deepcopy(self.env_params_)
+            temp_params = deepcopy(self.env_params_)
             temp_params["params"]["state"] = _s
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
@@ -197,7 +197,7 @@ class AOGS():
                         U = v
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(copy.deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     # print("s ", s_p)
                     # print("act ", self.env_.get_actions(s_p))
                     # for a in self.graph_[self.gi_[str_sp]].a_:
@@ -239,16 +239,16 @@ class AOGS():
         # print("m ", self.m_)
         # print("n", self.n_)
         # print("g---")
-        plt.cla()
-        for s in self.graph_:
-            # print(s.s_)
-            if "pose" in s.s_:
-                self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
-        print("---g")
-        t_map = (self.map_)
-        print("max map ", np.max(np.max(self.map_)))
-        plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
-        plt.pause(1)
+        # plt.cla()
+        # for s in self.graph_:
+        #     # print(s.s_)
+        #     if "pose" in s.s_:
+        #         self.map_[s.s_["pose"][0]][s.s_["pose"][1]] +=1
+        # print("---g")
+        # t_map = (self.map_)
+        # print("max map ", np.max(np.max(self.map_)))
+        # plt.imshow(np.transpose(t_map), cmap='Reds', interpolation='hanning')
+        # plt.pause(1)
         # print(len(self.gi_))
         # print("Usize", len(self.U_))
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
@@ -269,9 +269,9 @@ class AOGS():
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
-            self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
-                temp_params = copy.deepcopy(self.env_params_)
+                temp_params = deepcopy(self.env_params_)
                 temp_params["params"]["state"] = _s
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
                 self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])

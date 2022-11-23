@@ -8,8 +8,8 @@
             "pose" : [20,20,0]
         },
         "dimensions": [40,40],
-        "goal": [10,10],
-        "p": 0.1,
+        "goal": [15,15],
+        "p": 0,
         "prefix": "/home/jared/ambiguity_ws/data/sailing/",
         "reward_bounds": [0,1],
         "seed": 234,

@@ -3,8 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 import time
-import copy
-
+from copy import deepcopy
 import sys
 import os
 
@@ -55,7 +54,7 @@ class GBOP():
         else:
             self.rng_ = np.random.default_rng()
             
-        self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])
+        # self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])
 
     ############## COME BACK ##############################
     def reinit(self, _state = None, _action = None, _s_prime = None):
@@ -111,13 +110,13 @@ class GBOP():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(copy.deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
         # print("-----------")
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             
-            temp_params = copy.deepcopy(self.env_params_)
+            temp_params = deepcopy(self.env_params_)
             temp_params["params"]["state"] = _s
             # print(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
@@ -165,9 +164,9 @@ class GBOP():
                         v = 0
                     # temp_sp = {}
                     # for el in s_p:
-                    #     temp_sp[el] = copy.deepcopy(s_p[el])
+                    #     temp_sp[el] = deepcopy(s_p[el])
                     #     print(s_p[el])
-                    self.graph_[self.gi_[str_sp]] = State(copy.deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
                     self.n_ += 1
                     # print("save_par", self.graph_[self.gi_[str_s]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))
                     # print("save", self.graph_[self.gi_[str_sp]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))

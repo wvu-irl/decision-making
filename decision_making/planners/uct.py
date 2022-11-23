@@ -9,8 +9,7 @@ import time
 
 import sys
 import os
-import copy
-
+from copy import deepcopy
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -61,7 +60,7 @@ class UCT():
         else:
             self.rng_ = np.random.default_rng()
             
-        self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])        
+        # self.map_ = np.zeros([self.env_params_["params"]["dimensions"][0],self.env_params_["params"]["dimensions"][0]])        
     
     def reinit(self):
         self.tree_ = [State(1)] * int(self.alg_params_["max_graph_size"])
@@ -95,10 +94,10 @@ class UCT():
         start_time = time.perf_counter()
         s = _s
         
-        self.tree_[0] = State(copy.deepcopy(_s),self.env_.get_actions(_s),None,0)
+        self.tree_[0] = State(deepcopy(_s),self.env_.get_actions(_s),None,0)
 
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
-            temp_params = copy.deepcopy(self.env_params_)
+            temp_params = deepcopy(self.env_params_)
             temp_params["params"]["state"] = _s
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
@@ -172,7 +171,7 @@ class UCT():
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
         if nextNodeIndex == self.n_:
-            self.tree_[nextNodeIndex] = State(copy.deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
+            self.tree_[nextNodeIndex] = State(deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
             self.tree_[nextNodeIndex].N_ += 1 
             self.n_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
@@ -187,12 +186,12 @@ class UCT():
         # print(action)
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
-        self.tree_[nextNodeIndex] = State(copy.deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
+        self.tree_[nextNodeIndex] = State(deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
         self.tree_[nextNodeIndex].is_terminal_ = done
         self.tree_[nextNodeIndex].N_ += 1 
         self.n_ += 1
         if done:
-            self.tree_[nextNodeIndex].V_ = self.bounds_[1]/(1-self.alg_params_["gamma"])     
+            self.tree_[nextNodeIndex].V_ = reward/(1-self.alg_params_["gamma"])     
         return nextNodeIndex
 
 

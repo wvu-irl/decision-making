@@ -16,7 +16,7 @@
         "max_samples": 5e3,
         "horizon": 15,
         "timeout": 5,
-        "reinit": false
+        "reinit": true
     },
     "action_selection" : 
     {
