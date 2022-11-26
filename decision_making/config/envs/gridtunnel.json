@@ -8,8 +8,9 @@
             "pose" : [25,5]
         },
         "dimensions": [35,10],
+        "offset": 2,
         "goal": [10,10],
-        "p": 0.1,
+        "p": 0,
         "prefix": "/home/jared/ambiguity_ws/data/gridtunnel/",
         "reward_bounds": [0,1],
         "seed": 234,

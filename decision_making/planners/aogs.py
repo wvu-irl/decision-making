@@ -277,7 +277,11 @@ class AOGS():
                 self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
                 self.env_.reset()
                 # print(_s, self.env_.get_observation())
+            # print(_a)
+            # print(self.env_.step(_a))
+            # exit()
             s_p, r, done, info = self.env_.step(_a)
+            
             self.m_+=1
             # self.d_+=1
             _do_reset = False
