@@ -14,7 +14,7 @@ import itertools
 import json 
 import gym
 import numpy as np
-import custom_gym
+import irl_gym
 import copy
 import pickle
 
@@ -91,7 +91,7 @@ def runWrapper(params : dict):
 def poolHandler(alg_config, env_config, mt_config):
     
     rng = np.random.default_rng()
-    env_str = env_config["env"].replace("custom_gym/", "")
+    env_str = env_config["env"].replace("irl_gym/", "")
     fp = os.path.dirname(__file__) + "/multithread/" + alg_config["alg"] + "_" + env_str + ".pkl" #mt_config["file"] + ".npy"
 
     temp = []
@@ -166,7 +166,7 @@ def poolHandler(alg_config, env_config, mt_config):
 
                 env_config["params"]["state"]["pose"] = s
                 env_config["params"]["goal"] = g
-                if env_config["env"] == "custom_gym/Sailing-v0":
+                if env_config["env"] == "irl_gym/Sailing-v0":
                 	print("yee")
                 	env_config["params"]["state"]["pose"] = [s[0], s[1], rng.integers(0,7)]
             # print(i)

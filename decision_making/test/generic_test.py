@@ -11,7 +11,7 @@ from multiprocessing import Pool, Lock
 import json 
 import copy
 import gym
-import custom_gym
+import irl_gym
 
 from planners.utils import *
 

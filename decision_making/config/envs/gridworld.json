@@ -1,5 +1,5 @@
 {
-    "env": "custom_gym/GridWorld-v0",
+    "env": "irl_gym/GridWorld-v0",
     "max_time": 100,
     "params":
     {
