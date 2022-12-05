@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 
 ## functions
 def get_distance(s1, s2):
+        #print("gd",s1,s2)
         return ((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)**0.5
     
 def compute_min_time(d):
@@ -84,6 +85,7 @@ for d in aogs_pickle:
                     
             temp_d["init"] = aogs_pickle[d]["init"][i]["pose"]
             temp_d["goal"] = aogs_pickle[d]["goal"][i]
+            #print("aogs", temp_d["init"], temp_d["goal"])
             temp_d["r"] = aogs_pickle[d]["R"][i]
             temp_d["t"] = aogs_pickle[d]["ts"][i]
             # print(temp_d["init"],temp_d["goal"])
@@ -147,7 +149,7 @@ for d in uct_pickle:
                     # print(el, temp_d[el], var_config[el], float(temp_d[el]) not in var_config[el] )
                     do_append = False
                     
-            temp_d["init"] = uct_pickle[d]["init"][i]#["pose"]
+            temp_d["init"] = uct_pickle[d]["init"][i]["pose"]
             temp_d["goal"] = uct_pickle[d]["goal"][i]
             temp_d["r"] = uct_pickle[d]["R"][i]
             temp_d["t"] = uct_pickle[d]["ts"][i]
@@ -340,3 +342,4 @@ if crossref_variable == None:
 
 fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
 fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
+print(test_file)
