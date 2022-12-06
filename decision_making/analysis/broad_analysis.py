@@ -20,16 +20,19 @@ import matplotlib.pyplot as plt
 
 ## functions
 def get_distance(s1, s2):
-        #print("gd",s1,s2)
         return ((s1[0]-s2[0])**2 + (s1[1]-s2[1])**2)**0.5
     
 def compute_min_time(d):
     return np.ceil(d/(2**(1/2)))
 
 var_file = sys.argv[1]
+print(var_file)
 test_file = sys.argv[2]
+print(test_file)
 dep_variable = sys.argv[3]
+print(dep_variable)
 indep_variable = sys.argv[4]
+print(indep_variable)
 if indep_variable == "alpha":
     uct_indep = "c"
 else:
@@ -42,6 +45,12 @@ if len(sys.argv) > 5:
         uct_cr = crossref_variable
 else:
     crossref_variable = None
+print(crossref_variable)
+if len(sys.argv) > 6:
+    print(sys.argv[6])
+    data_filter = int(sys.argv[6])
+else:
+    data_filter = 0
 
 f = open(current + "/../config/analysis/" + var_file +  ".json")
 var_config = json.load(f)
@@ -179,6 +188,7 @@ for x in uct_data:
 var_config["d"] = [float(el) for el in var_config["d"]]
 var_config["d"].sort()
 var_config["d"] = [str(el) for el in var_config["d"]]
+# print(var_config["d"])
 
 
 # print(var_config["d"])
@@ -204,7 +214,7 @@ if splt_len[0]*splt_len[1] < num_plots:
 fig, ax = plt.subplots(splt_len[0],splt_len[1],figsize=(7.5, 7.5 ))
 # fig.title(dep_variable)
 
-print(ax)
+# print(ax)
 # print(splt_len)
 # print(num_plots)
 if crossref_variable != None:
@@ -275,12 +285,12 @@ for i in range(num_plots):
     for el in x:
         
         aogs_y.append(np.average(np.array(aogs_temp[str(el)])))
-        print("aogs", len(aogs_temp[str(el)]))
+        # print("aogs", len(aogs_temp[str(el)]))
         gbop_y.append(np.average(np.array(gbop_temp[str(el)])))
-        print("gbop", len(gbop_temp[str(el)]))
+        # print("gbop", len(gbop_temp[str(el)]))
     if indep_variable not in ["epsilon", "delta"]:
         for el in uct_x:
-            print("uct", len(uct_temp[str(el)]))
+            # print("uct", len(uct_temp[str(el)]))
             uct_y.append(np.average(np.array(uct_temp[str(el)])))
     
     ind = np.argwhere( np.invert( np.isnan(aogs_y)) )
@@ -291,6 +301,7 @@ for i in range(num_plots):
     
     ind = np.argwhere( np.invert( np.isnan(gbop_y)) )
     ind = ind.flatten()
+
     gbop_x = [float(x[i]) for i in ind]
     gbop_y = [gbop_y[i] for i in ind]
     
@@ -299,12 +310,20 @@ for i in range(num_plots):
     uct_x = [float(x[i]) for i in ind]
     uct_y = [uct_y[i] for i in ind]
     
-    # aogs_x = np.convolve (aogs_x, np.ones(5)/3)
-    # aogs_y = np.convolve (aogs_y, np.ones(5)/3)
-    # gbop_x = np.convolve (gbop_x, np.ones(5)/3)
-    # gbop_y = np.convolve (gbop_y, np.ones(5)/3)
-    # uct_x = np.convolve (uct_x, np.ones(5)/3)
-    # uct_y = np.convolve (uct_y, np.ones(5)/3)
+    #Need to fix rolling average because it moves the x values too...
+    if data_filter:
+        if len(aogs_x):
+            aogs_x = np.convolve (aogs_x, np.ones(data_filter)/data_filter)
+            aogs_y = np.convolve (aogs_y, np.ones(data_filter)/data_filter)
+        if len(gbop_x):
+            gbop_x = np.convolve (gbop_x, np.ones(data_filter)/data_filter)
+            gbop_y = np.convolve (gbop_y, np.ones(data_filter)/data_filter)
+        if len(uct_x):
+            uct_x = np.convolve (uct_x, np.ones(data_filter)/data_filter)
+            uct_y = np.convolve (uct_y, np.ones(data_filter)/data_filter)
+    
+    if indep_variable == "d":
+        print(gbop_x)
     # print(x)
     # print(aogs_y)
     if num_plots == 1:
@@ -342,4 +361,3 @@ if crossref_variable == None:
 
 fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".eps", format="eps", bbox_inches="tight", pad_inches=0)
 fig.savefig(current + "/plots/" + var_file + "_" + test_file + "_" + indep_variable + "_vs_" + dep_variable + "_cr_" + crossref_variable + ".png", format="png", bbox_inches="tight", pad_inches=0.0)
-print(test_file)
