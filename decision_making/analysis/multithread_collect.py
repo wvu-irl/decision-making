@@ -167,7 +167,6 @@ def poolHandler(alg_config, env_config, mt_config):
                 env_config["params"]["state"]["pose"] = s
                 env_config["params"]["goal"] = g
                 if env_config["env"] == "irl_gym/Sailing-v0":
-                	print("yee")
                 	env_config["params"]["state"]["pose"] = [s[0], s[1], rng.integers(0,7)]
             # print(i)
             trials.append({"env": copy.deepcopy(env_config), "alg": copy.deepcopy(alg_config), "trial": count, "instance": i, "fp": fp, "key": data_key})
