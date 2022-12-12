@@ -11,3 +11,4 @@ data/
 *.xcf
 *.pkl
 *.out
+*.err
