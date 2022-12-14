@@ -40,7 +40,7 @@ class State():
             self.s_ = _state
         else:
             self.s_ = {"x":_state}
-            
+        
         if type(_action) is list:
             self.a_ = []
             self.a_unused = []
@@ -181,9 +181,10 @@ class Action():
             _r (float): reward
         """
         ind = -1
-        if np.isin(_s,self.s_prime_):
-            for x in range(len(self.s_prime_)): 
-                if _s == self.s_prime_[x]:
+        print("sp", self.s_prime_)
+        if _s_p_i in self.s_prime_i_:
+            for x in range(len(self.s_prime_i_)): 
+                if _s_p_i == self.s_prime_i_[x]:
                     i = x
                     break
             self.r_[i] = (self.n_[i]*self.r_[i] + _r)/(self.n_[i]+1)

@@ -1,1 +1,1 @@
-__all__ = ["aogs", "uct", "gbop", "vi"]
+__all__ = ["aogs", "uct", "gbop"]

@@ -73,7 +73,7 @@ class GBOP():
         self.current_policy = -1
         self.n_ = 0
         self.value_gap_ = 1
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
 
     ######################################################
 
@@ -110,19 +110,19 @@ class GBOP():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            a_list, neighbors = self.env_.get_actions(_s)
+            self.graph_[self.n_] = State(deepcopy(_s), a_list, _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
         # print("-----------")
         #N is the number of trajectories now    
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             
             temp_params = deepcopy(self.env_params_)
-            temp_params["params"]["state"] = _s
+            temp_params["params"]["state"] = deepcopy(_s)
             # print(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
-            self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset()
+            self.env_.reset(options=temp_params["params"])
             
             s = self.env_.get_observation()
             
@@ -166,7 +166,8 @@ class GBOP():
                     # for el in s_p:
                     #     temp_sp[el] = deepcopy(s_p[el])
                     #     print(s_p[el])
-                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    a_list, neighbors = self.env_.get_actions(s_p)
+                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), a_list, str_s, v, is_terminal, _L = L, _U = U)
                     self.n_ += 1
                     # print("save_par", self.graph_[self.gi_[str_s]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))
                     # print("save", self.graph_[self.gi_[str_sp]].s_, hash(str(self.graph_[self.gi_[str_sp]].s_)))
@@ -223,9 +224,9 @@ class GBOP():
             done (bool): Flag for simulation completion
         """
         # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
-        s_p, r, done, info = self.env_.step(_a)
+        s_p, r, done, is_trunc, info = self.env_.step(_a)
+        done = done or is_trunc
         self.m_+=1
-
         return s_p, r, done
 
 

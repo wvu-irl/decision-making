@@ -48,8 +48,10 @@ env_config = json.load(f)
 
 # ENVS
 # gym_examples:gym_examples/GridWorld-v0
-env = gym.make(env_config["env"],max_episode_steps = max_ts, _params=env_config["params"])
-s = env.reset()
+if "r_range" in env_config:
+    env_config["r_range"] = tuple(env_config["r_range"])
+env = gym.make(env_config["env"],max_episode_steps = max_ts, params=env_config["params"])
+s, info = env.reset()
 env_config["state"] = copy.deepcopy(s)
 # print(env_config, "--------")
 planner = get_agent(alg_config,env_config)
@@ -67,7 +69,8 @@ while(not done):
     # print("act " + str(a))
     #env.reset(s)
     # s, r,done,info = env.step(a)
-    s, r,done,info = env.step(a)
+    s, r,done, is_trunc, info = env.step(a)
+    done = done or is_trunc
 #     env.render()
     
 

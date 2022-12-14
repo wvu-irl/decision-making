@@ -43,7 +43,7 @@ class AOGS():
         
         self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
         
-        self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
+        self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
 
         self.m_ = 0
 
@@ -82,7 +82,7 @@ class AOGS():
         self.current_policy = -1
         self.n_ = 0
         self.value_gap_ = 1
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
         
     ######################################################
               
@@ -119,7 +119,8 @@ class AOGS():
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_actions(_s), _L= self.bounds_[0], _U = self.bounds_[1])
+            a_list, neighbors = self.env_.get_actions(_s)
+            self.graph_[self.n_] = State(deepcopy(_s), a_list, _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
             
@@ -127,11 +128,10 @@ class AOGS():
         # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = deepcopy(self.env_params_)
-            temp_params["params"]["state"] = _s
-            # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
-            self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
+            temp_params["params"]["state"] = deepcopy(_s)
+            # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset()
+            self.env_.reset(options=temp_params["params"])
             # print(len(self.U_))
             # print("------------")
             # for i in range(len(self.gi_)):
@@ -187,6 +187,7 @@ class AOGS():
                 else:
                     ind = self.n_
 
+                print(a,s_p,ind,r)
                 ind = self.graph_[self.gi_[str_s]].add_child(a, s_p, ind,r)
                 if ind == self.n_:
                     
@@ -197,7 +198,9 @@ class AOGS():
                         U = v
                     else:
                         v = 0
-                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_actions(s_p), str_s, v, is_terminal, _L = L, _U = U)
+                    
+                    a_list, neighbors = self.env_.get_actions(s_p)
+                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), a_list, str_s, v, is_terminal, _L = L, _U = U)
                     # print("s ", s_p)
                     # print("act ", self.env_.get_actions(s_p))
                     # for a in self.graph_[self.gi_[str_sp]].a_:
@@ -272,16 +275,15 @@ class AOGS():
             # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = deepcopy(self.env_params_)
-                temp_params["params"]["state"] = _s
+                temp_params["params"]["state"] = deepcopy(_s)
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
-                self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
-                self.env_.reset()
+                self.env_.reset(options=temp_params["params"])
                 # print(_s, self.env_.get_observation())
             # print(_a)
             # print(self.env_.step(_a))
             # exit()
-            s_p, r, done, info = self.env_.step(_a)
-            
+            s_p, r, done, is_trunc, info = self.env_.step(_a)
+            done = done or is_trunc
             self.m_+=1
             # self.d_+=1
             _do_reset = False

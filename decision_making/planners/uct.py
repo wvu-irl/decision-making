@@ -68,7 +68,7 @@ class UCT():
         self.render_ = False
         self.terminalStates = []
         self.terminalActions = [] 
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
 
 
     # def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
@@ -94,15 +94,15 @@ class UCT():
         start_time = time.perf_counter()
         s = _s
         
-        self.tree_[0] = State(deepcopy(_s),self.env_.get_actions(_s),None,0)
+        a_list, neighbors = self.env_.get_actions(_s)
+        self.tree_[0] = State(deepcopy(_s),a_list,None,0)
 
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
             temp_params = deepcopy(self.env_params_)
-            temp_params["params"]["state"] = _s
+            temp_params["params"]["state"] = deepcopy(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
-            self.env_ = gym.make(temp_params["env"],max_episode_steps = (self.search_params_["horizon"]), _params=temp_params["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset()
+            self.env_.reset(options=temp_params["params"])
 
             nextNode = 0
             treePrintList = []
@@ -171,7 +171,8 @@ class UCT():
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
         if nextNodeIndex == self.n_:
-            self.tree_[nextNodeIndex] = State(deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
+            a_list, neighbors = self.env_.get_actions(obs)
+            self.tree_[nextNodeIndex] = State(deepcopy(obs),a_list,[nodeIndex],0)
             self.tree_[nextNodeIndex].N_ += 1 
             self.n_ += 1
         self.tree_[nextNodeIndex].is_terminal_ = done
@@ -209,11 +210,11 @@ class UCT():
     def simulate(self, _s, _a):
         # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
 
-        state, reward, done, info = self.env_.step(_a)
+        state, reward, done, is_trunc, info = self.env_.step(_a)
         # print(_a)
 
         self.m_ += 1
-        return state,reward,done
+        return state,reward, done or is_trunc
 
     def rollout(self, _s,_n = 0,_param = None):
         """

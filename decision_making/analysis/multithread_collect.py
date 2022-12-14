@@ -35,7 +35,7 @@ lock = Lock()
 
 ## Evaluation -------------------------------------------------
 def runWrapper(params : dict): 
-    env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], _params=params["env"]["params"])
+    env = gym.make(params["env"]["env"],max_episode_steps = params["env"]["max_time"], params=params["env"]["params"])
     s = env.reset()
     params["env"]["state"] = copy.deepcopy(s)
     planner = get_agent(params["alg"],params["env"])
@@ -52,7 +52,8 @@ def runWrapper(params : dict):
     while(not done):
         # print(params["trial"], params["instance"], done)
         a = planner.search(s, alg_config["search"])
-        s, r,done,info = env.step(a)
+        s, r,done, is_trunc, info = env.step(a)
+        done = done or is_trunc
         ts += 1
         accum_reward += r
         
