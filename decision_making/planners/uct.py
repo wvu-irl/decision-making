@@ -49,7 +49,7 @@ class UCT():
         self.as_s_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["decision_function"]], _alg_params["action_selection"]["decision_params"])
         self.as_r_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["rollout_function"]], _alg_params["action_selection"]["rollout_params"])
 
-        self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
+        self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
 
         self.m_ = 0
 
@@ -72,7 +72,7 @@ class UCT():
 
 
     # def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):
-    def search(self, _s : State, _search_params = None):
+    def evaluate(self, _s : State, _search_params = None):
         
         if _search_params != None:
             self.search_params_ = _search_params
@@ -92,7 +92,6 @@ class UCT():
         self.m_ = 0
         self.n_ += 1
         start_time = time.perf_counter()
-        s = _s
         
         a_list, neighbors = self.env_.get_actions(_s)
         self.tree_[0] = State(deepcopy(_s),a_list,None,0)
@@ -102,7 +101,7 @@ class UCT():
             temp_params["params"]["state"] = deepcopy(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset(options=temp_params["params"])
+            s, info = self.env_.reset(options=temp_params["params"])
 
             nextNode = 0
             treePrintList = []
@@ -187,7 +186,8 @@ class UCT():
         # print(action)
         obs,reward,done = self.simulate(self.tree_[nodeIndex].s_, action)
         nextNodeIndex = self.tree_[nodeIndex].add_child(action,obs,self.n_,reward)
-        self.tree_[nextNodeIndex] = State(deepcopy(obs),self.env_.get_actions(obs),[nodeIndex],0)
+        a_list, neighbors = self.env_.get_actions(obs)
+        self.tree_[nextNodeIndex] = State(deepcopy(obs),a_list,[nodeIndex],0)
         self.tree_[nextNodeIndex].is_terminal_ = done
         self.tree_[nextNodeIndex].N_ += 1 
         self.n_ += 1

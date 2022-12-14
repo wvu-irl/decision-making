@@ -51,7 +51,7 @@ def runWrapper(params : dict):
 
     while(not done):
         # print(params["trial"], params["instance"], done)
-        a = planner.search(s, alg_config["search"])
+        a = planner.evaluate(s, alg_config["search"])
         s, r,done, is_trunc, info = env.step(a)
         done = done or is_trunc
         ts += 1

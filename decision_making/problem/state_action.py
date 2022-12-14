@@ -181,7 +181,6 @@ class Action():
             _r (float): reward
         """
         ind = -1
-        print("sp", self.s_prime_)
         if _s_p_i in self.s_prime_i_:
             for x in range(len(self.s_prime_i_)): 
                 if _s_p_i == self.s_prime_i_[x]:

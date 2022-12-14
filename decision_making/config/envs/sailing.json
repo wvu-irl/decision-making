@@ -3,17 +3,18 @@
     "max_time": 100,
     "params":
     {
+        "dimensions": [40,40],
+        "goal": [15,15],
         "state": 
         {
             "pose" : [20,20,0]
         },
-        "dimensions": [40,40],
-        "goal": [15,15],
+        "r_radius": 5,
+        "r_range": [-400, 1100],
         "p": 0,
-        "prefix": "/home/jared/ambiguity_ws/data/sailing/",
-        "reward_bounds": [0,1],
-        "seed": 234,
-        "render" : false,
-        "print" : false
+        "render": "none",
+        "cell_size": 50,
+        "save_frames": false,
+        "log_level": "WARNING"
     }
 }

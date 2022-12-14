@@ -43,7 +43,7 @@ class GBOP():
         self.a_s_b_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["bound_function"]], _alg_params["action_selection"]["bound_params"])
         self.a_s_m_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["move_function"]], _alg_params["action_selection"]["move_params"])
         
-        self.bounds_ = [_env_params["params"]["reward_bounds"][0]/(1-_alg_params["gamma"]), _env_params["params"]["reward_bounds"][1]/(1-_alg_params["gamma"])]
+        self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
 
         self.m_ = 0
         
@@ -77,7 +77,7 @@ class GBOP():
 
     ######################################################
 
-    def search(self, _s : State, _search_params = None):              
+    def evaluate(self, _s : State, _search_params = None):              
         """
         Conducts Graph search from root
         Args:
@@ -122,10 +122,8 @@ class GBOP():
             # print(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset(options=temp_params["params"])
-            
-            s = self.env_.get_observation()
-            
+            s, info = self.env_.reset(options=temp_params["params"])
+                        
             self.d_ = 0
             is_terminal = False
             
@@ -197,6 +195,7 @@ class GBOP():
             if s != -1:
                 # print(s)
                 # print(self.gi_[s])
+
                 L,U = self.a_s_b_.return_action(self.graph_[self.gi_[s]],[self.alpha_],self)
                 
                 lprecision = ((1-self.alg_params_["gamma"])/self.alg_params_["gamma"])*self.alg_params_["model_accuracy"]["epsilon"]

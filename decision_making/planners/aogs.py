@@ -86,7 +86,7 @@ class AOGS():
         
     ######################################################
               
-    def search(self, _s : State, _search_params = None):
+    def evaluate(self, _s : State, _search_params = None):
         """
         Conducts Graph search from root
         Args:
@@ -131,7 +131,9 @@ class AOGS():
             temp_params["params"]["state"] = deepcopy(_s)
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            self.env_.reset(options=temp_params["params"])
+            # print("s outer", _s)
+            s, info = self.env_.reset(options=temp_params["params"])
+            # print("sa outer", s)
             # print(len(self.U_))
             # print("------------")
             # for i in range(len(self.gi_)):
@@ -142,8 +144,6 @@ class AOGS():
             #     s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
             # else:
                 # print("yee")
-
-            s = _s
             
             # print(hash(str(s)))
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
@@ -187,7 +187,6 @@ class AOGS():
                 else:
                     ind = self.n_
 
-                print(a,s_p,ind,r)
                 ind = self.graph_[self.gi_[str_s]].add_child(a, s_p, ind,r)
                 if ind == self.n_:
                     
@@ -277,7 +276,9 @@ class AOGS():
                 temp_params = deepcopy(self.env_params_)
                 temp_params["params"]["state"] = deepcopy(_s)
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
-                self.env_.reset(options=temp_params["params"])
+                # print(_s)
+                s, info = self.env_.reset(options=temp_params["params"])
+                # print("sa", s)
                 # print(_s, self.env_.get_observation())
             # print(_a)
             # print(self.env_.step(_a))

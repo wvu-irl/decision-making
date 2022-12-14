@@ -65,7 +65,7 @@ while(not done):
     print("-----------")
     print("state ",s)
     # print(done)
-    a = planner.search(s, alg_config["search"])#, alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
+    a = planner.evaluate(s, alg_config["search"])#, alg_config["horizon"], alg_config["max_time"], alg_config["reinit"])
     # print("act " + str(a))
     #env.reset(s)
     # s, r,done,info = env.step(a)
