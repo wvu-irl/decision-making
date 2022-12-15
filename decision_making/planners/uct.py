@@ -68,7 +68,7 @@ class UCT():
         self.render_ = False
         self.terminalStates = []
         self.terminalActions = [] 
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_["params"]))
 
 
     # def learn(self, s_ , _num_samples = 5e3, budget : int = 5000,gamma = .9):

@@ -3,18 +3,15 @@
     "max_time": 100,
     "params":
     {
-        "state": 
-        {
-            "pose" : [25,5]
-        },
-        "dimensions": [35,10],
+        "dimensions": [35,11],
+        "goal": [10,5],
         "offset": 2,
-        "goal": [10,10],
+        "r_radius": 5,
+        "r_range": [-0.01, 1],
         "p": 0,
-        "prefix": "/home/jared/ambiguity_ws/data/gridtunnel/",
-        "reward_bounds": [0,1],
-        "seed": 234,
-        "render" : false,
-        "print" : false
+        "render": "plot",
+        "cell_size": 50,
+        "save_frames": false,
+        "log_level": "WARNING"
     }
 }

@@ -73,7 +73,7 @@ class GBOP():
         self.current_policy = -1
         self.n_ = 0
         self.value_gap_ = 1
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
+        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_["params"]))
 
     ######################################################
 
