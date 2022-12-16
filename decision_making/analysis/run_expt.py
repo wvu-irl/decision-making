@@ -69,40 +69,21 @@ class RunExperiment():
         
         self.__lock = lock = Lock() 
         
-        self.generate_trials()
         
-        
-    def _generate_trials():
+    def _generate_trials(self):
         pass
     
-    def _setup_pool():
+    def _start_pool(self):
         pass
     
-    def _simulate():
+    def _simulate(self, params : dict):
         pass
     
-    def run():
+    def run(self):
+        self._generate_trials()
+        self._start_pool()
         pass
     
-    
-    
-    
-if __name__=='__main__':
-    alg_config_file = sys.argv[1]
-    env_config_file = sys.argv[2]
-    debug_config_file = sys.argv[3]
-    if len(sys.argv >= 5):
-        n_trials = sys.argv[4]
-    else:
-        n_trials = 1
-    if len(sys.argv) > 6: 
-        n_threads = int(sys.argv[5])
-    else:
-        n_threads = 1
-        
-    expts = RunExperiment(alg_config_file, env_config_file, debug_config_file, n_trials, n_threads)
-    
-    expts.run()
 
 ## Evaluation -------------------------------------------------
 def runWrapper(params : dict): 
@@ -289,5 +270,20 @@ def poolHandler(alg_config, env_config, mt_config):
     #     prev_exp_data.save(prev_exp_filepath)
 
 
-
+if __name__=='__main__':
+    alg_config_file = sys.argv[1]
+    env_config_file = sys.argv[2]
+    debug_config_file = sys.argv[3]
+    if len(sys.argv >= 5):
+        n_trials = sys.argv[4]
+    else:
+        n_trials = 1
+    if len(sys.argv) > 6: 
+        n_threads = int(sys.argv[5])
+    else:
+        n_threads = 1
+        
+    expts = RunExperiment(alg_config_file, env_config_file, debug_config_file, n_trials, n_threads)
+    
+    expts.run()
 

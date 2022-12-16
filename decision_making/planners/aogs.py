@@ -1,10 +1,11 @@
-import random
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-import gym
-import time
-from copy import deepcopy
+"""
+The AOGS class implements in the Ambiguous Optimistic Graph Search from 
+
+<insert citation>
+"""
+__license__ = "BSD-3"
+__docformat__ = 'reStructuredText'
+__author__ = "Jared Beard"
 
 import sys
 import os
@@ -12,6 +13,12 @@ import os
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
+
+import math
+import numpy as np
+import gym, irl_gym
+import time
+from copy import deepcopy
 
 from problem.state_action import State, Action
 from select_action.utils import * 
