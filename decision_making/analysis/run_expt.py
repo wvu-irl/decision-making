@@ -29,39 +29,38 @@ class RunExperiment():
     """
     Performs expermiental trials for a given algorithm and gym environment
     
-    For config files, system will check "config/<algorithms, envs, or debug>/"
+    For config files, system will check "config/<algorithms, envs, or expt>/"
     
     :param alg_config: (str) Filename for algorithm params (See each alg for more details)
+        Config file should contain an element "algs" which has both "default" params common to all algs, as well as remaining as well as specific members with all possible values
     :param env_config: (str) Filename for env params (see each env for more details)
-    :param debug_config: (str) Filename for debug params
-    
-    Should be formatted as a dict of params:
-    
-        -
-        
+        Config file should contain an element "envs" which has both "default" params common to all envs, as well as remaining as well as specific members with all possible values
     :param n_trials: (int) Number of trials to run for each set of parameters, *default*: 1
-    :param n_threads: (int) Number of threads to use
+    :param n_threads: (int) Number of threads to use, *default*: 1
+    :param log_level: (str) Log level (does not override default values), *default*: WARNING
     """
-    def __init__(self, *, alg_config : str, env_config : str, debug_config : str, n_trials : int = 1, n_threads : int = 1):
-        f = open(current + "/../config/debug/" + debug_config +  ".json")
-        self._debug_config = json.load(f)
+    def __init__(self, *, alg_config : str, env_config : str, n_trials : int = 1, n_threads : int = 1, log_level = "WARNING"):
         
-        if "log_level" not in self._debug_config:
-            self._debug_config["log_level"] = logging.WARNING
-        else:
-            log_levels = {"NOTSET": logging.NOTSET, "DEBUG": logging.DEBUG, "INFO": logging.INFO, "WARNING": logging.WARNING, "ERROR": logging.ERROR ,"CRITICAL": logging.CRITICAL}
-            self._debug_config["log_level"] = log_levels[self._debug_config["log_level"]]
+        log_levels = {"NOTSET": logging.NOTSET, "DEBUG": logging.DEBUG, "INFO": logging.INFO, "WARNING": logging.WARNING, "ERROR": logging.ERROR ,"CRITICAL": logging.CRITICAL}
+        self._log_level = log_levels[log_level]
                                              
-        logging.basicConfig(stream=sys.stdout, format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s', level=self._debug_config["log_level"])
+        logging.basicConfig(stream=sys.stdout, format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s', level=self._expt_config["log_level"])
         self._log = logging.getLogger(__name__)
         
         self._log.warn("RunExperiment Init, perform " + str(n_trials) + " trials across " + str(n_threads) + "threads")
         
         f = open(current + "/../config/alg/" + alg_config +  ".json")
         self._alg_config = json.load(f)
+        self._alg_default = self._alg_config.pop('default', None)
+        if "log_level" not in self._alg_default:
+            self._alg_default["log_level"] = log_level
         self._log.warn("Accessed algorithm configuration")
+        
         f = open(current + "/../config/env/" + env_config +  ".json")
         self._env_config = json.load(f)  
+        self._env_default = self._env_config.pop('default', None)
+        if "log_level" not in self._env_default:
+            self._env_default["log_level"] = log_level
         self._log.warn("Accessed Environment configuration") 
         
         self._n_trials = n_trials
@@ -71,17 +70,56 @@ class RunExperiment():
         
         
     def _generate_trials(self):
+        """
+        Generates a set of trials from the environment and algorithm params provided
+
+        :return: (list(dict)) contains list of the parameters for each algorithm
+        """
+        # Generate algorithm params
+        algs = [] 
+        for el in self._alg_config["algs"]:
+            keys, configs = self.__unpack_dict(el)
+            temp = list(itertools.product(*configs))
+            configs = self.__pack_dict(keys, configs, "alg") 
+            algs.append(configs) 
+            
+        # Generate Environment params
+        envs = []
+        for el in self._env_config["envs"]:
+            keys, configs = self.__unpack_dict(el)
+            temp = list(itertools.product(*configs))
+            configs = self.__pack_dict(keys, configs, "env") 
+            envs.append(configs) 
+        
+        # Combine experiments
+        expts = []
+        temp = list(itertools.product(*[algs,envs]))  
+        for i in self._n_trials:
+            expts.append(deepcopy(temp))
+        
+        return expts
+    
+    def __unpack_dict(self, dict):
         pass
     
-    def _start_pool(self):
+    def __pack_dict(self, keys, dict, format):
+                #don't forget to add in generic params
+                
+        #         "render": "none",
+        # "save_frames": false,
+        # "log_level": "WARNING"
+
+        pass
+    
+    def _start_pool(self, expts):
         pass
     
     def _simulate(self, params : dict):
         pass
     
     def run(self):
-        self._generate_trials()
-        self._start_pool()
+        expts = self._generate_trials()
+        self._start_pool(expts)
         pass
     
 
@@ -273,7 +311,7 @@ def poolHandler(alg_config, env_config, mt_config):
 if __name__=='__main__':
     alg_config_file = sys.argv[1]
     env_config_file = sys.argv[2]
-    debug_config_file = sys.argv[3]
+    expt_config_file = sys.argv[3]
     if len(sys.argv >= 5):
         n_trials = sys.argv[4]
     else:
@@ -283,7 +321,7 @@ if __name__=='__main__':
     else:
         n_threads = 1
         
-    expts = RunExperiment(alg_config_file, env_config_file, debug_config_file, n_trials, n_threads)
+    expts = RunExperiment(alg_config_file, env_config_file, expt_config_file, n_trials, n_threads)
     
     expts.run()
 
