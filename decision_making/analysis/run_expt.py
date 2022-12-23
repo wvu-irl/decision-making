@@ -8,6 +8,8 @@ __author__ = "Jared Beard"
 
 import sys
 import os
+
+from jinja2 import DictLoader
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -78,18 +80,12 @@ class RunExperiment():
         # Generate algorithm params
         algs = [] 
         for el in self._alg_config["algs"]:
-            keys, configs = self.__unpack_dict(el)
-            temp = list(itertools.product(*configs))
-            configs = self.__pack_dict(keys, configs, "alg") 
-            algs.append(configs) 
+            algs.append(self.__expand_trials(el))
             
         # Generate Environment params
         envs = []
         for el in self._env_config["envs"]:
-            keys, configs = self.__unpack_dict(el)
-            temp = list(itertools.product(*configs))
-            configs = self.__pack_dict(keys, configs, "env") 
-            envs.append(configs) 
+            algs.append(self.__expand_trials(el))
         
         # Combine experiments
         expts = []
@@ -99,17 +95,74 @@ class RunExperiment():
         
         return expts
     
-    def __unpack_dict(self, dict):
-        pass
-    
-    def __pack_dict(self, keys, dict, format):
-                #don't forget to add in generic params
+    def __expand_trials(self, d, form):
+        """
+        Unpacks a dictionary into a sequence of lists for trial generation
+        
+        :param d: (dict) params to expand
+        :return: (list(dict)) trials
+        """
+        trials = []
+        # temp = list(itertools.product(*configs))
+        # configs = self.__pack_dict(keys, configs, "alg") 
+        # print(list(itertools.product(*a.values())))
+        
+        # to repack values, iterate over original dict outline then recursively call using the subkeys
+        # so something like
+        
+        #for el in list
+            #make new val        
+            #for itm in el?
+                #val[el] = update_dict(el,itm)
                 
-        #         "render": "none",
-        # "save_frames": false,
-        # "log_level": "WARNING"
+        #def update_dict(el,val)
+            # for key, el in dict:
+                # if type(el) == dict:
+                    #update_dict(el, val)
+                # else
+                    # return el
+        return deepcopy(trials)
+    
+    def __unpack_dict(self, d):
+        """
+        Converts nested dictionary into a list of lists
+        
+        :param d: (dict) dictionary to be mapped to a list
+        :return: (list(str), list(list)) keys and values for each element in d
+        """
+        if type(d) == dict:
+            temp_key = []
+            temp_el = []
+            for key in d:
+                temp_key.append(key)
+                keys, vals = self.__unpack_dict(d[key])
+                if keys != None:
+                    temp_key.append(keys)  
+                temp_el.append(vals) 
+            return temp_key, temp_el            
+        elif type(d) == list:
+            return None, d
+        else:
+            return None, [d]    
+        
+    
+    def __pack_dict(self, d_in, d_structure):
+        """
+        Repackages list of keys and values into a nested dictionary (consumes input dictionary)
 
-        pass
+        :param d_in: 1d dict containing values
+        :param d_structure: (dict) dictionary containing structure and default values
+        :return: Restructured dictionary
+        """
+        d_out = deepcopy(d_structure)
+        for key in d_structure:
+            if type(d_structure[key]) == dict:
+                d_out[key] = self.__pack_dict(d_in, d_structure[key])
+            elif key in d_in:
+                d_out[key] = deepcopy(d_in[key])
+                d_in.pop(key)
+
+        return deepcopy(d_out)
     
     def _start_pool(self, expts):
         pass

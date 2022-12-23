@@ -1,14 +1,26 @@
 {
     "alg": "gbop",
-    "max_iter": 6e3,
-    "model_accuracy":
+    "params": 
     {
-        "epsilon": 0.1,
-        "delta": 0.1
-    },
-    "gamma": 0.95,
-    "max_graph_size": 5e4,
-    "rng_seed": 45,
+        "max_iter": 6e3,
+        "epsilon_accuracy": 0.1,
+        "gamma": 0.95,
+        "max_graph_size": 5e4,
+        "rng_seed": 45,
+        "action_selection" : 
+        {
+            "bound_function": "gbop_dm",
+            "bound_params":
+            {
+
+            },
+            "move_function": "gbop_best_action",
+            "move_params": 
+            {
+                "alpha": 0
+            }
+        }
+    },   
     "search" :
     {
         "branch_factor_s": 4,
@@ -17,19 +29,6 @@
         "horizon": 15,
         "timeout": 5,
         "reinit": true
-    },
-    "action_selection" : 
-    {
-        "bound_function": "gbop_dm",
-        "bound_params":
-        {
-
-        },
-        "move_function": "gbop_best_action",
-        "move_params": 
-        {
-            "alpha": 0
-        }
     }
 
 }
