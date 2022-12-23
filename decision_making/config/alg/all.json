@@ -2,6 +2,10 @@
     "algs":
     [
         {
+            "alg": "default"
+        },
+
+        {
             "alg": "aogs",
             "max_iter": 6e3,
             "model_accuracy":

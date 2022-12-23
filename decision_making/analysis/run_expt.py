@@ -34,9 +34,9 @@ class RunExperiment():
     For config files, system will check "config/<algorithms, envs, or expt>/"
     
     :param alg_config: (str) Filename for algorithm params (See each alg for more details)
-        Config file should contain an element "algs" which has both "default" params common to all algs, as well as remaining as well as specific members with all possible values
+        Config file should contain an element "alg" which has both "default" params common to all algs, as well as remaining as well as specific members with all possible values
     :param env_config: (str) Filename for env params (see each env for more details)
-        Config file should contain an element "envs" which has both "default" params common to all envs, as well as remaining as well as specific members with all possible values
+        Config file should contain an element "env" which has both "default" params common to all envs, as well as remaining as well as specific members with all possible values
     :param n_trials: (int) Number of trials to run for each set of parameters, *default*: 1
     :param n_threads: (int) Number of threads to use, *default*: 1
     :param log_level: (str) Log level (does not override default values), *default*: WARNING
@@ -95,33 +95,47 @@ class RunExperiment():
         
         return expts
     
-    def __expand_trials(self, d, form):
+    def __expand_trials(self, d):
         """
         Unpacks a dictionary into a sequence of lists for trial generation
         
         :param d: (dict) params to expand
         :return: (list(dict)) trials
         """
-        trials = []
-        # temp = list(itertools.product(*configs))
-        # configs = self.__pack_dict(keys, configs, "alg") 
-        # print(list(itertools.product(*a.values())))
         
-        # to repack values, iterate over original dict outline then recursively call using the subkeys
-        # so something like
+        if "alg" in d:
+            temp = deepcopy(self._alg_default)
+        elif "env" in d:
+            temp = deepcopy(self._env_default)
+            
+        d = self.__add_to_dict(temp, d)
         
-        #for el in list
-            #make new val        
-            #for itm in el?
-                #val[el] = update_dict(el,itm)
-                
-        #def update_dict(el,val)
-            # for key, el in dict:
-                # if type(el) == dict:
-                    #update_dict(el, val)
-                # else
-                    # return el
+        keys, vals = self.__unpack_dict(d)
+        combos = list(itertools.product(*vals))
+        
+        trials = [None] * len(combos)
+        for el, i in enumerate(combos):
+            temp = dict(zip(deepcopy(keys), deepcopy(el)))
+            trials[i] = self.__pack_dict(temp,d)
+
         return deepcopy(trials)
+    
+    def __add_to_dict(self, d_base, d_add):
+        """
+        Adds d_add values to d_base recursively. d_add values overwrite d_base values
+        
+        :param d_base: (dict) base dictionary
+        :param d_add: (dict) dictionary to add
+        :return: (dict) combined dictionary
+        """
+        d_base = deepcopy(d_base)
+        
+        for key, val in d_add:
+            if key not in d_base or type(d_base[key]) != dict:
+                d_base[key] = deepcopy(val)
+            else:
+                d_base[key] = self.__add_to_dict(d_base[key], d_add[key])
+        return d_base
     
     def __unpack_dict(self, d):
         """
@@ -145,7 +159,6 @@ class RunExperiment():
         else:
             return None, [d]    
         
-    
     def __pack_dict(self, d_in, d_structure):
         """
         Repackages list of keys and values into a nested dictionary (consumes input dictionary)
