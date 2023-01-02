@@ -124,6 +124,32 @@ class RunExperiment():
         
         return expts
     
+    def _generate_lazy_trials(self):
+        """
+        Generator implementation for yielding a set of trials from the environment and algorithm params provided
+
+        :return: (list(dict)) contains list of the parameters for each algorithm
+        """
+        self._log.warn("Generating Trials for ")
+        # Generate algorithm params
+        self._log.warn("...planning algorithms")
+        algs = [] 
+        for el in self._alg_config["algs"]:
+            algs.append(self.__expand_trials(el))
+            
+        # Generate Environment params
+        self._log.warn("...environments")
+        envs = []
+        for el in self._env_config["envs"]:
+            algs.append(self.__expand_trials(el))
+        
+        # Combine experiments
+        self._log.warn("...combining")
+        for el in itertools.product(*[algs,envs]):
+            temp = {"alg":deepcopy(el[0]), "env":deepcopy(el[1])}
+            for i in self._n_trials:
+                yield temp
+    
     def _start_pool(self, expts):
         """
         Starts Multithreading pool and performs series of experiments
