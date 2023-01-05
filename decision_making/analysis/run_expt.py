@@ -25,6 +25,7 @@ import gym
 import irl_gym
 
 import nestifydict as nd
+import sampler
 
 from planners.utils import *
 
@@ -281,8 +282,9 @@ class RunExperiment():
         d = nd.merge(temp, d)
         
         if "sample" in d:
-            pass
-        
+            sampler.sample_all(d["sample"], d)
+            d.pop("sample")
+            
         if "whitelist" not in d:
             return [d]
         else:
