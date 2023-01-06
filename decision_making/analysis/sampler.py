@@ -58,8 +58,10 @@ def sample_all(config : dict, output : dict):
         for param in params:
             if isinstance(params[param],list):
                 d[key + params] = deepcopy(nd.recursive_get(d,nd.find_key(params[param])))
-                
-        nd.recursive_set(output,["output"] + key[1:len(key)],sample(key, d))
+        
+        s = sample(key, d)
+        if s is not None:     
+            nd.recursive_set(output,["output"] + key[1:len(key)],s)
     
 def sample(sample_params : dict):
     """
@@ -92,8 +94,9 @@ def sample(sample_params : dict):
     
     if "choice" in sample_params:
         return sample_discrete(rng, sample_params)
-    else:
+    elif "low" in sample_params:
         return sample_continuous(rng, sample_params)
+    return None
         
 def sample_continuous(rng, params):
     """

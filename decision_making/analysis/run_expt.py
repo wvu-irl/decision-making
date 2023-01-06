@@ -89,10 +89,10 @@ class RunExperiment():
                     pickle.dump([],f)
         else:
             self.__fp = None
-
+        
         self.__lock = lock = Lock() 
             
-    def _generate_trials(self):
+    def _list_trials(self):
         """
         Generates a set of trials from the environment and algorithm params provided
 
@@ -118,14 +118,18 @@ class RunExperiment():
         for i,el in enumerate(temp):
             temp[i] = {"alg":deepcopy(el[0]), "env":deepcopy(el[1])}
         for i in self._n_trials:
-            #sample vars
-            #if find key is none 
-                #recursive set
-            expts += deepcopy(temp)
-        
+            for el in temp:
+                temp_sampled = deepcopy(el)
+                if "sample" in self._alg_default:
+                    sampler.sample_all(self._alg_default["sample"], temp_sampled["alg"])
+                if "sample" in self._env_default:
+                    sampler.sample_all(self._env_default["sample"], temp_sampled["env"])
+
+                expts += temp_sampled
+
         return expts
     
-    def _generate_lazy_trials(self):
+    def _generator_trials(self):
         """
         Generator implementation for yielding a set of trials from the environment and algorithm params provided
 
@@ -149,6 +153,11 @@ class RunExperiment():
         for el in itertools.product(*[algs,envs]):
             temp = {"alg":deepcopy(el[0]), "env":deepcopy(el[1])}
             for i in self._n_trials:
+                if "sample" in self._alg_default:
+                    sampler.sample_all(self._alg_default["sample"], temp["alg"])
+                if "sample" in self._env_default:
+                    sampler.sample_all(self._env_default["sample"], temp["env"])
+
                 yield temp
     
     def _start_pool(self, expts):
@@ -234,7 +243,7 @@ class RunExperiment():
         Runs Experiment. This is the primary UI.
         """
         self._log.warn("Running experiments")
-        expts = self._generate_trials()
+        expts = self._list_trials()
         self._start_pool(expts)
     
     def __expand_trials(self, d):
