@@ -33,7 +33,7 @@ class RunExperiment():
     """
     Performs experimental trials for a given algorithm and gym environment
     
-    For config files, system will check "config/<algorithms, envs, or expt>/"
+    For config files, system will check "config/<alg, env>/"
     
     *If using sample_expt, remember that this will affect `n_trials`. Depending on how an experiment is defined,
     this could lead to double counting and an explosion in simulations.* 
@@ -325,21 +325,19 @@ class RunExperiment():
 if __name__=='__main__':
     alg_config_file = sys.argv[1]
     env_config_file = sys.argv[2]
-    expt_config_file = sys.argv[3]
-    if len(sys.argv >= 5):
-        n_trials = sys.argv[4]
-    else:
-        n_trials = 1
-    if len(sys.argv) >= 6: 
-        n_threads = int(sys.argv[5])
-    else:
-        n_threads = 1
-    if len(sys.argv) >= 7:
-        clear_save = bool(int(sys.argv[6]))
-    else:
-        clear_save = True
+    
+    n_trials = 1
+    n_threads = 1
+    clear_save = True
+    
+    if len(sys.argv >= 4):
+        n_trials = sys.argv[3]
+    if len(sys.argv) >= 5: 
+        n_threads = int(sys.argv[4])
+    if len(sys.argv) >= 6:
+        clear_save = bool(int(sys.argv[5]))
         
-    expts = RunExperiment(alg_config_file, env_config_file, expt_config_file, n_trials, n_threads, clear_save)
+    expts = RunExperiment(alg_config_file, env_config_file, n_trials, n_threads, clear_save)
     
     expts.run()
 

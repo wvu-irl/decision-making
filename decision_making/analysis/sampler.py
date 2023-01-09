@@ -46,6 +46,10 @@ def sample_all(config : dict, output : dict):
     """
     Sample configuration to an output dictionary
     
+    Sampling uses `NestifyDict <https://pypi.org/project/nestifydict/>`_ so variables can be specified as their deepest key assuming this variable is only used in one place. 
+    Otherwise the variable should be defined as a list.
+    Nonexistent keys are skipped as the sampling declarations are contained here. 
+    
     :param config: (dict) Sample configuration
     :param output: (dict) Where to add samples
     """
