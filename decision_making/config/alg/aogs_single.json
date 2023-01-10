@@ -1,13 +1,7 @@
 {
     "alg": "aogs",
-    "sample":
-    {
-
-    },
-    "whitelists":
-    {
-        "combo": []
-    },
+    "sample": [ ],
+    "whitelists": { "combo": [] },
     "params":
     {
         "max_iter": 6e3,
@@ -32,5 +26,4 @@
         "timeout": 5,
         "reinit": true
     }
-
 }

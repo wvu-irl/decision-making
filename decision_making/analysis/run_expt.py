@@ -33,24 +33,21 @@ class RunExperiment():
     """
     Performs experimental trials for a given algorithm and gym environment
     
-    For config files, system will check "config/<alg, env>/"
-    
     *If using sample_expt, remember that this will affect `n_trials`. Depending on how an experiment is defined,
     this could lead to double counting and an explosion in simulations.* 
     If both are being used, it is recommented to set n_trials to no more than 5 unless 
     a deep investigation into a given state is needed.
     
-    :param alg_file: (str) Filename for algorithm params (See each alg for more details)
-        Config file should contain an element "alg" which has both "default" params common to all algs, as well as remaining as well as specific members with all possible values
-    :param env_file: (str) Filename for env params (see each env for more details)
-        Config file should contain an element "env" which has both "default" params common to all envs, as well as remaining as well as specific members with all possible values
+    :param alg_file: (str) Filename for algorithm params (see :doc:`config/core/get_defaults.py` for default path and :ref:`Config <config>` for specification)
+    :param env_file: (str) Filename for env params (see :doc:`config/core/get_defaults.py` for default path and :ref:`Config <config>` for specification)
+    :param core_file: (str) Filename for system params (such as file paths (see :doc:`config/operational.json` for defaults and :ref:`Update Config <update_config>` for command tools))
     :param n_trials: (int) Number of trials to run for each set of parameters, *default*: 1
     :param n_threads: (int) Number of threads to use, *default*: 1
     :param log_level: (str) Log level (does not override default values), *default*: WARNING
     :param file_name: (str) file to save data (default path is "~/data/"), if none does not save, *default*: None
     :param clear_save: (bool) clears data from pickle before running experiment, *default*: False
     """
-    def __init__(self, alg_file : str, env_file : str, n_trials : int = 1, n_threads : int = 1, log_level : str = "WARNING", file_name : str = None, clear_save : bool = False):
+    def __init__(self, alg_file : str, env_file : str, core_file: str, n_trials : int = 1, n_threads : int = 1, log_level : str = "WARNING", file_name : str = None, clear_save : bool = False):
         
         super(RunExperiment, self).__init__()
         
@@ -325,6 +322,7 @@ class RunExperiment():
 if __name__=='__main__':
     alg_config_file = sys.argv[1]
     env_config_file = sys.argv[2]
+    core_config_file = parent + "config/core/core.json"
     
     n_trials = 1
     n_threads = 1
@@ -337,7 +335,7 @@ if __name__=='__main__':
     if len(sys.argv) >= 6:
         clear_save = bool(int(sys.argv[5]))
         
-    expts = RunExperiment(alg_config_file, env_config_file, n_trials, n_threads, clear_save)
+    expts = RunExperiment(alg_config_file, env_config_file, core_config_file, n_trials, n_threads, clear_save)
     
     expts.run()
 
