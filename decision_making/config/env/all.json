@@ -1,6 +1,120 @@
 {
-    "envs":
-    {
-        
-    }
+    "envs": [
+        {
+            "env": "irl_gym/GridTunnel-v0",
+            "max_time": 100,
+            "params": {
+                "dimensions": [
+                    35,
+                    11
+                ],
+                "goal": [
+                    10,
+                    5
+                ],
+                "offset": 2,
+                "r_radius": 5,
+                "r_range": [
+                    -0.01,
+                    1
+                ],
+                "p": 0,
+                "render": "plot",
+                "cell_size": 50,
+                "save_frames": false,
+                "log_level": "WARNING"
+            }
+        },
+        {
+            "env": "irl_gym/GridWorld-v0",
+            "max_time": 100,
+            "params": {
+                "dimensions": [
+                    40,
+                    40
+                ],
+                "goal": [
+                    10,
+                    10
+                ],
+                "state": {
+                    "pose": [
+                        20,
+                        20
+                    ]
+                },
+                "r_radius": 5,
+                "r_range": [
+                    -0.01,
+                    1
+                ],
+                "p": 0,
+                "render": "none",
+                "cell_size": 50,
+                "save_frames": false,
+                "log_level": "WARNING"
+            }
+        },
+        {
+            "env": "irl_gym/GridWorld-v0",
+            "max_time": 100,
+            "params": {
+                "dimensions": [
+                    40,
+                    40
+                ],
+                "goal": [
+                    10,
+                    10
+                ],
+                "state": {
+                    "pose": [
+                        20,
+                        20
+                    ]
+                },
+                "r_radius": 5,
+                "r_range": [
+                    -0.01,
+                    1
+                ],
+                "p": 0,
+                "render": "plot",
+                "cell_size": 50,
+                "save_frames": false,
+                "log_level": "WARNING"
+            }
+        },
+        {
+            "env": "irl_gym/Sailing-v0",
+            "max_time": 100,
+            "params": {
+                "dimensions": [
+                    40,
+                    40
+                ],
+                "goal": [
+                    15,
+                    15
+                ],
+                "state": {
+                    "pose": [
+                        20,
+                        20,
+                        0
+                    ]
+                },
+                "r_radius": 5,
+                "r_range": [
+                    -400,
+                    1100
+                ],
+                "p": 0,
+                "render": "none",
+                "cell_size": 50,
+                "save_frames": false,
+                "log_level": "WARNING"
+            }
+        }
+    ]
 }

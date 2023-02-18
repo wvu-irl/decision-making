@@ -1,33 +1,29 @@
 {
     "algs":[{
-        "alg": "gbop",
-        "params": 
+        "alg":"aogs",
+        "sample": [],
+        "stich": { "combo": [] },
+        "params":
         {
             "max_iter": 6e3,
             "epsilon_accuracy": 0.1,
+            "delta_probability": 0.05,
             "gamma": 0.95,
             "max_graph_size": 5e4,
             "rng_seed": 45,
             "action_selection" : 
             {
-                "bound_function": "gbop_dm",
-                "bound_params":
-                {
-    
-                },
-                "move_function": "gbop_best_action",
-                "move_params": 
+                "function": "ambiguity_aware",
+                "params": 
                 {
                     "alpha": 0
                 }
             }
-        },   
+        },
         "search" :
         {
-            "branch_factor_s": 4,
-            "branch_factor_a": 4,
             "max_samples": 5e3,
-            "horizon": 15,
+            "horizon": 25,
             "timeout": 5,
             "reinit": true
         }

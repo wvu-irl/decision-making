@@ -1,17 +1,19 @@
 {
-    "env": "irl_gym/GridTunnel-v0",
-    "max_time": 100,
-    "params":
-    {
-        "dimensions": [35,11],
-        "goal": [10,5],
-        "offset": 2,
-        "r_radius": 5,
-        "r_range": [-0.01, 1],
-        "p": 0,
-        "render": "plot",
-        "cell_size": 50,
-        "save_frames": false,
-        "log_level": "WARNING"
-    }
+    "envs":[{
+        "env": "irl_gym/GridTunnel-v0",
+        "max_time": 100,
+        "params":
+        {
+            "dimensions": [35,11],
+            "goal": [10,5],
+            "offset": 2,
+            "r_radius": 5,
+            "r_range": [-0.01, 1],
+            "p": 0,
+            "render": "plot",
+            "cell_size": 50,
+            "save_frames": false,
+            "log_level": "WARNING"
+        }
+    }]
 }
