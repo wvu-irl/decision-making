@@ -1,4 +1,4 @@
-import gym,irl_gym
+import gymnasium as gym
 import pandas as pd
 import numpy as np
 import nestifydict as nd

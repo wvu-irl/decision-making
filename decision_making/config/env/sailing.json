@@ -12,7 +12,7 @@
             },
             "r_radius": 5,
             "r_range": [-400, 1100],
-            "p": 0,
+            "p": [0,0.1],
             "render": "none",
             "cell_size": 50,
             "save_frames": false,

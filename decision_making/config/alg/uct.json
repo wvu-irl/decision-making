@@ -7,7 +7,7 @@
         "search" :
         {
             "rollout": 25,
-            "max_samples": 5e3,
+            "max_samples": [100,500,1e3],
             "horizon": 40,
             "timeout": 5,
             "reinit": true
@@ -17,7 +17,7 @@
             "decision_function": "ucb1",
             "decision_params": 
             {
-                "c": 0.5
+                "c": [0.5,1,4,8,16]
             },
             "rollout_function": "random_action",
             "rollout_params": 
