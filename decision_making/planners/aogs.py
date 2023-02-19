@@ -45,18 +45,18 @@ class AOGS():
              AOGS: AOGS object
          """
         super(AOGS, self).__init__()
-
-        self.alg_params_ = _alg_params
-        self.env_params_ = _env_params
         if "search" in _alg_params:
             self.search_params_ = _alg_params["search"]
+        _alg_params = _alg_params["params"]; 
+        self.alg_params_ = _alg_params
+        self.env_params_ = _env_params
         
         self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
         
         self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
 
         self.m_ = 0
-
+    
         self.reinit()
         
         self.t_ = self.num_samples(self.alg_params_["model_accuracy"])
