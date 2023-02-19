@@ -8,6 +8,10 @@
             "gamma": 0.95,
             "max_graph_size": 5e4,
             "rng_seed": 45,
+            "model_accuracy":{
+                "epsilon": 0.1,
+                "delta": 0.05
+            },
             "action_selection" : 
             {
                 "bound_function": "gbop_dm",

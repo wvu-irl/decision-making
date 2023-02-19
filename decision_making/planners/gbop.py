@@ -34,12 +34,13 @@ class GBOP():
          """
         super(GBOP, self).__init__()
 
-        self.alg_params_ = _alg_params
-        self.env_params_ = _env_params
         if "search" in _alg_params:
             self.search_params_ = _alg_params["search"]
+        _alg_params = _alg_params["params"]; 
+        self.alg_params_ = _alg_params
+        self.env_params_ = _env_params
+        
         self.alpha_ = _alg_params["action_selection"]["move_params"]["alpha"]
-            
         self.a_s_b_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["bound_function"]], _alg_params["action_selection"]["bound_params"])
         self.a_s_m_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["move_function"]], _alg_params["action_selection"]["move_params"])
         
