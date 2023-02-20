@@ -4,12 +4,23 @@
         "max_time": 100,
         "params":
         {
-            "dimensions": [40,40],
-            "goal": [10,10],
-            "state": 
-            {
-                "pose" : [20,20]
-            },
+            "stitch" : [{"pair": ["goal", "pose"]},{"combo": ["p"]}],
+            "sample" :
+            [
+                {
+                    "key" : ["goal"],
+                    "low": [0,0],
+                    "high": [50,50],
+                    "num_increments": [51,51] 
+                },
+                {
+                    "key" : ["state", "pose"],
+                    "low": [0,0],
+                    "high": [50,50],
+                    "num_increments": [51,51]
+                }
+            ],
+            "dimensions": [50,50],
             "r_radius": 5,
             "r_range": [-0.01, 1],
             "p": [0,0.1],

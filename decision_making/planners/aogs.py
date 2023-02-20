@@ -16,7 +16,8 @@ sys.path.append(parent)
 
 import math
 import numpy as np
-import gym, irl_gym
+import irl_gym
+import gymnasium as gym
 import time
 from copy import deepcopy
 

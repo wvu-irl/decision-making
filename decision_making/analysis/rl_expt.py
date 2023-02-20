@@ -20,7 +20,7 @@ def rl_expt(params : dict):
     
     :param params: (dict) Contains "alg" and "env" with corresponding params
     """
-    print(params["envs"]["env"])
+    # print(params)
     env = gym.make(params["envs"]["env"], max_episode_steps = params["envs"]["max_time"], params=deepcopy(params["envs"]["params"]))
     s,info = env.reset()
     print(s)
