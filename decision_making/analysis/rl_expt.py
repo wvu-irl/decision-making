@@ -1,4 +1,3 @@
-import gymnasium as gym
 import pandas as pd
 import numpy as np
 import nestifydict as nd
@@ -14,6 +13,8 @@ sys.path.append(parent)
 from planners.utils import get_agent
 
 def rl_expt(params : dict):
+    import irl_gym
+    import gymnasium as gym
     """
     Simulates and saves a single experimental trial
     
