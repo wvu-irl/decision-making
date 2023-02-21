@@ -140,10 +140,15 @@ class AOGS():
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = deepcopy(self.env_params_)
             temp_params["params"]["state"] = deepcopy(_s)
+            # print('before flag ')
+            # print(hash(str(_s)))
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
             # print("s outer", _s)
             s, info = self.env_.reset(options=temp_params["params"])
+            # print('after flag')
+            # print(hash(str(s)))
+            
             # print("sa outer", s)
             # print(len(self.U_))
             # print("------------")
@@ -185,8 +190,8 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-
-                # print(self.gi_)
+                print('flag')
+                print(s["pose"])
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
