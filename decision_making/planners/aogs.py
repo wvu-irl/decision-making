@@ -190,8 +190,8 @@ class AOGS():
                 # print(str_s)
                 #pass alpha into initialization, 
                 # bounds and params available from solver 
-                print('flag')
-                print(s["pose"])
+                # print('flag')
+                # print(s["pose"])
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],[1],self)
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L

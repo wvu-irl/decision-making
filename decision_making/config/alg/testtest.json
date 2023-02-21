@@ -1,0 +1,117 @@
+{
+    "stitch": [
+        {
+            "combo": [
+                "algs",
+                "envs"
+            ]
+        }
+    ],
+    "envs": [
+        {
+            "env": "irl_gym/GridWorld-v0",
+            "stitch": [
+                {
+                    "combo": [
+                        "p"
+                    ]
+                }
+            ],
+            "default": {
+                "sample": [
+                    {
+                        "key": [
+                            "params",
+                            "state",
+                            "pose"
+                        ],
+                        "low": [
+                            0,
+                            0
+                        ],
+                        "high": [
+                            49,
+                            49
+                        ],
+                        "num_increments": "+1"
+                    },
+                    {
+                        "key": [
+                            "params",
+                            "goal"
+                        ],
+                        "low": [
+                            0,
+                            0
+                        ],
+                        "high": [
+                            49,
+                            49
+                        ],
+                        "num_increments": "+1"
+                    }
+                ]
+            },
+            "max_time": 1,
+            "params": {
+                "r_radius": 5,
+                "render": "none",
+                "cell_size": 50,
+                "save_frames": false,
+                "log_level": "WARNING",
+                "p": [
+                    0,
+                    0.1
+                ],
+                "dimensions": [
+                    50,
+                    50
+                ],
+                "r_range": [
+                    -0.01,
+                    1
+                ]
+            }
+        }
+    ],
+    "algs": [
+        {
+            "alg": "aogs",
+            "stitch": [
+                {
+                    "combo": [
+                        "max_samples",
+                        "alpha"
+                    ]
+                }
+            ],
+            "params": {
+                "max_iter": 6000.0,
+                "gamma": 0.95,
+                "max_graph_size": 50000.0,
+                "rng_seed": 45,
+                "model_accuracy": {
+                    "epsilon": 0.2,
+                    "delta": 0.1
+                },
+                "action_selection": {
+                    "function": "ambiguity_aware",
+                    "params": {
+                        "alpha": [
+                            0,
+                            1
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "max_samples": [
+                    500
+                ],
+                "horizon": 50,
+                "timeout": 5,
+                "reinit": true
+            }
+        }
+    ]
+}

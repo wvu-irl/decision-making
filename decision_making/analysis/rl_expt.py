@@ -20,7 +20,6 @@ def rl_expt(params : dict):
     
     :param params: (dict) Contains "alg" and "env" with corresponding params
     """
-    print(params)
     env = gym.make(params["envs"]["env"], max_episode_steps = params["envs"]["max_time"], params=deepcopy(params["envs"]["params"]))
     s,info = env.reset()
     params["envs"]["state"] = deepcopy(s)
@@ -44,8 +43,6 @@ def rl_expt(params : dict):
     data_point = nd.unstructure(params)
     data_point["time"] = ts
     data_point["r"] = accum_reward
-    print(data_point["pose"])
-    print(data_point["goal"])
     if "pose" in data_point and "goal" in data_point:
         data_point["distance"] = np.linalg.norm(np.asarray(data_point["pose"][1:2])-np.asarray(data_point["goal"]))
     data_point["final"] = deepcopy(s)
