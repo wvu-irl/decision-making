@@ -16,6 +16,7 @@ sys.path.append(parent)
 
 import math
 import numpy as np
+import time
 
 import gymnasium as gym
 import time
