@@ -19,9 +19,10 @@ sys.path.append(parent)
 from problem.state_action import State, Action
 from select_action.utils import * 
 
-import gym
+import gymnasium as gym
 
-class UCT():
+
+class UCT(gym.Env):
     """
     Perform Upper Confidence Tree Search 
     Description: User specifies problem and UCT solves for the policy

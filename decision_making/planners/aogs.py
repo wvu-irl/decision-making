@@ -16,7 +16,7 @@ sys.path.append(parent)
 
 import math
 import numpy as np
-import irl_gym
+
 import gymnasium as gym
 import time
 from copy import deepcopy
@@ -25,7 +25,7 @@ from problem.state_action import State, Action
 from select_action.utils import * 
 
 
-class AOGS():
+class AOGS(gym.Env):
     """
     Ambiguous Optimistic Graph Search from 
 

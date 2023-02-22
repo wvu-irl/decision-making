@@ -15,8 +15,9 @@ sys.path.append(parent)
 from problem.state_action import State, Action
 from select_action.utils import * 
 
+import gymnasium as gym
 
-class GBOP():
+class GBOP(gym.Env):
     """
     Perform Monte Carlo Tree Search 
     Description: User specifies MDP model and GBOP solves the MDP policy to some confidence.
