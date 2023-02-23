@@ -12,3 +12,4 @@ data/
 *.pkl
 *.out
 *.err
+*.csv

@@ -1,0 +1,31 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "test3.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/",
+    "figure_file" : "test.csv",
+    "cross_ref" : "alg",
+    "x" : "max_samples",
+    "y" : "r",
+    "z" : null,
+    "control" : null,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Sailing Reward vs Sample Allotment",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alpha", "op" : "in", "val" : [0]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "log_level" : "WARNING"
+}
