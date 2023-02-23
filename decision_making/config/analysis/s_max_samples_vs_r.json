@@ -2,7 +2,7 @@
     "data_path" : "/home/jared/decision-making/decision_making/data/",
     "data_file" : "test3.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "test.csv",
+    "figure_file" : "s_max_samples_vs_r",
     "cross_ref" : "alg",
     "x" : "max_samples",
     "y" : "r",
@@ -27,5 +27,6 @@
     },
     "sort": true,
     "avg" : true,
-    "log_level" : "WARNING"
+    "log_level" : "WARNING",
+    "render": true
 }

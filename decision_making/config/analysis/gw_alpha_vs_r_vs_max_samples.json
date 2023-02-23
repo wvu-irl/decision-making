@@ -2,16 +2,23 @@
     "data_path" : "/home/jared/decision-making/decision_making/data/",
     "data_file" : "test3.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "gw_max_samples_vs_r",
+    "figure_file" : "gw_alpha_vs_r_vs_max_samples",
     "cross_ref" : "alg",
-    "x" : "max_samples",
+    "x" : "alpha",
     "y" : "r",
     "z" : null,
-    "control" : null,
+    "control" : "max_samples",
+    "control_kwargs":
+    {
+        "bins":
+        {
+            "as_interval" : false
+        }
+    },
     "fig":
     {
         "type" : "line",
-        "title" : "Sailing Reward vs Sample Allotment",
+        "title" : "GridWorld Reward vs Alpha",
         "kwargs" : null
     },
     "filter" :
@@ -20,7 +27,6 @@
         {
             "and" :
             [
-                {"col" : "alpha", "op" : "in", "val" : [0]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
             ]
         }
@@ -28,5 +34,5 @@
     "sort": true,
     "avg" : true,
     "log_level" : "WARNING",
-    "render": true
+    "render" : true
 }
