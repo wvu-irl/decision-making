@@ -191,7 +191,8 @@ class GBOP(gym.Env):
                
     def bound_outcomes(self, _s):
         parents = [_s]
-        while len(parents):
+        count = 0
+        while len(parents) and count < 10000:
             s = parents.pop(0)
             t =0
             if s != -1:
@@ -211,6 +212,7 @@ class GBOP(gym.Env):
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
                 t += 1
+            count += 1
         return L, U 
 
     def simulate(self, _s, _a):

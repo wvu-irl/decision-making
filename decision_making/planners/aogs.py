@@ -322,7 +322,6 @@ class AOGS(gym.Env):
     def backpropagate(self, _parents):
         
         start_time = time.perf_counter()
-
         while len(_parents) and (time.perf_counter()-start_time < 10):
             #print(_parents)
             s = _parents.pop(0)
