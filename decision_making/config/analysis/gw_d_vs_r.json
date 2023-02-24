@@ -1,0 +1,40 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "total_data.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/",
+    "figure_file" : "gw_d_vs_r",
+    "cross_ref" : "alg",
+    "x" : "distance",
+    "y" : "r",
+    "z" : null,
+    "control" : "p",
+    "control_kwargs":
+    {
+        "bins":
+        {
+            "as_interval" : false
+        }
+    },
+    "fig":
+    {
+        "type" : "line",
+        "title" : "GridWorld Reward vs Distance",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alpha", "op" : "in", "val" : [0]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "smooth" : 3,
+    "log_level" : "WARNING",
+    "render": true
+}

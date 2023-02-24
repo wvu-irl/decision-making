@@ -42,22 +42,22 @@ class UCT(gym.Env):
          """
         super(UCT, self).__init__()
 
-        self.alg_params_ = _alg_params
+        self.alg_params_ = _alg_params["params"]
         self.env_params_ = _env_params
         if "search" in _alg_params:
             self.search_params_ = _alg_params["search"]
 
-        self.as_s_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["decision_function"]], _alg_params["action_selection"]["decision_params"])
-        self.as_r_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["rollout_function"]], _alg_params["action_selection"]["rollout_params"])
+        self.as_s_ = action_selection.action_selection(act_sel_funcs[self.alg_params_["action_selection"]["decision_function"]], self.alg_params_["action_selection"]["decision_params"])
+        self.as_r_ = action_selection.action_selection(act_sel_funcs[self.alg_params_["action_selection"]["rollout_function"]], self.alg_params_["action_selection"]["rollout_params"])
 
-        self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
+        self.bounds_ = [_env_params["params"]["r_range"][0]/(1-self.alg_params_["gamma"]), _env_params["params"]["r_range"][1]/(1-self.alg_params_["gamma"])]
 
         self.m_ = 0
 
         self.reinit()
 
-        if "rng_seed" in _alg_params:
-            self.rng_ = np.random.default_rng(_alg_params["rng_seed"])
+        if "rng_seed" in self.alg_params_:
+            self.rng_ = np.random.default_rng(self.alg_params_["rng_seed"])
         else:
             self.rng_ = np.random.default_rng()
             
@@ -114,7 +114,7 @@ class UCT(gym.Env):
             # Currently this does not reset at leaf nodes. It should
             #
             ########
-            while not(self.tree_[nextNode].is_terminal_) and not(done) and self.m_ < self.alg_params_["search"]["max_samples"]:
+            while not(self.tree_[nextNode].is_terminal_) and not(done) and self.m_ < self.search_params_["max_samples"]:
                 nextNode,done = self.treeStep(nextNode)
                 treePrintList.append(nextNode)
             if not(self.tree_[nextNode].is_terminal_):
@@ -235,7 +235,7 @@ class UCT(gym.Env):
             # print(a)
             s,r,done = self.simulate(_s.s_, a)                
             reward += (self.alg_params_["gamma"]**i)*r
-            if done or self.m_ >= self.alg_params_["search"]["max_samples"]:
+            if done or self.m_ >= self.search_params_["max_samples"]:
                 reward += r/(1-self.alg_params_["gamma"])
                 break
         return reward   

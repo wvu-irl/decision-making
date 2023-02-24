@@ -1,0 +1,38 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "total_data.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/",
+    "figure_file" : "s_alpha_vs_r_vs_max_samples",
+    "cross_ref" : "alg",
+    "x" : "alpha",
+    "y" : "r",
+    "z" : null,
+    "control" : "max_samples",
+    "control_kwargs":
+    {
+        "bins":
+        {
+            "as_interval" : false
+        }
+    },
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Sailing Reward vs Alpha",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "log_level" : "WARNING",
+    "render" : true
+}

@@ -191,8 +191,8 @@ class GBOP(gym.Env):
                
     def bound_outcomes(self, _s):
         parents = [_s]
-        count = 0
-        while len(parents) and count < 10000:
+        start_time = time.perf_counter()
+        while len(parents) and (time.perf_counter()-start_time < 10):
             s = parents.pop(0)
             t =0
             if s != -1:
