@@ -148,8 +148,7 @@
                 {
                     "combo": [
                         "max_samples",
-                        "c",
-                        "rollout"
+                        "c"
                     ]
                 }
             ],
@@ -168,7 +167,7 @@
                 }
             },
             "search": {
-                "rollout": [25, 50, 100],
+                "rollout": 25,
                 "max_samples": [ 500, 1000.0, 5000.0 ],
                 "horizon": 50,
                 "timeout": 5,
