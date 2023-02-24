@@ -1,6 +1,6 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/data/",
-    "data_file" : "test3.csv",
+    "data_file" : "total_data.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
     "figure_file" : "s_max_samples_vs_r",
     "cross_ref" : "alg",

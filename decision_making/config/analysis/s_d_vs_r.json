@@ -1,8 +1,8 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/data/",
-    "data_file" : "test3.csv",
+    "data_file" : "total_data.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "gw_d_vs_r",
+    "figure_file" : "s_d_vs_r",
     "cross_ref" : "alg",
     "x" : "distance",
     "y" : "r",
@@ -34,6 +34,7 @@
     },
     "sort": true,
     "avg" : true,
+    "smooth" : 3,
     "log_level" : "WARNING",
     "render": true
 }
