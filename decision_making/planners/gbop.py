@@ -212,6 +212,7 @@ class GBOP(gym.Env):
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
                 t += 1
+            count += 1
         return L, U 
 
     def simulate(self, _s, _a):

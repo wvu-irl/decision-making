@@ -1,13 +1,13 @@
 #!/bin/bash
  
 # Name of job:
-#PBS -N test1
+#PBS -N test2
  
 # Where to write stderr:
-#PBS -e log/test1.err
+#PBS -e log/test2.err
  
 # Where to write stdout: 
-#PBS -o log/test1.out
+#PBS -o log/test2.out
  
 # Specify number of nodes, processors (really threads) per node, and the maximum allowed run time for the job
 # Can also specify max memory requested with something like mem=10gb
@@ -21,4 +21,4 @@
 cd $PBS_O_WORKDIR
 
 # Run the program
-python3 /home/users/michael_butts/.local/lib/python3.10/site-packages/lab_space/bin/labspace -e rl_expt1 -r -s -ts test1.csv -tt 250 -tp 80 -tl WARNING
+python3 /home/users/michael_butts/.local/lib/python3.10/site-packages/lab_space/bin/labspace -e rl_expt1 -r -s -ts test2.csv -tt 250 -tp 80 -tl WARNING
