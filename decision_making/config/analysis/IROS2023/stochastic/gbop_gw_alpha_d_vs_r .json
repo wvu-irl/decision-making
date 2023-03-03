@@ -1,0 +1,38 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "all.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2023/",
+    "figure_file" : "gw_alpha_d_vs_r_gbop",
+    "cross_ref" : "alpha",
+    "x" : "distance",
+    "y" : "r",
+    "z" : null,
+    "control" : null,
+    "legend" : true,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "GBOP GridWorld Reward vs Distance",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alg", "op" : "in", "val" : ["gbop"]},
+                {"col" : "alpha", "op" : "in", "val" : [0, 0.25, 0.5, 0.75, 1]},
+                {"col" : "p", "op" : "in", "val" : [0.1]},
+                {"col" : "max_samples", "op" : "in", "val" : [500]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "smooth" : 15,
+    "cap": 70,
+    "log_level" : "WARNING",
+    "render": false
+}

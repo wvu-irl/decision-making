@@ -1,10 +1,10 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/data/",
-    "data_file" : "all.csv",
+    "data_file" : "uct_data.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "s_alpha_vs_r_vs_max_samples",
+    "figure_file" : "gw_c_vs_r_vs_max_samples_uct",
     "cross_ref" : "alg",
-    "x" : "alpha",
+    "x" : "c",
     "y" : "r",
     "z" : null,
     "control" : "max_samples",
@@ -18,7 +18,7 @@
     "fig":
     {
         "type" : "line",
-        "title" : "Sailing Reward vs Alpha",
+        "title" : "GridWorld Reward vs C",
         "kwargs" : null
     },
     "filter" :
@@ -27,13 +27,13 @@
         {
             "and" :
             [
-                {"col" : "alg", "op" : "in", "val" : ["aogs", "gbop"]},
-                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+                {"col" : "alg", "op" : "in", "val" : ["uct"]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
             ]
         }
     },
     "sort": true,
     "avg" : true,
     "log_level" : "WARNING",
-    "render" : false
+    "render" : true
 }

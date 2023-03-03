@@ -2,23 +2,16 @@
     "data_path" : "/home/jared/decision-making/decision_making/data/",
     "data_file" : "all.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "s_alpha_vs_r_vs_max_samples",
+    "figure_file" : "s_max_samples_vs_r",
     "cross_ref" : "alg",
-    "x" : "alpha",
+    "x" : "max_samples",
     "y" : "r",
     "z" : null,
-    "control" : "max_samples",
-    "control_kwargs":
-    {
-        "bins":
-        {
-            "as_interval" : false
-        }
-    },
+    "control" : null,
     "fig":
     {
         "type" : "line",
-        "title" : "Sailing Reward vs Alpha",
+        "title" : "Sailing Reward vs Sample Allotment",
         "kwargs" : null
     },
     "filter" :
@@ -27,7 +20,12 @@
         {
             "and" :
             [
-                {"col" : "alg", "op" : "in", "val" : ["aogs", "gbop"]},
+                {"or":
+                    [
+                        {"col" : "alpha", "op" : "in", "val" : [0]},
+                        {"col" : "c", "op" : "in", "val" : [8]}
+                    ]
+                },
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
             ]
         }
@@ -35,5 +33,5 @@
     "sort": true,
     "avg" : true,
     "log_level" : "WARNING",
-    "render" : false
+    "render": false
 }

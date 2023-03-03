@@ -1,6 +1,6 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/data/",
-    "data_file" : "total_data.csv",
+    "data_file" : "all.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
     "figure_file" : "gw_alpha_vs_r_vs_max_samples",
     "cross_ref" : "alg",
@@ -27,6 +27,7 @@
         {
             "and" :
             [
+                {"col" : "alg", "op" : "in", "val" : ["aogs", "gbop"]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
             ]
         }
@@ -34,5 +35,5 @@
     "sort": true,
     "avg" : true,
     "log_level" : "WARNING",
-    "render" : true
+    "render" : false
 }

@@ -1,20 +1,13 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/data/",
     "data_file" : "all.csv",
-    "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "s_alpha_vs_r_vs_max_samples",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2023/",
+    "figure_file" : "s_alpha_vs_r_500samples_static",
     "cross_ref" : "alg",
     "x" : "alpha",
     "y" : "r",
     "z" : null,
-    "control" : "max_samples",
-    "control_kwargs":
-    {
-        "bins":
-        {
-            "as_interval" : false
-        }
-    },
+    "control" : null,
     "fig":
     {
         "type" : "line",
@@ -28,6 +21,8 @@
             "and" :
             [
                 {"col" : "alg", "op" : "in", "val" : ["aogs", "gbop"]},
+                {"col" : "p", "op" : "in", "val" : [0]},
+                {"col" : "max_samples", "op" : "in", "val" : [500]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
             ]
         }

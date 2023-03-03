@@ -7,18 +7,8 @@ sys.path.append(parent)
 import csv
 
 import numpy as np
-import random
 
-import gym
-
-from decision_making.envs.grid_world import GridWorld
-from decision_making.envs.grid_tunnel import GridTrap
-from envs.sailing import Sailing
-from planners.aogs import AOGS
-from planners.uct import UCT
-# from solvers.mcgs import MCGS
-from decision_making.select_action import action_selection as act
-
+import matplotlib
 import matplotlib.pyplot as plt
 
 ## functions
@@ -41,7 +31,7 @@ alpha = [0, 0.05, 0.25, 0.5, 0.75, 0.95, 1]
 
 if True:
     #fp = "/home/jared/amb_ws/src/ambiguous-decision-making/python/analysis/results/"
-    fp = "/home/jared/ambiguity_ws/src/ambiguous-decision-making/python/analysis/results/"
+    fp = "/home/jared/Data/old_aogs_data/results/"
 
 else:
     fp = None
@@ -159,26 +149,46 @@ elif test_type == 1:
 else:
     title_name = "Sailing" 
 
+fsize = 19
+font = {'size'   : fsize}
+matplotlib.rc('font', **font)
+fig, ax = plt.subplots(1,1,sharey=True,figsize=(6, 7.5))#, gridspec_kw={'width_ratios': [2.45, 3]})
 
-fig, ax = plt.subplots(1,2,sharey=True, gridspec_kw={'width_ratios': [2.45, 3]})
+
 # print(np.min(np.min(d_diff)),np.max(np.max(d_diff)))
-
-ax[0].contourf(ddim,aalpha, steps_aogs_avg, levels= 20, cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
+ax.contourf(ddim,aalpha, steps_aogs_avg, levels= 20, cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
-ax[0].set_ylabel("alpha")
-ax[0].set_xlabel("distance")
-ax[0].title.set_text("AOGS")
+ax.set_ylabel(r"$\alpha$")
+ax.set_xlabel("distance")
+# ax.title.set_text("AOGS")
 # plt.axis('scaled')
+ax.tick_params(axis='both', which='major', labelsize=15)
+ax.tick_params(axis='both', which='minor', labelsize=15)
+# ax.set_yticks([0,0.2,0.4,0.6,0.8,1])
+plt.savefig(fp + "new_figs/aags_trap.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(fp + "new_figs/aags_trap.png", format="png", bbox_inches="tight", pad_inches=0.05)
+    
+fsize = 18
+font = {'size'   : fsize}
+matplotlib.rc('font', **font)
+fig, ax = plt.subplots(1,1,sharey=True,figsize=(7.5, 7.5))#, gridspec_kw={'width_ratios': [2.45, 3]})
 
-im2 = ax[1].contourf(ddim,aalpha, steps_mcgs_avg, levels= 20,cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
+
+im2 = ax.contourf(ddim,aalpha, steps_mcgs_avg, levels= 20,cmap='Blues', interpolation='hanning', vmin=0, vmax=100)#, cmap='binary')
 # plt.xticks(p)
 # plt.yticks(amb)
-# ax[1].ylabel("alpha")
-ax[1].set_xlabel("distance")
-ax[1].title.set_text("GBOP")
+# ax.set_ylabel(r"$\alpha$")
+ax.set_xlabel("distance")
+# ax.title.set_text("GBOP")
 # plt.axis('scaled')
+ax.set_yticks([])
 fig.colorbar(im2)
+ax.tick_params(axis='both', which='major', labelsize=15)
+ax.tick_params(axis='both', which='minor', labelsize=15)
+
+plt.savefig(fp + "new_figs/gbop_trap.eps", format="eps", bbox_inches="tight", pad_inches=0)
+plt.savefig(fp + "new_figs/gbop_trap.png", format="png", bbox_inches="tight", pad_inches=0.05)
 
 # ax.plot(max_samples, steps_avg)
 # ax.plot(max_samples, mind_avg)
@@ -197,8 +207,7 @@ fig.colorbar(im2)
 # # cb = plt.colorbar()
 # # plt.legend()
 
-plt.savefig(fp + "figs/steps.eps", format="eps", bbox_inches="tight", pad_inches=0)
-plt.savefig(fp + "figs/steps.png", format="png", bbox_inches="tight", pad_inches=0.05)
+
 # cb.remove()
 
 

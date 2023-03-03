@@ -2,12 +2,12 @@
     "data_path" : "/home/jared/decision-making/decision_making/data/",
     "data_file" : "all.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/figs/",
-    "figure_file" : "s_alpha_vs_r_vs_max_samples",
+    "figure_file" : "gw_d_vs_r_all",
     "cross_ref" : "alg",
-    "x" : "alpha",
+    "x" : "distance",
     "y" : "r",
     "z" : null,
-    "control" : "max_samples",
+    "control" : "p",
     "control_kwargs":
     {
         "bins":
@@ -18,7 +18,7 @@
     "fig":
     {
         "type" : "line",
-        "title" : "Sailing Reward vs Alpha",
+        "title" : "GridWorld Reward vs Distance",
         "kwargs" : null
     },
     "filter" :
@@ -27,13 +27,19 @@
         {
             "and" :
             [
-                {"col" : "alg", "op" : "in", "val" : ["aogs", "gbop"]},
-                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+                {"or":
+                    [
+                        {"col" : "alpha", "op" : "in", "val" : [0]},
+                        {"col" : "c", "op" : "in", "val" : [0.5]}
+                    ]
+                },
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/GridWorld-v0"]}
             ]
         }
     },
     "sort": true,
     "avg" : true,
+    "smooth" : 15,
     "log_level" : "WARNING",
-    "render" : false
+    "render": false
 }

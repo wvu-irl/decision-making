@@ -1,0 +1,40 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "all.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2023/",
+    "figure_file" : "s_d_vs_r_all_a1_static",
+    "cross_ref" : "alg",
+    "x" : "distance",
+    "y" : "r",
+    "z" : null,
+    "control" : null,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Sailing Reward vs Distance",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"or":
+                    [
+                        {"col" : "alpha", "op" : "in", "val" : [1]},
+                        {"col" : "c", "op" : "in", "val" : [8]}
+                    ]
+                },
+                {"col" : "p", "op" : "in", "val" : [0]},
+                {"col" : "max_samples", "op" : "in", "val" : [500]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "cap": 90000,
+    "log_level" : "WARNING",
+    "render": false
+}

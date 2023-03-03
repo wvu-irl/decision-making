@@ -160,7 +160,7 @@
                 "action_selection": {
                     "decision_function": "ucb1",
                     "decision_params": {
-                        "c": [0.5, 1, 2, 8, 32]
+                        "c": [0.5, 8]
                     },
                     "rollout_function": "random_action",
                     "rollout_params": {}
