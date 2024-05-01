@@ -9,7 +9,7 @@ __author__ = "Jared Beard"
 
 import sys
 import os
-
+import pygame
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
@@ -58,6 +58,33 @@ class AOGS(gym.Env):
         self.bounds_ = [_env_params["params"]["r_range"][0]/(1-_alg_params["gamma"]), _env_params["params"]["r_range"][1]/(1-_alg_params["gamma"])]
 
         self.m_ = 0
+        
+        self.map_ =  np.zeros(self.env_params_["params"]["dimensions"])
+        self._img_count = 0
+        self.window = None
+        self.clock = None
+        
+        # self._id_action = {
+        #     0: np.array([ 0, -1]),
+        #     1: np.array([-1, -1]),
+        #     2: np.array([-1,  0]),
+        #     3: np.array([-1,  1]),
+        #     4: np.array([ 0,  1]),
+        #     5: np.array([ 1,  1]),
+        #     6: np.array([ 1, 0]),
+        #     7: np.array([ 1, -1]),
+        # }
+        # self._triangle = [np.array([0.3,0]),np.array([-0.3,-0.15]),np.array([-0.3,0.15])]
+        # for i, el in enumerate(self._triangle):
+        #     self._triangle[i] = el*self.env_params_["params"]["cell_size"]
+    
+
+        # if self.env_params_["params"]["render"] == "plot":
+        #     self._goal_polygon = [  (self.env_params_["params"]["goal"]+np.array([ 1  , 0.5]))*self.env_params_["params"]["cell_size"], 
+        #                             (self.env_params_["params"]["goal"]+np.array([ 0.5, 1  ]))*self.env_params_["params"]["cell_size"], 
+        #                             (self.env_params_["params"]["goal"]+np.array([ 0,   0.5]))*self.env_params_["params"]["cell_size"], 
+        #                             (self.env_params_["params"]["goal"]+np.array([ 0.5, 0  ]))*self.env_params_["params"]["cell_size"]]
+        
     
         self.reinit()
         
@@ -128,6 +155,8 @@ class AOGS(gym.Env):
         s = None
         self.value_gap_ = self.alg_params_["model_accuracy"]["epsilon"]
         _str_s = hash(str(_s))
+        
+        self._state = deepcopy(_s)
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
@@ -271,6 +300,11 @@ class AOGS(gym.Env):
         # plt.pause(1)
         # print(len(self.gi_))
         # print("Usize", len(self.U_))
+        
+        
+        # self.plot()
+        
+        
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
                
     def simulate(self, _s, _a, _do_reset):
@@ -289,7 +323,7 @@ class AOGS(gym.Env):
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[act_ind].N_ <= self.t_:
-            # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
+            self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = deepcopy(self.env_params_)
                 temp_params["params"]["state"] = deepcopy(_s)
@@ -353,5 +387,142 @@ class AOGS(gym.Env):
                 # lmn = 0
         _parents.clear()
 
+    # def plot(self):  
+    #     if self.env_params_["params"]["render"] == "plot":
+    #         if self.window is None:
+    #             pygame.init()
+    #             pygame.display.init()
+    #             self.window = pygame.display.set_mode((self.env_params_["params"]["dimensions"][0]*self.env_params_["params"]["cell_size"], self.env_params_["params"]["dimensions"][1]*self.env_params_["params"]["cell_size"]))
+    #         if self.clock is None:
+    #             self.clock = pygame.time.Clock()
             
+    #         img = pygame.Surface((self.env_params_["params"]["dimensions"][0]*self.env_params_["params"]["cell_size"], self.env_params_["params"]["dimensions"][1]*self.env_params_["params"]["cell_size"]))
+    #         img.fill((255,255,255))
+
+    #         max_map = np.max(np.max(self.map_))
+    #         for x in range(self.env_params_["params"]["dimensions"][0]):
+    #             for y in range(self.env_params_["params"]["dimensions"][1]):
+    #                 if self.map_[x][y] > 0:
+    #                     samples = max(255*(1-self.map_[x][y]/max_map)**(4),0)
+    #                     pygame.draw.rect(img, (samples,samples/2,samples/2), (x*self.env_params_["params"]["cell_size"], y*self.env_params_["params"]["cell_size"], self.env_params_["params"]["cell_size"], self.env_params_["params"]["cell_size"]))
+
+    #         # Agent, goal
+    #         if np.all(self._state["pose"] == self.env_params_["params"]["goal"]):
+    #             pygame.draw.polygon(img, (255,0,0), self._goal_polygon)
+    #         else:
+    #             pygame.draw.circle(img, (0,0,255), (self._state["pose"]+0.5)*self.env_params_["params"]["cell_size"], self.env_params_["params"]["cell_size"]/2)
+    #             pygame.draw.polygon(img, (0,255,0), self._goal_polygon)
+            
+    #         for y in range(self.env_params_["params"]["dimensions"][1]):
+    #             pygame.draw.line(img, 0, (0, self.env_params_["params"]["cell_size"] * y), (self.env_params_["params"]["cell_size"]*self.env_params_["params"]["dimensions"][0], self.env_params_["params"]["cell_size"] * y), width=2)
+    #         for x in range(self.env_params_["params"]["dimensions"][0]):
+    #             pygame.draw.line(img, 0, (self.env_params_["params"]["cell_size"] * x, 0), (self.env_params_["params"]["cell_size"] * x, self.env_params_["params"]["cell_size"]*self.env_params_["params"]["dimensions"][1]), width=2)
+                
+    #         self.window.blit(img, img.get_rect())
+    #         pygame.event.pump()
+    #         pygame.display.update()
+    #         self.clock.tick(4)
+            
+    #         if self.env_params_["params"]["save_frames"]:
+    #             pygame.image.save(img, self.env_params_["params"]["prefix"] + "img" + str(self._img_count) + ".png")
+    #             self._img_count += 1
+                
+    #     elif self.env_params_["params"]["render"] == "print":
+    #         self._log.warning(str(self._state))
+            
+    def plot(self):
+        """    
+        Renders environment
         
+        Has two render modes: 
+        
+        - *plot* uses PyGame visualization
+        - *print* logs pose at Warning level
+
+        Visualization
+        
+        - blue triangle: agent
+        - green diamond: goal 
+        - red diamond: goal + agent
+        - orange triangle: wind direction
+        - Grey cells: The darker the shade, the higher the reward
+        """
+        if self.env_params_["params"]["render"] == "plot":
+            if self.window is None:
+                pygame.init()
+                pygame.display.init()
+                self.window = pygame.display.set_mode((self.env_params_["params"]["dimensions"][0]*self.env_params_["params"]["cell_size"], self.env_params_["params"]["dimensions"][1]*self.env_params_["params"]["cell_size"]))
+            if self.clock is None:
+                self.clock = pygame.time.Clock()
+            
+            img = pygame.Surface((self.env_params_["params"]["dimensions"][0]*self.env_params_["params"]["cell_size"], self.env_params_["params"]["dimensions"][1]*self.env_params_["params"]["cell_size"]))
+            img.fill((255,255,255))
+            
+            max_map = np.max(np.max(self.map_))
+            for x in range(self.env_params_["params"]["dimensions"][0]):
+                for y in range(self.env_params_["params"]["dimensions"][1]):
+                    if self.map_[x][y] > 0:
+                        samples = max(255*(1-self.map_[x][y]/max_map)**(4),0)
+                        pygame.draw.rect(img, (samples,samples/2,samples/2), (x*self.env_params_["params"]["cell_size"], y*self.env_params_["params"]["cell_size"], self.env_params_["params"]["cell_size"], self.env_params_["params"]["cell_size"]))
+
+            
+            # Reward, wind
+            for i in range(self.env_params_["params"]["dimensions"][0]):
+                for j in range(self.env_params_["params"]["dimensions"][1]):                    
+                    wind_direction = self._id_action[self._state["wind"][i][j]]
+                    wind_direction = np.arctan2(wind_direction[1],wind_direction[0])
+                    triangle = self._rotate_polygon(self._triangle,wind_direction)
+                    for k, el in enumerate(triangle):
+                        triangle[k] = el + (np.array([i,j])+0.5)*self.env_params_["params"]["cell_size"]
+                    pygame.draw.polygon(img, (100,100,100), triangle)
+            
+            # Agent, goal
+            if np.all(self._state["pose"] == self.env_params_["params"]["goal"]):
+                pygame.draw.polygon(img, (255,0,0), self._goal_polygon)
+            else:
+                move_direction = self._id_action[self._state["pose"][2]]
+                move_direction = np.arctan2(move_direction[1],move_direction[0])
+                triangle = self._rotate_polygon(self._triangle,move_direction)
+                for i, el in enumerate(triangle):
+                    triangle[i] = 2.5*el + (self._state["pose"][0:2]+0.5)*self.env_params_["params"]["cell_size"]
+                pygame.draw.polygon(img, (0,0,255), triangle)
+                pygame.draw.polygon(img, (0,255,0), self._goal_polygon)
+            
+            # Grid
+            for y in range(self.env_params_["params"]["dimensions"][1]):
+                pygame.draw.line(img, 0, (0, self.env_params_["params"]["cell_size"] * y), (self.env_params_["params"]["cell_size"]*self.env_params_["params"]["dimensions"][0], self.env_params_["params"]["cell_size"] * y), width=2)
+            for x in range(self.env_params_["params"]["dimensions"][0]):
+                pygame.draw.line(img, 0, (self.env_params_["params"]["cell_size"] * x, 0), (self.env_params_["params"]["cell_size"] * x, self.env_params_["params"]["cell_size"]*self.env_params_["params"]["dimensions"][1]), width=2)
+                
+            self.window.blit(img, img.get_rect())
+            pygame.event.pump()
+            pygame.display.update()
+            self.clock.tick(4)
+            
+            if self.env_params_["params"]["save_frames"]:
+                pygame.image.save(img, self.env_params_["params"]["prefix"] + "img" + str(self._img_count) + ".png")
+                self._img_count += 1
+                
+        elif self.env_params_["params"]["render"] == "print":
+            p = self._state["pose"]
+                
+    def _rotate_polygon(self, vertices : list, angle : float, center : np.ndarray = np.zeros(2)):
+        """
+        Rotates a polygon by a given angle
+
+        :param vertices: (list(ndarray)) List of 2d coordinates
+        :param angle: (float) angle in radians to rotate polygon
+        :param center: (ndarray) coordinate about which to rotate polygon, *default*: [0,0] 
+        """
+        # Since there are only a few angles, could potentially preload all of them them pass in the matrix
+        vertices = deepcopy(vertices)
+        R = np.zeros([2,2])
+        R[0,0] = np.cos(angle)
+        R[0,1] = -np.sin(angle)
+        R[1,0] = np.sin(angle)
+        R[1,1] = np.cos(angle)
+        for i in range(len(vertices)):
+            vertices[i] -= center
+            vertices[i]  = np.matmul(R,vertices[i])
+            vertices[i] += center
+        return vertices

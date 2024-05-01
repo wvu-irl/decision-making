@@ -1,0 +1,21 @@
+{
+    "env": "irl_gym/Sailing-v0",
+    "max_time": 100,
+    "params":
+    {
+        "stitch" : [{"pair": ["goal", "pose"]},{"combo": ["p"]}],
+        "dimensions": [40,40],
+        "goal": [10,10],
+        "state": 
+        {
+            "pose": [20,20,4]
+        },
+        "r_radius": 5,
+        "r_range": [-400, 1100],
+        "p": 0.1,
+        "render": "plot",
+        "cell_size": 10,
+        "save_frames": false,
+        "log_level": "WARNING"
+    }
+}

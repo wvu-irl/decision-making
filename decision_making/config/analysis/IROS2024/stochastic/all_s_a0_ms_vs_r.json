@@ -1,0 +1,38 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/IROS2024/",
+    "data_file" : "all.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2024/",
+    "figure_file" : "s_a0_ms_vs_r",
+    "cross_ref" : "alg",
+    "x" : "alpha",
+    "y" : "r",
+    "z" : null,
+    "control" : null,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Sailing Reward vs Alpha",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"or":
+                    [
+                        {"col" : "alpha", "op" : "in", "val" : [0]},
+                        {"col" : "c", "op" : "in", "val" : [8]}
+                    ]
+                },
+                {"col" : "p", "op" : "in", "val" : [0.1]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "log_level" : "WARNING",
+    "render" : false
+}

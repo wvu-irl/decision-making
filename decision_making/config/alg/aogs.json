@@ -24,7 +24,7 @@
         },
         "search" :
         {
-            "max_samples": [500,1e3,5e3],
+            "max_samples": 500,
             "horizon": 50,
             "timeout": 5,
             "reinit": true

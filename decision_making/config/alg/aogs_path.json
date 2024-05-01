@@ -1,0 +1,31 @@
+{
+    "alg":"aogs",
+    "sample": [],
+    "stich": { "combo": ["alpha","max_samples"]},
+    "params":
+    {
+        "max_iter": 6e3,
+        "gamma": 0.99,
+        "max_graph_size": 5e4,
+        "rng_seed": 45,
+        "model_accuracy":{
+            "epsilon": 0.1,
+            "delta": 0.05
+        },
+        "action_selection" : 
+        {
+            "function": "ambiguity_aware",
+            "params": 
+            {
+                "alpha": [0]
+            }
+        }
+    },
+    "search" :
+    {
+        "max_samples": 500,
+        "horizon": 10,
+        "timeout": 5,
+        "reinit": false
+    }
+}

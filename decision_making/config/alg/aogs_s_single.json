@@ -9,16 +9,17 @@
     ],
     "envs": [
         {
-            "env": "irl_gym/Sailing-v0",
+            "env": "irl_gym/SailingBR-v0",
             "max_time": 100,
             "params": {
                 "state": {
-                    "pose": [20, 20, 0 ]
+                    "pose": [15, 20, 0 ]
                 },
                 "goal": [10, 10],
                 "r_radius": 5,
                 "render": "plot",
-                "cell_size": 50,
+                "prefix": "/home/jared/decision-making/decision_making/figs/env/",
+                "cell_size": 25,
                 "save_frames": false,
                 "log_level": "WARNING",
                 "p": 0.1,
@@ -48,7 +49,7 @@
                 "action_selection": {
                     "function": "ambiguity_aware",
                     "params": {
-                        "alpha": 0
+                        "alpha": 1
                     }
                 }
             },

@@ -13,13 +13,14 @@
             "max_time": 100,
             "params": {
                 "state": {
-                    "pose": [20, 20 ]
+                    "pose": [15, 20 ]
                 },
                 "goal": [10, 10],
                 "r_radius": 5,
-                "render": "none",
-                "cell_size": 50,
-                "save_frames": false,
+                "render": "plot",
+                "prefix": "/home/jared/decision-making/decision_making/figs/env/",
+                "cell_size": 25,
+                "save_frames": true,
                 "log_level": "WARNING",
                 "p": 0.1,
                 "dimensions": [
@@ -56,7 +57,7 @@
                 "max_samples": 500,
                 "horizon": 50,
                 "timeout": 5,
-                "reinit": true
+                "reinit": false
             }
         }
     ]

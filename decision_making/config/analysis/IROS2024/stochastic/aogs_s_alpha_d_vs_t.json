@@ -1,0 +1,38 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/IROS2024/",
+    "data_file" : "all.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2024/",
+    "figure_file" : "s_alpha_d_vs_t_aogs",
+    "cross_ref" : "alpha",
+    "x" : "distance",
+    "y" : "time",
+    "z" : null,
+    "control" : null,
+    "legend" : true,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "AOGS Sailing Reward vs Distance",
+        "xlabel" : "Initial Distance",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alg", "op" : "in", "val" : ["aogs"]},
+                {"col" : "alpha", "op" : "in", "val" : [0, 0.05, 0.125, 0.75, 1]},
+                {"col" : "p", "op" : "in", "val" : [0.1]},
+                {"col" : "max_samples", "op" : "in", "val" : [500]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "smooth" : 15,
+    "log_level" : "WARNING",
+    "render": false
+}

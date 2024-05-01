@@ -1,0 +1,36 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/data/",
+    "data_file" : "all.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/figs/IROS2023/",
+    "figure_file" : "s_alpha_d_vs_fd_uct",
+    "cross_ref" : "c",
+    "x" : "distance",
+    "y" : "final_distance",
+    "z" : null,
+    "control" : null,
+    "legend" : true,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "AOGS Sailing Distance vs Final Distance",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alg", "op" : "in", "val" : ["uct"]},
+                {"col" : "p", "op" : "in", "val" : [0.1]},
+                {"col" : "max_samples", "op" : "in", "val" : [500]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Sailing-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "smooth" : 15,
+    "log_level" : "WARNING",
+    "render": false
+}
