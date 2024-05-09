@@ -133,7 +133,7 @@ class AOGS(gym.Env):
         
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_model_dist(), _L= self.bounds_[0], _U = self.bounds_[1])
+            self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_belief(), _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
             
@@ -197,6 +197,7 @@ class AOGS(gym.Env):
                                
                 
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],{"alpha": 1},self)
+                # raise NotImplemented("map action space back to global")
                 model = a["model"]              
                 del a["model"]
                 
@@ -222,7 +223,7 @@ class AOGS(gym.Env):
                     else:
                         v = 0
                     
-                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_model_dist(), str_s, v, is_terminal, _L = L, _U = U)
+                    self.graph_[self.gi_[str_sp]] = State(deepcopy(s_p), self.env_.get_belief(), str_s, v, is_terminal, _L = L, _U = U)
                     # print("s ", s_p)
                     # print("act ", self.env_.get_actions(s_p))
                     # for a in self.graph_[self.gi_[str_sp]].a_:
@@ -262,6 +263,8 @@ class AOGS(gym.Env):
         ## For parameters, call get action from env and pass it to the action selection function. 
         ##
         a, e_max, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[_str_s]],{"is_policy" : True},self)
+        # raise NotImplemented("map action space back to global")
+
         # print("emax ", e_max)
         # print(exps)
         # print("gap", U-L)
@@ -282,8 +285,8 @@ class AOGS(gym.Env):
         # print("Usize", len(self.U_))
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
     
-    def update_model_dist(self, _s, _a, _s_p, _r):
-        self.env_.update_model_dist(_s, _a, _s_p, _r)
+    def update_models(self, _s, _a, _s_p, _r):
+        self.env_.update_models(_s, _a, _s_p, _r)
                
     def simulate(self, _s, _a, _model, _do_reset):
         """
@@ -345,7 +348,9 @@ class AOGS(gym.Env):
             s = _parents.pop(0)
             #print("lp " + str(len(_parents)))
             if s != -1:
-                a, v, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[s]],[],self)
+                a, v, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[s]],{"is_policy" : True},self)
+                # raise NotImplemented("map action space back to global")
+
                 lprecision = (1-self.alg_params_["gamma"])/self.alg_params_["gamma"]*diffs[0]
                 # print("----------")
                 # print(lprecision)

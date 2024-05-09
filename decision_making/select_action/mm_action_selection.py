@@ -16,7 +16,7 @@ from problem.state_action import State, Action
 from select_action.ambiguity_toolbox import *
 from select_action.gbop_toolbox import *
 
-from select_action.mm_action_selection import mm_progressive_widening
+from select_action.model_selection import mm_progressive_widening
 
 
 class mm_action_selection():
@@ -66,19 +66,36 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
                 
     else:
         
-        model = mm_progressive_widening(_s, _const["model"], _params, _solver)
+        mm_params = _params["mm_prog_widening"]
         
-        is_widened, a = progressive_widening(_s, _const["model"], _params, _solver)
+        model = mm_progressive_widening(_s, _const["model"], mm_params, _solver)
+        
+        a_params = _params["action_prog_widening"]
+        
+        is_widened, a = progressive_widening(_s, _const["model"], a_params, _solver)
         
         if not is_widened:
             for a in _s.a_[model]:
                 expectation, low_exp, up_exp = get_action_expectation(model, a, _const, _params, _solver)
                 
                 best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, low_exp, up_exp, exp_max, gap, lexps, uexps)  
+                
+        else:
+            expectation, L_exp, U_exp = get_action_expectation(model, a, _const, _params, _solver)
+            best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)
     
-    raise NotImplemented("map action space back to global")
+    ldiff = 0
+    udiff = 0
+    if len(uexps) > 1:
+        uexps.sort()
+        lexps.sort()    
+        ldiff = lexps[0]-lexps[1]
+        udiff = uexps[0]-uexps[1]
     
-    a = {"model": m, **best_action}
+    ldiff = max(0.1,ldiff)
+    udiff = max(0.1,udiff)
+    
+    a = {"model": best_model, **best_action}
     return a, exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
 def random_action(_s : State,_const,_param,solver = None):
@@ -90,13 +107,15 @@ def random_action(_s : State,_const,_param,solver = None):
     
 def progressive_widening(_s : State, _const, _param, solver = None):
     if _param == {}:
-        c = _const["c"]
+        k = _const["k"]
+        a = _const["a"]
     else:
-        c = _param["c"]
+        k = _param["k"]
+        a = _param["a"]
         
-    if _s.N_ < c:
-        raise NotImplementedError("call model get action function and find a way to add this to state... (may not need to do last part)")
-        return True #, a
+    if len(_s.a_[_param["m"]]) < k*_s.model_N_**a:
+        a = np.random.choice(_s.a_[_param["m"]])
+        return True, a.a_
     else:
         return False, None       
 

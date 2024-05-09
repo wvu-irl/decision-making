@@ -61,12 +61,17 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
     :return: Model to select
     """
     if _param == {}:
-        c = _const["c"]
+        k = _const["k"]
+        a = _const["a"]
     else:
-        c = _param["c"]
-     
-    raise NotImplementedError("find way to set c as function of number of models...")
-    if _s.N_ < c:
+        k = _param["k"]
+        a = _param["a"]
+        
+    raise NotImplementedError("Need to fix sampling to make sure model id is conveyed properly")
+    raise NotImplementedError("Need to fix sampling to make sure un/used models are not sampled when looking for the other")
+        
+    if len(_s.m_) < k*_s.N_**a:
+
         models = []
         for m in _s.model_dist_:
             for el in m["el"]:

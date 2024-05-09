@@ -41,25 +41,17 @@ class State():
         else:
             self.s_ = {"x":_state}
         
+        self.m_ = []
         if type(_model_dist) is dict:
-            self.m_ = []
             self.m_unused_ = []
             for m in _model_dist:
                 for el in m["el"]:
-                    self.m_.append(m)
                     self.m_unused_.append(m)
-            self.m_ = list(set(self.m_))
             self.m_unused_ = list(set(self.m_unused))
             self.model_dist_ = _model_dist
             
-        else:
-            self.m_ = []
-            
         self.a_ = {}
         self.model_N_ = {}
-        for m in self.m_:
-            self.a_[m] = []
-            self.model_N_[m] = 0
         for m in self.m_unused_:
             self.a_[m] = []
             self.model_N_[m] = 0
