@@ -27,7 +27,7 @@ from select_action.model_selection import model_selection
 from select_action.utils import * 
 
 
-class AOGS(gym.Env):
+class MM_AAGS(gym.Env):
     """
     Ambiguous Optimistic Graph Search from 
 
