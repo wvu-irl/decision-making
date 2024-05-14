@@ -4,7 +4,7 @@ import numpy as np
 import random
 import sys
 import os
-import copy
+from copy import deepcopy
 
 from pandas import option_context
 
@@ -36,7 +36,7 @@ class mm_action_selection():
         """
         self.func_ : function = _func
         self.const_ : dict = _const
-        print("umm")
+        # print("umm")
         self.const_["model_sel_func"] = model_selection(act_sel_funcs[_const["model_selection"]["function"]], _const["model_selection"]["params"])
     
     def return_action(self,_s,_param = {}, _solver = None):
@@ -52,6 +52,8 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
     gap = 0
     lexps = []
     uexps = []
+    if "alpha" not in _params:
+        _params["alpha"] = _const["alpha"]
     # if _s.s_ == {"pose": [17,16]}:
     #     print(_s)
     # print(";;;;;;;;;;;;;;;;;;")
@@ -60,17 +62,16 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
     if "is_policy" in _params and _params["is_policy"]:
         for model in _s.m_:
             for a in _s.a_[model]:
+
+                expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
                 
-                expectation, low_exp, up_exp = get_action_expectation(model, a, _const, _params, _solver)
-                
-                best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, low_exp, up_exp, exp_max, gap, lexps, uexps)
+                best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)
                 
     else:
         
         # mm_params = _const["model_selection"]["params"]
         
         model = _solver.model_sel_.return_model(_s, {}, _solver)#_const["model"], mm_params, _solver)
-        
         a_params = _const["action_prog_widening"]
         a_params["m"] = model
         
@@ -78,9 +79,9 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
         
         if not is_widened:
             for a in _s.a_[model]:
-                expectation, low_exp, up_exp = get_action_expectation(a, _const, _params, _solver)
+                expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
                 
-                best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, low_exp, up_exp, exp_max, gap, lexps, uexps)  
+                best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)  
                 
         else:
             a = Action(a)
@@ -97,7 +98,7 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
     
     ldiff = max(0.1,ldiff)
     udiff = max(0.1,udiff)
-    
+
     a = {"model": best_model, **best_action}
     return a, exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
@@ -181,6 +182,8 @@ def update_best_action(best_model, best_action, model, a, expectation, low_exp, 
         best_model.append(model)
         best_action.append(a.a_)
     
-    best_action = np.random.choice(best_action)
+    i = np.random.choice(range(len(best_model)))
+    best_model = best_model[i]
+    best_action = best_action[i]
     
     return best_model, best_action, exp_max, gap, lexps, uexps

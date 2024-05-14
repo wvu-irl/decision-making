@@ -89,7 +89,7 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
             models[i]["p"] = models[i]["p"]/total
         
         p = np.random.rand()
-        print(p)
+
         return sample_ambiguous_dist(models, p)
     
     

@@ -166,7 +166,7 @@ while not done:
     print("reward",r)
     print("|||||||||||||||||||||||||||||||")
     plt.pause(1)
-    mm_env.render()
+    true_env.render()
     i += 1
 
 exit()

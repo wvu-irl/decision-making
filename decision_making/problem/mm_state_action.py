@@ -13,7 +13,7 @@ class State():
         _is_terminal (bool): is true if state is terminal
         _policy (int): Action to select
     """
-    def __init__(self, _state, _model_dist = None, _parent = None, _V = 0, _is_terminal = False, _policy = None, _L = None, _U = None):
+    def __init__(self, _state, _model_dist = None, _parent = None, _V = 0, _is_terminal = False, _policy_m = None, _policy_a = None, _L = None, _U = None):
         """
         Constructor
         """
@@ -28,7 +28,6 @@ class State():
             self.L_ = _V
         else:
             self.L_ = _L
-        self.policy_ = _policy
         self.is_terminal_ = _is_terminal
         
         self.s_ = _state
@@ -70,8 +69,8 @@ class State():
         # else:
         #     self.a_ = []
             
-        if _policy is not None:
-            self.policy_ = _policy
+        self.policy_m_ = _policy_m
+        self.policy_a_ = _policy_a
 
         if type(_parent) is list:
             self.parent_ = _parent
@@ -101,10 +100,19 @@ class State():
         return self.hash_
     
     def get_action_index(self, _m, _a):
-        for i in range(len(self.a_)):
-            if self.a_[_m].a_ == _a:
+        for i in range(len(self.a_[_m])):
+            if self.a_[_m][i].a_ == _a:
                 return i
         return None
+    
+    def get_policy(self):
+        if self.policy_a_ == None:
+            return self.m_[0], self.a_[self.m_[0]][0].a_
+        return self.policy_m_, self.policy_a_
+    
+    def set_policy(self, m, a):
+        self.policy_m_ = m
+        self.policy_a_ = a
     
     def add_child(self, _m, _a, _s_p, _s_p_i, _r):
         """
@@ -134,7 +142,10 @@ class State():
         #     child_ind =  self.a_[_m].add_child(_s_p, _s_p_i, _r)
         
         if len(self.a_[_m]) > 0:
-            child_ind = self.a_[_m].add_child(_s_p, _s_p_i, _r)
+            for i in range(len(self.a_[_m])):
+                if self.a_[_m][i].a_ == _a:
+                    child_ind = self.a_[_m][i].add_child(_s_p, _s_p_i, _r)
+                    break
         else:
             self.a_[_m].append(Action(_a))
             child_ind = _s_p_i

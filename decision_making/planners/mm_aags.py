@@ -135,7 +135,6 @@ class MM_AAGS(gym.Env):
         # print(self.env_.get_belief())
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
-            print(self.env_.get_belief())
             self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_belief(), _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
@@ -144,30 +143,10 @@ class MM_AAGS(gym.Env):
         # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = deepcopy(self.env_params_)
-            temp_params["state"] = deepcopy(_s)
-            print(s)
-            # print('before flag ')
-            # print(hash(str(_s)))
-            # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
-            # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
-            # print("s outer", _s)
+            temp_params["shared"]["state"] = deepcopy(_s)
+
             s, info = self.env_.reset(options=temp_params)
-            # print('after flag')
-            # print(hash(str(s)))
-            
-            # print("sa outer", s)
-            # print(len(self.U_))
-            # print("------------")
-            # for i in range(len(self.gi_)):
-            #     print(self.graph_[i].s_)
-            # print(self.gi_)    
-            # if _str_s not in self.U_:
-            #     # print("nee")
-            #     s = self.graph_[self.gi_[self.rng_.choice(self.U_)]].s_
-            # else:
-                # print("yee")
-            
-            # print(hash(str(s)))
+
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
             self.d_ = 0
@@ -178,33 +157,22 @@ class MM_AAGS(gym.Env):
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             self.is_not_converged_ = False
+            
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]: #check if leaf
-                # print("---")
-                # print(s)
-                # print("n " + str(self.n_) + ", d " + str(d) )
-                # print("s ", s)
+
                 str_s = hash(str(s))
-                # print(str_s)
-                # if str_s in self.gi_ and self.graph_[self.gi_[str_s]].s_["pose"] != s["pose"]:
-                #     print("---")
-                #     print(s)
-                #     print(str_s)
-                #     print(self.graph_[self.gi_[str_s]].s_)
+
                 if str_s not in parents:     
                     parents[p_ind] = str_s
                     p_ind += 1
-                # print(str_s)
-                #pass alpha into initialization, 
-                # bounds and params available from solver 
-                # print('flag')
-                # print(s["pose"])
+
                                
-                print(s)
+                # print(s)
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],{"alpha": 1},self)
                 # raise NotImplemented("map action space back to global")
                 model = a["model"]              
                 del a["model"]
-                print(model, a)
+                # print(model, a)
                 
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
@@ -217,6 +185,7 @@ class MM_AAGS(gym.Env):
                 else:
                     ind = self.n_
 
+                # print(self.graph_[self.gi_[str_s]].s_)
                 ind = self.graph_[self.gi_[str_s]].add_child(model, a, s_p, ind,r)
                 if ind == self.n_:
                     
@@ -251,11 +220,10 @@ class MM_AAGS(gym.Env):
                         self.graph_[self.gi_[str_sp]].parent_.append(str_s)
                     
                 self.d_ += 1
-                policy = self.graph_[self.gi_[str_s]].policy_
-                pol_ind = self.graph_[self.gi_[str_s]].get_action_index(policy)
-                # print(self.graph_[self.gi_[str_s]].s_)
-                # print(self.graph_[self.gi_[str_s]].a_)
-                # print(pol_ind, len(self.graph_[self.gi_[str_s]].a_))
+                model, policy = self.graph_[self.gi_[str_s]].get_policy()
+
+                pol_ind = self.graph_[self.gi_[str_s]].get_action_index(model, policy)
+  
                 if str_s in self.U_ and self.graph_[self.gi_[str_s]].a_[model][pol_ind].N_ > self.t_:
                     self.U_.remove(str_s)
                 elif str_s not in self.U_ and self.graph_[self.gi_[str_s]].a_[model][pol_ind].N_ <= self.t_: 
@@ -313,14 +281,14 @@ class MM_AAGS(gym.Env):
         act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_model, _a)
         # print(_s)
         # print(act_ind)
-        if self.graph_[self.gi_[hash(str(_s))]].a_[_model][act_ind].N_ <= self.t_:
+        if act_ind is None or self.graph_[self.gi_[hash(str(_s))]].a_[_model][act_ind].N_ <= self.t_:
             # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
                 temp_params = deepcopy(self.env_params_)
-                temp_params["params"]["state"] = deepcopy(_s)
+                temp_params["shared"]["state"] = deepcopy(_s)
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
                 # print(_s)
-                s, info = self.env_.reset(options=temp_params["params"])
+                s, info = self.env_.reset(options=temp_params)
                 # print("sa", s)
                 # print(_s, self.env_.get_observation())
             # print(_a)
@@ -331,7 +299,7 @@ class MM_AAGS(gym.Env):
             s_p, r, done, is_trunc, info = self.env_.step({"model": _model, **_a})
             stop_model_time = time.perf_counter()
                 
-            self.env_.align_resources_usage(_model,stop_model_time-start_model_time)
+            self.env_.align_resource_usage(_model,stop_model_time-start_model_time)
             done = done or is_trunc
             self.m_+=1
             # self.d_+=1
@@ -382,7 +350,9 @@ class MM_AAGS(gym.Env):
                 self.graph_[self.gi_[s]].V_ = v
                 self.graph_[self.gi_[s]].L_ = L
                 self.graph_[self.gi_[s]].U_ = U
-                self.graph_[self.gi_[s]].policy_ = a
+                temp_a = deepcopy(a)
+                del temp_a["model"]
+                self.graph_[self.gi_[s]].set_policy(a["model"], temp_a)
                 # print("V", v)
                 # print("L", L)
                 # print("U", U)
