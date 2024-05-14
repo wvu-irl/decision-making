@@ -10,8 +10,6 @@ sys.path.append(parent)
 
 from problem.state_action import State
 
-from belief_functions import BeliefFunction
-
 def sample_ambiguous_dist(dist, p):
     """
     Description: Samples a distribution with ambiguity
@@ -22,11 +20,11 @@ def sample_ambiguous_dist(dist, p):
     """
     total = 0
     i = 0
-    while total < p:
+    while total <= p:
         total += dist[i]["p"]
         i += 1
     if len(dist[i-1]["el"]) == 1:
-        return dist[i-1]["el"]
+        return dist[i-1]["el"][0]
     else:
         return np.random.choice(dist[i-1]["el"])
 
@@ -48,7 +46,7 @@ class model_selection():
         self.func_ : function = _func
         self.const_ : dict = _const
     
-    def return_action(self,_s,_param = {}, _solver = None):
+    def return_model(self,_s,_param = {}, _solver = None):
         return self.func_(_s, self.const_,_param,_solver)
     
 def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
@@ -67,16 +65,22 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
         k = _param["k"]
         a = _param["a"]
         
-    raise NotImplementedError("Need to fix sampling to make sure model id is conveyed properly")
-    raise NotImplementedError("Need to fix sampling to make sure un/used models are not sampled when looking for the other")
+    # raise NotImplementedError("Need to fix sampling to make sure model id is conveyed properly")
         
-    if len(_s.m_) < k*_s.N_**a:
+    if len(_s.m_) <= k*_s.N_**a and len(_s.m_):
 
         models = []
-        for m in _s.model_dist_:
-            for el in m["el"]:
-                if el in _s.m_:
-                    models.append(m)
+        for m in _s.model_dist_.keys():
+            if type(m) is set:
+                els = []
+                for el in m:
+                    if el in _s.m_:
+                        els.append(m)
+                models.append({"el":els, "p":_s.model_dist_[m]})
+            else:
+                if m in _s.m_:
+                    models.append({"el":[m], "p":_s.model_dist_[m]})
+            
                     
         total = 0
         for m in models:
@@ -85,15 +89,22 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
             models[i]["p"] = models[i]["p"]/total
         
         p = np.random.rand()
+        print(p)
         return sample_ambiguous_dist(models, p)
     
     
     else:
         unused_models = []
-        for m in _s.model_dist_:
-            for el in m["el"]:
-                if el in _s.m_unused_:
-                    unused_models.append(m)
+        for m in _s.model_dist_.keys():
+            if type(m) is set:
+                els = []
+                for el in m:
+                    if el in _s.m_unused_:
+                        els.append(m)
+                unused_models.append({"el":els, "p":_s.model_dist_[m]})
+            else:
+                if m in _s.m_unused_:
+                    unused_models.append({"el":[m], "p":_s.model_dist_[m]})
             
         total = 0
         for m in unused_models:

@@ -42,12 +42,17 @@ class State():
             self.s_ = {"x":_state}
         
         self.m_ = []
+        self.m_unused_ = []
         if type(_model_dist) is dict:
-            self.m_unused_ = []
-            for m in _model_dist:
-                for el in m["el"]:
-                    self.m_unused_.append(m)
-            self.m_unused_ = list(set(self.m_unused))
+            for m in _model_dist.keys():
+                if type(m) is set:
+                    for el in m:
+                        if el not in self.m_unused_:
+                            self.m_unused_.append(el)
+                else:
+                    if m not in self.m_unused_:
+                        self.m_unused_.append(m)
+                        
             self.model_dist_ = _model_dist
             
         self.a_ = {}
@@ -97,7 +102,7 @@ class State():
     
     def get_action_index(self, _m, _a):
         for i in range(len(self.a_)):
-            if self.a_[_m][i].a_ == _a:
+            if self.a_[_m].a_ == _a:
                 return i
         return None
     
@@ -110,28 +115,43 @@ class State():
             _s_p (int): hash key for transition state
             _r (float): reward
         """
-        models_with_action = []
-        for m in self.m_:
-            for a in self.a_[m]:
-                if _a == a.a_:
-                    models_with_action.append(m)
+        if _m not in self.m_:
+            self.m_.append(_m)
+            ind = 0
+            for i in range(len(self.m_unused_)):
+                if self.m_unused_[i] == _m:
+                    ind = i
+                    break
+            self.m_unused_.pop(ind)
+
+            
+        # models_with_action = []
+        # for m in self.m_:
+        #     for a in self.a_[m]:
+        #         if _a == a.a_:
+        #             models_with_action.append(m)
+        # if _m in models_with_action:
+        #     child_ind =  self.a_[_m].add_child(_s_p, _s_p_i, _r)
         
-        if _m in models_with_action:
-            child_ind =  self.a_[_m].add_child(_s_p, _s_p_i, _r)
-        elif len(self.a_[_m]) > 0:
-            child_ind = self.a_[models_with_action[0]].add_child(_s_p, _s_p_i, _r)
-            self.a_[_m] = self.a_[models_with_action[0]]
+        if len(self.a_[_m]) > 0:
+            child_ind = self.a_[_m].add_child(_s_p, _s_p_i, _r)
         else:
             self.a_[_m].append(Action(_a))
             child_ind = _s_p_i
         
+        self.model_N_[_m] += 1
         self.N_ += 1
         return child_ind
     
     def add_action(self, _m, _a):
+        not_found = True
+        
         for a in self.a_[_m]:
-            if a.a_ != _a:
-                self.a_[_m].append(Action(_a))
+            if a.a_ == _a:
+                not_found = False
+                break
+        if not_found:        
+            self.a_[_m].append(Action(_a))
     # @abstractmethod 
     # def get_N(self):
     #     self.N_ = 0
@@ -260,5 +280,17 @@ class Action():
         
         return 
         
+    @abstractmethod
+    def __eq__(self, _a):
+        """
+        Checks if two actions are equal
+
+        Args:
+            _s (State): action to compare against
+
+        Returns:
+            bool: true if equal
+        """
+        return (self.a_ == _a.a_)
 
     

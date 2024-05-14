@@ -12,12 +12,12 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-from problem.state_action import State, Action
+from problem.mm_state_action import State, Action
 from select_action.ambiguity_toolbox import *
 from select_action.gbop_toolbox import *
 
-from select_action.model_selection import mm_progressive_widening
-
+from select_action.model_selection import model_selection
+from select_action.utils import * 
 
 class mm_action_selection():
     """
@@ -36,18 +36,19 @@ class mm_action_selection():
         """
         self.func_ : function = _func
         self.const_ : dict = _const
+        print("umm")
+        self.const_["model_sel_func"] = model_selection(act_sel_funcs[_const["model_selection"]["function"]], _const["model_selection"]["params"])
     
     def return_action(self,_s,_param = {}, _solver = None):
         return self.func_(_s, self.const_,_param,_solver)
 
 def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
-    
         # if _params[1] == None:
         #     no_c = True
     # print(alpha)
     exp_max = -inf
     best_model = 0
-    best_action = _s.a_[best_action].a_
+    best_action = None #_s.a_[best_action].a_
     gap = 0
     lexps = []
     uexps = []
@@ -66,24 +67,26 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
                 
     else:
         
-        mm_params = _params["mm_prog_widening"]
+        # mm_params = _const["model_selection"]["params"]
         
-        model = mm_progressive_widening(_s, _const["model"], mm_params, _solver)
+        model = _solver.model_sel_.return_model(_s, {}, _solver)#_const["model"], mm_params, _solver)
         
-        a_params = _params["action_prog_widening"]
+        a_params = _const["action_prog_widening"]
+        a_params["m"] = model
         
-        is_widened, a = progressive_widening(_s, _const["model"], a_params, _solver)
+        is_widened, a = progressive_widening(_s, _const, a_params, _solver)
         
         if not is_widened:
             for a in _s.a_[model]:
-                expectation, low_exp, up_exp = get_action_expectation(model, a, _const, _params, _solver)
+                expectation, low_exp, up_exp = get_action_expectation(a, _const, _params, _solver)
                 
                 best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, low_exp, up_exp, exp_max, gap, lexps, uexps)  
                 
         else:
-            expectation, L_exp, U_exp = get_action_expectation(model, a, _const, _params, _solver)
-            best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)
-    
+            a = Action(a)
+            expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
+            best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)  
+
     ldiff = 0
     udiff = 0
     if len(uexps) > 1:
@@ -112,12 +115,25 @@ def progressive_widening(_s : State, _const, _param, solver = None):
     else:
         k = _param["k"]
         a = _param["a"]
-        
-    if len(_s.a_[_param["m"]]) < k*_s.model_N_**a:
+    
+    if len(_s.a_[_param["m"]]) == 0:
+        return True, solver.env_.get_action(_param["m"], _s.s_)
+    if len(_s.a_[_param["m"]]) <= k*_s.model_N_[_param["m"]]**a:
         a = np.random.choice(_s.a_[_param["m"]])
         return True, a.a_
     else:
-        return False, None       
+        a = None
+        while a == None:
+            temp_a = solver.env_.get_action(_param["m"], _s.s_)
+            select_a = True
+            for a in _s.a_[_param["m"]]:
+                if a.a_ == temp_a:
+                    select_a = False
+            if select_a:
+                a = temp_a
+                # _s.add_child(a)
+                
+        return False, a  
 
 def get_action_expectation(_a,_const = 1,_params={}, _solver = None):
     delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
@@ -155,8 +171,8 @@ def update_best_action(best_model, best_action, model, a, expectation, low_exp, 
     lexps.append(low_exp)
     if expectation > exp_max:
         exp_max = expectation
-        L_exp = low_exp
-        U_exp = up_exp
+        # L_exp = low_exp
+        # U_exp = up_exp
         gap = up_exp-low_exp
         best_model = [model]
         best_action = [a.a_]
@@ -164,15 +180,7 @@ def update_best_action(best_model, best_action, model, a, expectation, low_exp, 
     elif expectation == exp_max:
         best_model.append(model)
         best_action.append(a.a_)
-    ldiff = 0
-    udiff = 0
-    if len(uexps) > 1:
-        uexps.sort()
-        lexps.sort()    
-        ldiff = lexps[0]-lexps[1]
-        udiff = uexps[0]-uexps[1]
     
-    ldiff = max(0.1,ldiff)
-    udiff = max(0.1,udiff)
+    best_action = np.random.choice(best_action)
     
     return best_model, best_action, exp_max, gap, lexps, uexps

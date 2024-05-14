@@ -27,6 +27,8 @@ import irl_gym
 import time
 
 from decision_making.planners.utils import get_agent
+
+
 # from irl_gym.envs.structures.multimodel.mm_foraging import ForagingEnv
 
 # generate group maps, then specify in assumptions whether this is to be used with each model.
@@ -34,7 +36,7 @@ from decision_making.planners.utils import get_agent
 #set of model params
 
 
-params = {"models": [], "belief": {"type":"uniform", "params":{}}}
+params = {"mm_env": "irl_gym/MultiModel-v0", "models": [], "belief": {"type":"uniform", "params":{}}}
 shared_params = {
     "max_steps": 100,
     "map_size": [30,30],
@@ -44,6 +46,8 @@ shared_params = {
     "timeout_mult": 5,
     "velocity_lim": [0,2],
     # "continuity_mode": "continuous",
+    "env": "irl_gym/Foraging-v0",
+    
     
     "observer_local": False,
     "render": "plot",
@@ -69,7 +73,7 @@ model_flags = {
     }
 
 noise_lin = 10
-model_params = [{"continuity_mode": "continuous", "env": "irl_gym/Foraging-v0", "mapping": {}, "model": model_flags,
+model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_flags,
                  "controller": {"lin_gain": {"kp": 1, "ki": 0.0, "kd": 0.0, "db": 0.1}, "ang_gain": {"kp": 2, "ki": 0, "kd": 0, "db": 0.01}, "is_feedforward": False, "db_gain": 0.1},
                  "slip": {"value": {"var":[noise_lin, noise_lin,0]}, "limits": {"var":[0, 1]}},
                  "battery": {"value" : {"level": 100, "decay": [0.05, 0.2, 1, 2, 0, 0]}, "limits": {"level": [0, 100], "decay": [-100, 10]}},
@@ -91,14 +95,21 @@ model_params = [{"continuity_mode": "continuous", "env": "irl_gym/Foraging-v0", 
                  }
                  }]*2
 
-model_params[1] = deepcopy(model_params[0])
 
-model_params[1]["continuity_mode"] = "discrete"
 
+# ground truth params
+true_params = {**params, **shared_params, **model_params[0]}
+true_env = gym.make(true_params["env"], max_episode_steps=true_params["max_steps"], params=true_params)
+s, _ = true_env.reset(options = params)
+print(s)
+# mm params
+shared_params["state"] = deepcopy(s)
 params = {**params, "shared": shared_params, "models": model_params}
-mm_env = gym.make("irl_gym/MultiModel-v0", max_episode_steps=params["shared"]["max_steps"], params=params)
-mm_env.reset(options = params)
+model_params[1] = deepcopy(model_params[0])
+model_params[1]["continuity_mode"] = "discrete"
+params["models"] = model_params
 
+# alg paras
 alg_params = {
             "alg": "mm_aags",
             "params": {
@@ -110,14 +121,18 @@ alg_params = {
                     "epsilon": 0.2,
                     "delta": 0.1
                 },
+                "model_selection": {
+                    "function": "progressive_widening",
+                    "params": {
+                        "k": 2,
+                        "a": 0.5
+                    },
+                    
+                },
                 "action_selection": {
                     "function": "mm_ambiguity_aware",
                     "params": {
                         "alpha": 0,
-                        "mm_prog_widening": {
-                            "k": 2,
-                            "a": 0.5
-                        },
                         "action_prog_widening": {
                             "k": 2,
                             "a": 0.5
@@ -127,7 +142,7 @@ alg_params = {
             },
             "search": {
                 "max_samples": 50000,
-                "horizon": 50,
+                "horizon": params["shared"]["max_steps"],
                 "timeout": 5,
                 "reinit": True
             }
@@ -141,7 +156,7 @@ i = 0
 while not done:
     a = planner.evaluate(s, alg_params["search"])
     print(a)
-    s, r, done, is_trunc, _ = mm_env.step(a)
+    s, r, done, is_trunc, _ = true_env.step(a)
     if s_prev is not None:
         ds = np.linalg.norm(np.array(s["pose"][0:2])-np.array(s_prev["pose"][0:2]))
     else:

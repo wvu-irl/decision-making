@@ -22,7 +22,7 @@ import gymnasium as gym
 import time
 from copy import deepcopy
 
-from problem.state_action import State, Action
+from problem.mm_state_action import State, Action
 from select_action.model_selection import model_selection
 from select_action.utils import * 
 
@@ -47,7 +47,7 @@ class MM_AAGS(gym.Env):
          Returns:
              AOGS: AOGS object
          """
-        super(AOGS, self).__init__()
+        super(MM_AAGS, self).__init__()
         if "search" in _alg_params:
             self.search_params_ = _alg_params["search"]
         _alg_params = _alg_params["params"]; 
@@ -94,9 +94,10 @@ class MM_AAGS(gym.Env):
         self.current_policy = -1
         self.n_ = 0
         self.value_gap_ = 1
-        self.env_ = gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_["params"]))
+        self.env_ = gym.make(self.env_params_["mm_env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_))
+        self.env_.reset()
         
-        self.bounds_ = self.env_.get_reward_bounds()
+        self.bounds_ = self.env_.get_value_bounds()
         
     ######################################################
               
@@ -131,8 +132,10 @@ class MM_AAGS(gym.Env):
         self.value_gap_ = self.alg_params_["model_accuracy"]["epsilon"]
         _str_s = hash(str(_s))
         
+        # print(self.env_.get_belief())
         if _str_s not in self.gi_:
             self.gi_[_str_s] = self.n_
+            print(self.env_.get_belief())
             self.graph_[self.n_] = State(deepcopy(_s), self.env_.get_belief(), _L= self.bounds_[0], _U = self.bounds_[1])
             self.U_.append(_str_s) 
             self.n_ += 1
@@ -141,13 +144,14 @@ class MM_AAGS(gym.Env):
         # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
             temp_params = deepcopy(self.env_params_)
-            temp_params["params"]["state"] = deepcopy(_s)
+            temp_params["state"] = deepcopy(_s)
+            print(s)
             # print('before flag ')
             # print(hash(str(_s)))
             # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], params=self.env_params_["params"])
             # self.env_ = gym.make(self.env_params_["env"],max_episode_steps = (self.search_params_["horizon"]*2), _params=self.env_params_["params"])
             # print("s outer", _s)
-            s, info = self.env_.reset(options=temp_params["params"])
+            s, info = self.env_.reset(options=temp_params)
             # print('after flag')
             # print(hash(str(s)))
             
@@ -195,11 +199,12 @@ class MM_AAGS(gym.Env):
                 # print('flag')
                 # print(s["pose"])
                                
-                
+                print(s)
                 a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],{"alpha": 1},self)
                 # raise NotImplemented("map action space back to global")
                 model = a["model"]              
                 del a["model"]
+                print(model, a)
                 
                 # if gap > self.value_gap_:
                 #     self.value_gap_ = U-L
@@ -217,9 +222,14 @@ class MM_AAGS(gym.Env):
                     
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
-                        v = r/(1-self.alg_params_["gamma"])         
-                        L = v
-                        U = v
+                        if self.alg_params_["gamma"] == 1:
+                            v = r*self.env_params_["max_episode_steps"]
+                            L = v
+                            U = v
+                        else:
+                            v = r/(1-self.alg_params_["gamma"])         
+                            L = v
+                            U = v
                     else:
                         v = 0
                     
@@ -300,7 +310,7 @@ class MM_AAGS(gym.Env):
             done (bool): Flag for simulation completion
         """
         # print(_a)
-        act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_a)
+        act_ind = self.graph_[self.gi_[hash(str(_s))]].get_action_index(_model, _a)
         # print(_s)
         # print(act_ind)
         if self.graph_[self.gi_[hash(str(_s))]].a_[_model][act_ind].N_ <= self.t_:
@@ -351,15 +361,19 @@ class MM_AAGS(gym.Env):
                 a, v, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[s]],{"is_policy" : True},self)
                 # raise NotImplemented("map action space back to global")
 
-                lprecision = (1-self.alg_params_["gamma"])/self.alg_params_["gamma"]*diffs[0]
-                # print("----------")
-                # print(lprecision)
-                # print(np.abs(L - self.graph_[self.gi_[s]].L_))
-                # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
-                uprecision = (1-self.alg_params_["gamma"])/self.alg_params_["gamma"]*diffs[1]
-                # print(uprecision)
-                # print(np.abs(U - self.graph_[self.gi_[s]].U_))
-                # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
+                if self.alg_params_["gamma"] == 1:
+                    lprecision = diffs[0]*self.alg_params_["diffs_const"]
+                    uprecision = diffs[1]*self.alg_params_["diffs_const"]
+                else:
+                    lprecision = (1-self.alg_params_["gamma"])/self.alg_params_["gamma"]*diffs[0]
+                    # print("----------")
+                    # print(lprecision)
+                    # print(np.abs(L - self.graph_[self.gi_[s]].L_))
+                    # print(np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision)
+                    uprecision = (1-self.alg_params_["gamma"])/self.alg_params_["gamma"]*diffs[1]
+                    # print(uprecision)
+                    # print(np.abs(U - self.graph_[self.gi_[s]].U_))
+                    # print(np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision)
                 if np.abs(U - self.graph_[self.gi_[s]].U_) > uprecision or np.abs(L - self.graph_[self.gi_[s]].L_) > lprecision:
                     temp = self.graph_[self.gi_[s]].parent_
                     for p in temp:

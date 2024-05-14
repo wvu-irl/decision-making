@@ -19,5 +19,5 @@ act_sel_funcs = {
 }
 
 model_sel_funcs = {
-    "progressive_widening"  : model_selection.progressive_widening
+    "progressive_widening"  : model_selection.mm_progressive_widening
 }
