@@ -87,10 +87,10 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                 #  "repair": {"value": {"stations":[{"id": 0, "pose": [20,20,0], "repaired": 0}, {"id": 1, "pose": [30,20,0], "repaired": 0}], "p": 1, "is_directional": False, "taper": False, "repair_threshold": 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0.25, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "reward": {
                      "value":{
-                         "battery": 0, "battery_empty": -100, "time": -1, "distance": -2, "failed_grab": -5, "successful_grab": 0, "failed_drop": -5, "successful_drop": 5, "collision": 10, "repair": 5, "done": 1000
+                         "battery": 0, "battery_empty": -100, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -20, "successful_drop": 5, "collision": 10, "repair": 5, "done": 1000, "stay": -100
                      },
                      "limits": {
-                         "battery": [-100,100], "time": [-100,100], "distance": [-100,100], "grab": [-20,100], "drop": [-100,100], "collision": [-100,100], "repair": [-20,100]
+                         "battery": [-100,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
                      }
                  }
                  }]#*2
@@ -102,6 +102,7 @@ true_params = {**params, **shared_params, **model_params[0]}
 true_env = gym.make(true_params["env"], max_episode_steps=true_params["max_steps"], params=true_params)
 s, _ = true_env.reset(options = params)
 print(s)
+true_env.render()
 # mm params
 shared_params["state"] = deepcopy(s)
 shared_params["task"] = True
@@ -133,7 +134,7 @@ alg_params = {
                 "action_selection": {
                     "function": "mm_ambiguity_aware",
                     "params": {
-                        "alpha": 1,
+                        "alpha": 0,
                         "action_prog_widening": {
                             "k": 0.5,
                             "a": 0.8
@@ -166,7 +167,7 @@ while not done:
     print("state",s)
     print("reward",r)
     print("|||||||||||||||||||||||||||||||")
-    plt.pause(1)
+    plt.pause(5)
     true_env.render()
     i += 1
 

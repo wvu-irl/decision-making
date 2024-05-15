@@ -58,6 +58,7 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
     #     print(_s)
     # print(";;;;;;;;;;;;;;;;;;")
     # print(_s.s_)
+    print_a_values = []
     
     if "is_policy" in _params and _params["is_policy"]:
         for model in _s.m_:
@@ -66,6 +67,8 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
                 expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
                 
                 best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)
+                
+                print_a_values.append((model, a.a_, expectation, L_exp, U_exp))
                 
     else:
         
@@ -78,16 +81,20 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
         is_widened, a = progressive_widening(_s, _const, a_params, _solver)
         
         if not is_widened:
+            # print("----NOT WIDENED----")
+            
             for a in _s.a_[model]:
                 expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
                 
                 best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)  
+                print_a_values.append((a.a_, expectation, L_exp, U_exp))
                 
         else:
             a = Action(a)
             expectation, L_exp, U_exp = get_action_expectation(a, _const, _params, _solver)
             best_model, best_action, exp_max, gap, lexps, uexps = update_best_action(best_model, best_action, model, a, expectation, L_exp, U_exp, exp_max, gap, lexps, uexps)  
 
+    # print(L_exp, U_exp)
     ldiff = 0
     udiff = 0
     if len(uexps) > 1:
@@ -98,9 +105,12 @@ def ambiguity_aware(_s,_const = 1,_params={}, _solver = None):
     
     ldiff = max(0.1,ldiff)
     udiff = max(0.1,udiff)
+    # print(lexps,uexps)
+    # raise("print out expectations and actions")
+    # raise("check termination reward")
 
     a = {"model": best_model, **best_action}
-    return a, exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
+    return a, exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps], print_a_values
 
 def random_action(_s : State,_const,_param,solver = None):
     a = []
@@ -122,7 +132,8 @@ def progressive_widening(_s : State, _const, _param, solver = None):
     # print("mm", len(_s.a_[_param["m"]]), _s.N_, _s.model_N_[_param["m"]], k*_s.model_N_[_param["m"]]**a, len(_s.a_[_param["m"]]) <= k*_s.model_N_[_param["m"]]**a)
     if len(_s.a_[_param["m"]]) <= k*_s.model_N_[_param["m"]]**a:
         a = None
-        while a == None:
+        timeout = 0
+        while a == None and timeout < 20:
             temp_a = solver.env_.get_action(_param["m"], _s.s_)
             select_a = True
             for act in _s.a_[_param["m"]]:
@@ -131,17 +142,21 @@ def progressive_widening(_s : State, _const, _param, solver = None):
             if select_a:
                 a = temp_a
                 # _s.add_child(a)
+            timeout += 1
+        if timeout == 20:
+            # a = np.random.choice(_s.a_[_param["m"]]).a_
+            return False, None
         return True, a
         
     else:
-        a = np.random.choice(_s.a_[_param["m"]])
-        return False, a.a_
+        # a = np.random.choice(_s.a_[_param["m"]])
+        return False, None
 
 def get_action_expectation(_a,_const = 1,_params={}, _solver = None):
     delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
     epsilon = _solver.alg_params_["model_accuracy"]["epsilon"]
-    L = _solver.bounds_[0]
-    U = _solver.bounds_[1]
+    L = _solver.bounds_[0]*(_solver.search_params_["horizon"]-_solver.d_-1)
+    U = _solver.bounds_[1]*(_solver.search_params_["horizon"]-_solver.d_-1)
     gamma = _solver.alg_params_["gamma"]
     no_c = False
     if _params == []:

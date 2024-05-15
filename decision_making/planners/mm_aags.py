@@ -26,6 +26,8 @@ from problem.mm_state_action import State, Action
 from select_action.model_selection import model_selection
 from select_action.utils import * 
 
+import matplotlib.pyplot as plt
+
 
 class MM_AAGS(gym.Env):
     """
@@ -97,7 +99,9 @@ class MM_AAGS(gym.Env):
         self.env_ = gym.make(self.env_params_["mm_env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_))
         self.env_.reset()
         
-        self.bounds_ = self.env_.get_value_bounds()
+        self.bounds_ = list(self.env_.get_reward_bounds())
+        # self.bounds_[0] *= self.search_params_["horizon"]
+        # self.bounds_[1] *= self.search_params_["horizon"]
         
     ######################################################
               
@@ -142,8 +146,13 @@ class MM_AAGS(gym.Env):
         self.is_not_converged_ = True
         # print('lol')
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
-            temp_params = deepcopy(self.env_params_)
-            temp_params["shared"]["state"] = deepcopy(_s)
+            # temp_params = deepcopy(self.env_params_)
+            # temp_params["shared"]["state"] = deepcopy(_s)
+            temp_params = {"state": deepcopy(_s)}
+            # print("------------------------------------")
+            # print(_s)
+            # self.graph_[self.gi_[_str_s]].print_state()
+            # print("------------------------------------")
 
             s, info = self.env_.reset(options=temp_params)
 
@@ -157,7 +166,6 @@ class MM_AAGS(gym.Env):
             #should come up with better way to handle terminal states, check out MCRM
             # right now it may not terminate
             self.is_not_converged_ = False
-            
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]: #check if leaf
 
                 str_s = hash(str(s))
@@ -168,7 +176,7 @@ class MM_AAGS(gym.Env):
 
                                
                 # print(s)
-                a, v_opt, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],{"alpha": 1},self)
+                a, v_opt, L, U, diffs, exps, _ = self.act_sel_.return_action(self.graph_[self.gi_[str_s]],{"alpha": 1},self)
                 # raise NotImplemented("map action space back to global")
                 model = a["model"]              
                 del a["model"]
@@ -179,6 +187,9 @@ class MM_AAGS(gym.Env):
                 # print("l151 ",s)
                 s_p, r, is_terminal, do_reset = self.simulate(s,a,model, do_reset)
                 # print(r)
+                # if a["task"] == 4:
+                #     print("repair", r)
+                
                 str_sp = hash(str(s_p))
                 if str_sp in self.gi_:
                     ind = self.gi_[str_sp]
@@ -192,7 +203,9 @@ class MM_AAGS(gym.Env):
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
                         if self.alg_params_["gamma"] == 1:
-                            v = r*self.env_params_["max_episode_steps"]
+                            print(r)
+                            v = r*(self.search_params_["horizon"]-self.d_-1)
+                            print(self.d_, v)
                             L = v
                             U = v
                         else:
@@ -218,6 +231,8 @@ class MM_AAGS(gym.Env):
                 else:
                     if str_s not in self.graph_[self.gi_[str_sp]].parent_:
                         self.graph_[self.gi_[str_sp]].parent_.append(str_s)
+                        
+                # plt.pause(5)
                     
                 self.d_ += 1
                 model, policy = self.graph_[self.gi_[str_s]].get_policy()
@@ -245,9 +260,11 @@ class MM_AAGS(gym.Env):
         ##
         ## For parameters, call get action from env and pass it to the action selection function. 
         ##
-        a, e_max, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[_str_s]],{"is_policy" : True},self)
+        a, e_max, L, U, diffs, exps, pav = self.act_sel_.return_action(self.graph_[self.gi_[_str_s]],{"is_policy" : True},self)
         # raise NotImplemented("map action space back to global")
 
+        print("s", _s["pose"])
+        print(pav)
         # print("emax ", e_max)
         # print(exps)
         # print("gap", U-L)
@@ -292,8 +309,9 @@ class MM_AAGS(gym.Env):
         if act_ind is None or self.graph_[self.gi_[hash(str(_s))]].a_[_model][act_ind].N_ <= self.t_:
             # self.map_[_s["pose"][0]][_s["pose"][1]] += 1
             if _do_reset: 
-                temp_params = deepcopy(self.env_params_)
-                temp_params["shared"]["state"] = deepcopy(_s)
+                # temp_params = deepcopy(self.env_params_)
+                # temp_params["shared"]["state"] = deepcopy(_s)
+                temp_params = {"state": deepcopy(_s)}
                 # gym.make(self.env_params_["env"],max_episode_steps = self.search_params_["horizon"], _params=self.env_params_["params"])
                 # print(_s)
                 s, info = self.env_.reset(options=temp_params)
@@ -334,7 +352,7 @@ class MM_AAGS(gym.Env):
             s = _parents.pop(0)
             #print("lp " + str(len(_parents)))
             if s != -1:
-                a, v, L, U, diffs, exps = self.act_sel_.return_action(self.graph_[self.gi_[s]],{"is_policy" : True},self)
+                a, v, L, U, diffs, exps, _ = self.act_sel_.return_action(self.graph_[self.gi_[s]],{"is_policy" : True},self)
                 # raise NotImplemented("map action space back to global")
 
                 if self.alg_params_["gamma"] == 1:

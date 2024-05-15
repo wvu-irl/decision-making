@@ -149,10 +149,10 @@ class State():
                     break
             if child_ind == -1:
                 self.a_[_m].append(Action(_a))
-                child_ind = _s_p_i
+                child_ind = self.a_[_m][-1].add_child(_s_p, _s_p_i, _r)
         else:
             self.a_[_m].append(Action(_a))
-            child_ind = _s_p_i
+            child_ind = self.a_[_m][-1].add_child(_s_p, _s_p_i, _r)
         
         self.model_N_[_m] += 1
         self.N_ += 1
