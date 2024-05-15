@@ -41,7 +41,7 @@ shared_params = {
     "max_steps": 100,
     "map_size": [30,30],
     "home": [10,10],
-    "state":{"pose": [20.25,20,0]},
+    "state":{"pose": [20,20,0]},
     "dt": 0.11,
     "timeout_mult": 5,
     "velocity_lim": [0,2],
@@ -69,7 +69,7 @@ model_flags = {
         "interaction_heading" : False,
         "state_heading": True,
         "kinematics": True,
-        "task": False,
+        "task": True,
     }
 
 noise_lin = 10
@@ -79,21 +79,21 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                  "battery": {"value" : {"level": 100, "decay": [0.05, 0.2, 1, 2, 0, 0]}, "limits": {"level": [0, 100], "decay": [-100, 10]}},
                 #  "obstacles": {"max_num": 15, "max_radius": 5, "max_sides": 6, "is_random": False},
                  "resource_usage": {"value": 5.0, "limits": [0, 50], "enforce": False},
-                 "objects": {"max_num": 1, "is_random": False},
+                 "objects": {"max_num": 4, "is_random": False},
                 #  "objects": {"objects": [{"id": 0, "pose": [20,20,0]}]},#, {"id": 1, "pose": [20,20,0]}]},
                  "grab": {"value": {"p": 1, "is_directional": False, "taper": False}, "limits": {"range": [0, 1], "grab_radius": [0,0.5], "grab_time": [0.1, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "drop": {"value": {"p": 1, "is_directional": False, "taper": False, "drop_time": 2}, "limits": {"drop_radius": [0,0.5], "direction": [-np.pi/4, np.pi/4]}},
-                #  "repair": {"value": {"stations":{"n": 2, "is_random": False}, "p": 1, "is_directional": False, "taper": False}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
-                 "repair": {"value": {"stations":[{"id": 0, "pose": [20,20,0], "repaired": 0}, {"id": 1, "pose": [30,20,0], "repaired": 0}], "p": 1, "is_directional": False, "taper": True, "repair_threshold": 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0.25, 4], "direction": [-np.pi/4, np.pi/4]}},
+                 "repair": {"value": {"stations":{"n": 2, "is_random": False}, "p": 1, "is_directional": False, "taper": False}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
+                #  "repair": {"value": {"stations":[{"id": 0, "pose": [20,20,0], "repaired": 0}, {"id": 1, "pose": [30,20,0], "repaired": 0}], "p": 1, "is_directional": False, "taper": False, "repair_threshold": 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0.25, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "reward": {
                      "value":{
-                         "battery": 0, "battery_empty": -100, "time": -1, "distance": -2, "failed_grab": -5, "successful_grab": 0, "failed_drop": -5, "successful_drop": 5, "collision": 10, "repair": 5
+                         "battery": 0, "battery_empty": -100, "time": -1, "distance": -2, "failed_grab": -5, "successful_grab": 0, "failed_drop": -5, "successful_drop": 5, "collision": 10, "repair": 5, "done": 1000
                      },
                      "limits": {
-                         "battery": [-100,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-100,100]
+                         "battery": [-100,100], "time": [-100,100], "distance": [-100,100], "grab": [-20,100], "drop": [-100,100], "collision": [-100,100], "repair": [-20,100]
                      }
                  }
-                 }]*2
+                 }]#*2
 
 
 
@@ -104,10 +104,11 @@ s, _ = true_env.reset(options = params)
 print(s)
 # mm params
 shared_params["state"] = deepcopy(s)
+shared_params["task"] = True
 params = {**params, "shared": shared_params, "models": model_params}
-model_params[1] = deepcopy(model_params[0])
-model_params[1]["continuity_mode"] = "discrete"
-params["models"] = model_params
+# model_params[1] = deepcopy(model_params[0])
+# model_params[1]["continuity_mode"] = "discrete"
+# params["models"] = model_params
 
 # alg paras
 alg_params = {
@@ -125,17 +126,17 @@ alg_params = {
                     "function": "progressive_widening",
                     "params": {
                         "k": 2,
-                        "a": 0.5
+                        "a": 0.9
                     },
                     
                 },
                 "action_selection": {
                     "function": "mm_ambiguity_aware",
                     "params": {
-                        "alpha": 0,
+                        "alpha": 1,
                         "action_prog_widening": {
-                            "k": 2,
-                            "a": 0.5
+                            "k": 0.5,
+                            "a": 0.8
                         }
                     }
                 }

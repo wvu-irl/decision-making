@@ -142,10 +142,14 @@ class State():
         #     child_ind =  self.a_[_m].add_child(_s_p, _s_p_i, _r)
         
         if len(self.a_[_m]) > 0:
+            child_ind = -1
             for i in range(len(self.a_[_m])):
                 if self.a_[_m][i].a_ == _a:
                     child_ind = self.a_[_m][i].add_child(_s_p, _s_p_i, _r)
                     break
+            if child_ind == -1:
+                self.a_[_m].append(Action(_a))
+                child_ind = _s_p_i
         else:
             self.a_[_m].append(Action(_a))
             child_ind = _s_p_i
@@ -168,6 +172,13 @@ class State():
     #     self.N_ = 0
     #     for a in _self.a_:
     #         self.N_ += a.N_
+    
+    def print_state(self):
+        print("---------PS---------")
+        for m in self.m_:
+            print("Model: ", m, " N: ", self.model_N_[m])
+            for a in self.a_[m]:
+                print("-----Action: ", a.a_, " N: ", a.N_, "r: ", a.r_)
     
     def get_transition(self, _m, _a):
         """

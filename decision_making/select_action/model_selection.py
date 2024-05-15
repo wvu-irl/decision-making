@@ -67,8 +67,30 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
         
     # raise NotImplementedError("Need to fix sampling to make sure model id is conveyed properly")
         
-    if len(_s.m_) <= k*_s.N_**a and len(_s.m_):
-
+    if len(_s.m_) <= k*_s.N_**a and len(_s.m_unused_):
+        unused_models = []
+        for m in _s.model_dist_.keys():
+            if type(m) is set:
+                els = []
+                for el in m:
+                    if el in _s.m_unused_:
+                        els.append(m)
+                unused_models.append({"el":els, "p":_s.model_dist_[m]})
+            else:
+                if m in _s.m_unused_:
+                    unused_models.append({"el":[m], "p":_s.model_dist_[m]})
+            
+        total = 0
+        for m in unused_models:
+            total += m["p"]
+        for i in range(len(unused_models)):
+            unused_models[i]["p"] = unused_models[i]["p"]/total
+            
+        p = np.random.rand()
+        return sample_ambiguous_dist(unused_models, p)
+    
+    else:
+        
         models = []
         for m in _s.model_dist_.keys():
             if type(m) is set:
@@ -92,26 +114,5 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
 
         return sample_ambiguous_dist(models, p)
     
-    
-    else:
-        unused_models = []
-        for m in _s.model_dist_.keys():
-            if type(m) is set:
-                els = []
-                for el in m:
-                    if el in _s.m_unused_:
-                        els.append(m)
-                unused_models.append({"el":els, "p":_s.model_dist_[m]})
-            else:
-                if m in _s.m_unused_:
-                    unused_models.append({"el":[m], "p":_s.model_dist_[m]})
-            
-        total = 0
-        for m in unused_models:
-            total += m["p"]
-        for i in range(len(unused_models)):
-            unused_models[i]["p"] = unused_models[i]["p"]/total
-            
-        p = np.random.rand()
-        return sample_ambiguous_dist(unused_models, p)
+        
     

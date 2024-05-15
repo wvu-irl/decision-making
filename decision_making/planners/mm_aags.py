@@ -228,9 +228,14 @@ class MM_AAGS(gym.Env):
                     self.U_.remove(str_s)
                 elif str_s not in self.U_ and self.graph_[self.gi_[str_s]].a_[model][pol_ind].N_ <= self.t_: 
                     self.U_.append(str_s)
-                    
+                
+                
+                
                 s = s_p
             
+            # print("s ", hash(str(s)), s)
+            # self.graph_[0].print_state()
+                
             parents.reverse()   
              
             self.backpropagate(list(set(parents)))
@@ -261,6 +266,9 @@ class MM_AAGS(gym.Env):
         # plt.pause(1)
         # print(len(self.gi_))
         # print("Usize", len(self.U_))
+        
+        self.graph_[0].print_state()
+        
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
     
     def update_models(self, _s, _a, _s_p, _r):

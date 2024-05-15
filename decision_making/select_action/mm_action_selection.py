@@ -119,22 +119,23 @@ def progressive_widening(_s : State, _const, _param, solver = None):
     
     if len(_s.a_[_param["m"]]) == 0:
         return True, solver.env_.get_action(_param["m"], _s.s_)
+    # print("mm", len(_s.a_[_param["m"]]), _s.N_, _s.model_N_[_param["m"]], k*_s.model_N_[_param["m"]]**a, len(_s.a_[_param["m"]]) <= k*_s.model_N_[_param["m"]]**a)
     if len(_s.a_[_param["m"]]) <= k*_s.model_N_[_param["m"]]**a:
-        a = np.random.choice(_s.a_[_param["m"]])
-        return True, a.a_
-    else:
         a = None
         while a == None:
             temp_a = solver.env_.get_action(_param["m"], _s.s_)
             select_a = True
-            for a in _s.a_[_param["m"]]:
-                if a.a_ == temp_a:
+            for act in _s.a_[_param["m"]]:
+                if act.a_ == temp_a:
                     select_a = False
             if select_a:
                 a = temp_a
                 # _s.add_child(a)
-                
-        return False, a  
+        return True, a
+        
+    else:
+        a = np.random.choice(_s.a_[_param["m"]])
+        return False, a.a_
 
 def get_action_expectation(_a,_const = 1,_params={}, _solver = None):
     delta = 1-_solver.alg_params_["model_accuracy"]["delta"]
@@ -167,6 +168,11 @@ def get_action_expectation(_a,_const = 1,_params={}, _solver = None):
     return expectation, low_exp, up_exp
 
 def update_best_action(best_model, best_action, model, a, expectation, low_exp, up_exp, exp_max, gap, lexps, uexps):
+    
+    if type(best_model) is not list:
+        best_model = [best_model]
+    if type(best_action) is not list:
+        best_action = [best_action]
     
     uexps.append(up_exp)
     lexps.append(low_exp)
