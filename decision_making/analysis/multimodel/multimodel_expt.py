@@ -38,7 +38,7 @@ from decision_making.planners.utils import get_agent
 
 params = {"mm_env": "irl_gym/MultiModel-v0", "models": [], "belief": {"type":"uniform", "params":{}}}
 shared_params = {
-    "max_steps": 100,
+    "max_steps": 20,
     "map_size": [30,30],
     "home": [10,10],
     "state":{"pose": [20,20,0]},
@@ -47,6 +47,7 @@ shared_params = {
     "velocity_lim": [0,2],
     # "continuity_mode": "continuous",
     "env": "irl_gym/Foraging-v0",
+    "diffs_const": 0.1,
     
     
     "observer_local": False,
@@ -60,10 +61,10 @@ shared_params = {
 
 model_flags = {
         "objects": True, 
-        "repair": True, 
+        "repair": False, 
         "slip": False, 
         "omni_drive": False, 
-        "battery": False, 
+        "battery": True, 
         "obstacles": False, 
         "obj_partially_obs": False,
         "interaction_heading" : False,
@@ -83,29 +84,29 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                 #  "objects": {"objects": [{"id": 0, "pose": [20,20,0]}]},#, {"id": 1, "pose": [20,20,0]}]},
                  "grab": {"value": {"p": 1, "is_directional": False, "taper": False}, "limits": {"range": [0, 1], "grab_radius": [0,0.5], "grab_time": [0.1, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "drop": {"value": {"p": 1, "is_directional": False, "taper": False, "drop_time": 2}, "limits": {"drop_radius": [0,0.5], "direction": [-np.pi/4, np.pi/4]}},
-                 "repair": {"value": {"stations":{"n": 2, "is_random": False}, "p": 1, "is_directional": False, "taper": False}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
+                 "repair": {"value": {"stations":{"n": 4, "is_random": False}, "p": 1, "is_directional": False, "taper": False}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
                 #  "repair": {"value": {"stations":[{"id": 0, "pose": [20,20,0], "repaired": 0}, {"id": 1, "pose": [30,20,0], "repaired": 0}], "p": 1, "is_directional": False, "taper": False, "repair_threshold": 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0.25, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "reward": {
                      "value":{
-                         "battery": 0, "battery_empty": -100, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -20, "successful_drop": 5, "collision": 10, "repair": 5, "done": 1000, "stay": -100
+                         "battery": 0, "battery_empty": -1000, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -20, "successful_drop": 5, "collision": 10, "repair": 100, "done": 1000, "stay": -100
                      },
                      "limits": {
-                         "battery": [-100,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
+                         "battery": [-1000,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
                      }
                  }
-                 }]#*2
+                 }]
 
 
 
 # ground truth params
 true_params = {**params, **shared_params, **model_params[0]}
 true_env = gym.make(true_params["env"], max_episode_steps=true_params["max_steps"], params=true_params)
-s, _ = true_env.reset(options = params)
+s, _ = true_env.reset(options = true_params)
 print(s)
 true_env.render()
 # mm params
 shared_params["state"] = deepcopy(s)
-shared_params["task"] = True
+model_params[0]["model"]["task"] = True
 params = {**params, "shared": shared_params, "models": model_params}
 # model_params[1] = deepcopy(model_params[0])
 # model_params[1]["continuity_mode"] = "discrete"
@@ -116,12 +117,13 @@ alg_params = {
             "alg": "mm_aags",
             "params": {
                 "max_iter": 6000.0,
-                "gamma": 0.95,
+                "diffs_const": 0.1,
+                "gamma": 1,
                 "max_graph_size": 50000.0,
                 "rng_seed": 45,
                 "model_accuracy": {
                     "epsilon": 0.2,
-                    "delta": 0.1
+                    "delta": 0.2
                 },
                 "model_selection": {
                     "function": "progressive_widening",
@@ -134,24 +136,26 @@ alg_params = {
                 "action_selection": {
                     "function": "mm_ambiguity_aware",
                     "params": {
-                        "alpha": 0,
+                        "alpha": 0.5,
                         "action_prog_widening": {
-                            "k": 0.5,
-                            "a": 0.8
+                            "k": 0.25,
+                            "a": 0.55
+                            #non random
+                            #k 0.25, a 0.8
                         }
                     }
                 }
             },
             "search": {
-                "max_samples": 50000,
+                "max_samples": 5000,
                 "horizon": params["shared"]["max_steps"],
-                "timeout": 5,
+                "timeout": 10,
                 "reinit": True
             }
         }
 
 planner = get_agent(alg_params,params)
-
+# exit()
 done  = False
 s_prev = None
 i = 0
@@ -167,8 +171,8 @@ while not done:
     print("state",s)
     print("reward",r)
     print("|||||||||||||||||||||||||||||||")
-    plt.pause(5)
     true_env.render()
+    plt.pause(1)
     i += 1
 
 exit()

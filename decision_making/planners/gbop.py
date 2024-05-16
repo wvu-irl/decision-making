@@ -116,9 +116,11 @@ class GBOP(gym.Env):
             self.graph_[self.n_] = State(deepcopy(_s), a_list, _L= self.bounds_[0], _U = self.bounds_[1])
             self.n_ += 1
         # print("-----------")
-        #N is the number of trajectories now    
+        #N is the number of trajectories now 
+        cnt = 0   
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and self.m_ < self.search_params_["max_samples"]:
-            
+            cnt += 1
+            print(cnt)
             temp_params = deepcopy(self.env_params_)
             temp_params["params"]["state"] = deepcopy(_s)
             # print(_s)

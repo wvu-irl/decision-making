@@ -69,7 +69,7 @@ model_flags = {
         "interaction_heading" : False,
         "state_heading": True,
         "kinematics": True,
-        "task": True,
+        "task": False,
     }
 
 noise_lin = 10
@@ -80,7 +80,7 @@ model_params = [{
     "r_radius": 5,
     "r_range": [-0.01, 1],
     "p": 0,
-}]
+}]*2
 # model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_flags,
 #                  "controller": {"lin_gain": {"kp": 1, "ki": 0.0, "kd": 0.0, "db": 0.1}, "ang_gain": {"kp": 2, "ki": 0, "kd": 0, "db": 0.01}, "is_feedforward": False, "db_gain": 0.1},
 #                  "slip": {"value": {"var":[noise_lin, noise_lin,0]}, "limits": {"var":[0, 1]}},
@@ -106,12 +106,13 @@ model_params = [{
 
 
 # ground truth params
-true_params = {**params, **shared_params, **model_params[0]}
+true_params = {**params, **deepcopy(shared_params), **model_params[0]}
 true_env = gym.make(true_params["env"], max_episode_steps=true_params["max_steps"], params=true_params)
 s, _ = true_env.reset(options = params)
 print(s)
 true_env.render()
 # mm params
+shared_params = deepcopy(shared_params)
 shared_params["state"] = deepcopy(s)
 shared_params["task"] = True
 params = {**params, "shared": shared_params, "models": model_params}

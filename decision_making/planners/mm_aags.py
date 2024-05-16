@@ -97,9 +97,12 @@ class MM_AAGS(gym.Env):
         self.n_ = 0
         self.value_gap_ = 1
         self.env_ = gym.make(self.env_params_["mm_env"],max_episode_steps = self.search_params_["horizon"], params=deepcopy(self.env_params_))
-        self.env_.reset()
+        # self.env_.reset()
+        # print("===========", self.env_.get_reward_bounds())
         
         self.bounds_ = list(self.env_.get_reward_bounds())
+        temp = [self.bounds_[0]*self.search_params_["horizon"], self.bounds_[1]*self.search_params_["horizon"]]
+        # print(temp)
         # self.bounds_[0] *= self.search_params_["horizon"]
         # self.bounds_[1] *= self.search_params_["horizon"]
         
@@ -145,7 +148,10 @@ class MM_AAGS(gym.Env):
             
         self.is_not_converged_ = True
         # print('lol')
+        cnt = 0
         while (time.perf_counter()-start_time < self.search_params_["timeout"]) and self.n_ < self.alg_params_["max_graph_size"] and len(self.U_) and self.m_ < self.search_params_["max_samples"] and self.is_not_converged_:
+            cnt += 1
+            # print("cnt-------",cnt)
             # temp_params = deepcopy(self.env_params_)
             # temp_params["shared"]["state"] = deepcopy(_s)
             temp_params = {"state": deepcopy(_s)}
@@ -155,6 +161,11 @@ class MM_AAGS(gym.Env):
             # print("------------------------------------")
 
             s, info = self.env_.reset(options=temp_params)
+            
+            if _s["objects"] != s["objects"]:
+                print("-----------")
+                print(_s["objects"])
+                print(s["objects"])
 
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
@@ -167,7 +178,7 @@ class MM_AAGS(gym.Env):
             # right now it may not terminate
             self.is_not_converged_ = False
             while not is_terminal and self.d_ < self.search_params_["horizon"] and self.m_ < self.search_params_["max_samples"]: #check if leaf
-
+                # print("-------d", self.d_)
                 str_s = hash(str(s))
 
                 if str_s not in parents:     
@@ -186,6 +197,12 @@ class MM_AAGS(gym.Env):
                 #     self.value_gap_ = U-L
                 # print("l151 ",s)
                 s_p, r, is_terminal, do_reset = self.simulate(s,a,model, do_reset)
+                
+                if s["objects"] != s_p["objects"]:
+                    print("sp-----------")
+                    print(_s["objects"])
+                    print(s["objects"])
+                    print(s_p["objects"])
                 # print(r)
                 # if a["task"] == 4:
                 #     print("repair", r)
@@ -203,9 +220,9 @@ class MM_AAGS(gym.Env):
                     self.gi_[str_sp] = self.n_
                     if is_terminal:
                         if self.alg_params_["gamma"] == 1:
-                            print(r)
+                            # print(r)
                             v = r*(self.search_params_["horizon"]-self.d_-1)
-                            print(self.d_, v)
+                            # print(self.d_, v)
                             L = v
                             U = v
                         else:
@@ -244,7 +261,10 @@ class MM_AAGS(gym.Env):
                 elif str_s not in self.U_ and self.graph_[self.gi_[str_s]].a_[model][pol_ind].N_ <= self.t_: 
                     self.U_.append(str_s)
                 
-                
+                # if s["objects"] != s_p["objects"]:
+                #     print("-----------")
+                #     print(s["objects"])
+                #     print(s_p["objects"])
                 
                 s = s_p
             
@@ -264,7 +284,9 @@ class MM_AAGS(gym.Env):
         # raise NotImplemented("map action space back to global")
 
         print("s", _s["pose"])
-        print(pav)
+        for el in pav:
+            print(el)
+        # print(pav)
         # print("emax ", e_max)
         # print(exps)
         # print("gap", U-L)
@@ -285,6 +307,8 @@ class MM_AAGS(gym.Env):
         # print("Usize", len(self.U_))
         
         self.graph_[0].print_state()
+        
+        
         
         return a#self.graph_[self.gi_[_str_s]].get_action_index(a)
     
@@ -352,6 +376,7 @@ class MM_AAGS(gym.Env):
             s = _parents.pop(0)
             #print("lp " + str(len(_parents)))
             if s != -1:
+                                                                                                    #, "alpha": 1                        
                 a, v, L, U, diffs, exps, _ = self.act_sel_.return_action(self.graph_[self.gi_[s]],{"is_policy" : True},self)
                 # raise NotImplemented("map action space back to global")
 

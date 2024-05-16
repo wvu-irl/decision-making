@@ -163,6 +163,8 @@ def get_action_expectation(_a,_const = 1,_params={}, _solver = None):
         alpha = _const["alpha"]
     else:
         alpha = _params["alpha"]
+        
+    # print("alpha", alpha)
          
     if _a.N_ == 0:
         expectation = (1-alpha)*L + (alpha)*U
