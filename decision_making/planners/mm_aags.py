@@ -161,11 +161,17 @@ class MM_AAGS(gym.Env):
             # print("------------------------------------")
 
             s, info = self.env_.reset(options=temp_params)
+            # s = deepcopy(_s)
             
-            if _s["objects"] != s["objects"]:
-                print("-----------")
-                print(_s["objects"])
-                print(s["objects"])
+            # if _s["objects"] != s["objects"]:
+            #     print("-----------")
+            #     print(_s["objects"])
+            #     print(s["objects"])
+                
+            #     print("samples")
+            #     print(_s["samples"])
+            #     print(s["samples"])
+                
 
             parents = [-1]*int(self.search_params_["horizon"]*5+1)
             p_ind = 0
@@ -198,11 +204,16 @@ class MM_AAGS(gym.Env):
                 # print("l151 ",s)
                 s_p, r, is_terminal, do_reset = self.simulate(s,a,model, do_reset)
                 
-                if s["objects"] != s_p["objects"]:
-                    print("sp-----------")
-                    print(_s["objects"])
-                    print(s["objects"])
-                    print(s_p["objects"])
+                # if s["objects"] != s_p["objects"]:
+                #     print("sp-----------")
+                #     print(_s["objects"])
+                #     print(s["objects"])
+                #     print(s_p["objects"])
+                    
+                #     print("samples")
+                #     print(_s["samples"])
+                #     print(s["samples"])
+                #     print(s_p["samples"])
                 # print(r)
                 # if a["task"] == 4:
                 #     print("repair", r)
@@ -267,6 +278,9 @@ class MM_AAGS(gym.Env):
                 #     print(s_p["objects"])
                 
                 s = s_p
+                
+                # if self.d_ > 10:
+                #     exit()
             
             # print("s ", hash(str(s)), s)
             # self.graph_[0].print_state()
@@ -274,7 +288,9 @@ class MM_AAGS(gym.Env):
             parents.reverse()   
              
             self.backpropagate(list(set(parents)))
-    
+            # for el in pav:
+            #     print(el)
+        
         # print("n " + str(self.n_))
         
         ##
