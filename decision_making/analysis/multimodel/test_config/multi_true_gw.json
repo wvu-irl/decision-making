@@ -1,0 +1,163 @@
+{
+    "stitch": [
+        {
+            "combo": [
+                "algs",
+                "envs"
+            ]
+        }
+    ],
+    "envs": [
+        {
+            "multimodel":
+            {
+                "mm_env": "irl_gym/MultiModel-v0",
+                "belief": 
+                {
+                    "type": "nonparametric",
+                    "params": {}
+                }
+            },
+            "shared" : 
+            {
+                "max_steps": 20,
+                "map_size": [50,50],
+                "goal": [10,10],
+                "dt": 0.11,
+                "timeout_mult": 5,
+                "velocity_lim": [0,2],
+                "env": "irl_gym/GridWorld-v0",
+                "diffs_const": 0.1,
+                
+                "observer_local": false,
+                "render": "plot",
+                "cell_size": 20,
+                "prefix": "/plot/",
+                "save_frames": false,
+                "save_gif": false,
+                "log_level": "WARNING"
+            },
+
+            "flags" : 
+            {
+                "objects": true, 
+                "repair": true, 
+                "slip": false, 
+                "omni_drive": false, 
+                "battery": true, 
+                "obstacles": false, 
+                "obj_partially_obs": false,
+                "interaction_heading" : false,
+                "state_heading": true,
+                "kinematics": true,
+                "task": true,
+                "is_truth": true
+            },
+
+            "true_params":
+            {
+
+            },
+
+            "mm_params" :
+            [
+
+            ],
+            
+            "env": "irl_gym/GridWorld-v0",
+            "default": {
+                "sample": [
+                    {
+                        "key": [
+                            "shared",
+                            "state",
+                            "pose"
+                        ],
+                        "low": [
+                            0,
+                            0,
+                            0
+                        ],
+                        "high": [
+                            49,
+                            49,
+                            7
+                        ],
+                        "num_increments": "+1"
+                    },
+                    {
+                        "key": [
+                            "shared",
+                            "home"
+                        ],
+                        "low": [
+                            0,
+                            0
+                        ],
+                        "high": [
+                            49,
+                            49
+                        ],
+                        "num_increments": "+1"
+                    }, 
+                    {
+                        "key": [
+                            "multimodel",
+                            "num_models"
+                        ],
+                        "low": 1,
+                        "high": 5,
+                        "num_increments": "+1"
+                    }
+                ]
+            }
+        }
+    ],
+    "algs": [
+        {
+            "alg": "mm_aags",
+            "stitch": [
+                {
+                    "combo": [
+                        "alpha",
+                        "max_samples"
+                    ]
+                }
+            ],
+            "params": {
+                "diffs_const": 0.1,
+                "max_iter": 6000.0,
+                "gamma": 1,
+                "max_graph_size": 50000.0,
+                "rng_seed": 45,
+                "model_accuracy": {
+                    "epsilon": 0.2,
+                    "delta": 0.1
+                },
+                "model_selection": {
+                    "function": "progressive_widening",
+                    "params": {
+                        "k": 2,
+                        "a": 0.9
+                    }    
+                },
+                "action_selection": {
+                    "function": "mm_ambiguity_aware",
+                    "params": {
+                        "alpha": 0,
+                        "action_prog_widening": {
+                            "k": 0.5,
+                            "a": 0.8
+                        }
+                    }
+                }
+            },
+            "search": {
+                "max_samples": [100, 500, 1000, 5000],
+                "horizon": 75,
+                "timeout": 5,
+                "reinit": true
+            }
+        }
+    ]
+}

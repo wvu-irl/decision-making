@@ -89,7 +89,7 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                 #  "repair": {"value": {"stations":[{"id": 0, "pose": [20,20,0], "repaired": 0}, {"id": 1, "pose": [30,20,0], "repaired": 0}], "p": 1, "is_directional": False, "taper": False, "repair_threshold": 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0.25, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "reward": {
                      "value":{
-                         "battery": 0, "battery_empty": -1000, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -70, "successful_drop": 5, "collision": 10, "repair": 100, "done": 1000, "stay": -100
+                         "battery": 0, "battery_empty": -1000, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -70, "successful_drop": 100, "collision": 10, "repair": 100, "done": 1000, "stay": -100
                      },
                      "limits": {
                          "battery": [-1000,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]

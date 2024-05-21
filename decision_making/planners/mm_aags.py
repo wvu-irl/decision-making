@@ -155,6 +155,7 @@ class MM_AAGS(gym.Env):
             # temp_params = deepcopy(self.env_params_)
             # temp_params["shared"]["state"] = deepcopy(_s)
             temp_params = {"state": deepcopy(_s)}
+            # temp_params["state"]["init_settings"] = True
             # print("------------------------------------")
             # print(_s)
             # self.graph_[self.gi_[_str_s]].print_state()
