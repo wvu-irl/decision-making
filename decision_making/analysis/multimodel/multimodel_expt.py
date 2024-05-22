@@ -81,7 +81,7 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                  "battery": {"value" : {"level": 100, "decay": [0.05, 0.2, 1, 2, 0, 0]}, "limits": {"level": [0, 100], "decay": [-100, 10]}},
                 #  "obstacles": {"max_num": 15, "max_radius": 5, "max_sides": 6, "is_random": False},
                  "resource_usage": {"value": 5.0, "limits": [0, 50], "enforce": False},
-                 "objects": {"max_num": 4, "is_random": False},
+                 "objects": {"max_num": 1, "is_random": False},
                 #  "objects": {"objects": [{"id": 0, "pose": [20,20,0]}]},#, {"id": 1, "pose": [20,20,0]}]},
                  "grab": {"value": {"p": 1, "is_directional": False, "taper": False}, "limits": {"range": [0, 1], "grab_radius": [0,0.5], "grab_time": [0.1, 4], "direction": [-np.pi/4, np.pi/4]}},
                  "drop": {"value": {"p": 1, "is_directional": False, "taper": False, "drop_time": 2}, "limits": {"drop_radius": [0,0.5], "direction": [-np.pi/4, np.pi/4]}},
@@ -95,7 +95,7 @@ model_params = [{"continuity_mode": "continuous", "mapping": {}, "model": model_
                          "battery": [-1000,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
                      }
                  }
-                 }]
+                 }]*2
 
 
 

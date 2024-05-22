@@ -144,6 +144,7 @@ def progressive_widening(_s : State, _const, _param, solver = None):
                 # _s.add_child(a)
             timeout += 1
         if timeout == 20:
+            print("timeout")
             # a = np.random.choice(_s.a_[_param["m"]]).a_
             return False, None
         return True, a

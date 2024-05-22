@@ -37,54 +37,61 @@ from decision_making.planners.utils import get_agent
 
 def true_expt(params : dict):
     
-    env_params = params["env"]
-    alg_params = params["alg"]
+    env_params = params["envs"]
+    alg_params = params["algs"]
     
     ##
     ## Model processing
     ##
-    mm_params = env_params["multimodel"] #params = {"mm_env": "irl_gym/MultiModel-v0", "models": [], "belief": {"type":"uniform", "params":{}}}
-    shared_params = mm_params["shared"]
+    multimodel_params = env_params["multimodel"] #params = {"mm_env": "irl_gym/MultiModel-v0", "models": [], "belief": {"type":"uniform", "params":{}}}
+    shared_params = env_params["shared"]
     
-    true_params = mm_params["true_params"]
-    true_params["model"] = mm_params["flags"]
+    true_params = env_params["true_params"]
+    true_params["model"] = env_params["flags"]
     
-    true_env_params = {**deepcopy(mm_params), **deepcopy(shared_params), **deepcopy(true_params)}
+    true_env_params = {**deepcopy(true_params), **deepcopy(shared_params)}
     true_env = gym.make(true_env_params["env"], max_episode_steps=true_env_params["max_steps"], params=true_env_params)
     
     s, _ = true_env.reset(options = true_params)
 
-    true_env.render()
-
+    if true_env_params["render"] != "none":
+        true_env.render()
+    print(s)
+    
     #because we are assuming true models. If not doing so will need flags
     shared_params["state"] = deepcopy(s)
+    print(shared_params["state"])
+    true_params["model"]["is_truth"] = False
     
-    if "num_models" not in mm_params:
-        mm_params["num_models"] = 1
+    if "num_models" not in multimodel_params:
+        multimodel_params["num_models"] = 1
     
     mm_params = []
-    true_env_params = {**deepcopy(mm_params), **deepcopy(shared_params), **deepcopy(true_params)}
-    if len(params["mm_params"]) == 0:
-        for i in range(mm_params["num_models"]):
+    test_model_params = env_params["mm_params"]
+    if len(env_params["mm_params"]) == 0:
+        for i in range(multimodel_params["num_models"]):
             mm_params.append(deepcopy(true_params))
         
     else:
-        for i, model in enumerate(params["mm_params"]):
+        for i, model in enumerate(env_params["mm_params"]):
             temp = deepcopy(true_env_params)
-            temp.update(deepcopy(mm_params[i]))
+            temp.update(deepcopy(test_model_params[i]))
             mm_params.append(temp)
+
+    test_env_params = {**multimodel_params, "shared" :shared_params, "models": mm_params}
 
     ##
     ## Alg processing
     ##
     alg_params["search"]["horizon"] = shared_params["max_steps"]
-    planner = get_agent(alg_params,mm_params)
+    planner = get_agent(alg_params,test_env_params)
     
     ##
     ## Data processing
     ##
     data_point = {}
     data_point["env"] = true_env_params["env"]
+    print("env",data_point["env"])
     data_point["max_steps"] = shared_params["max_steps"]
     data_point["map_size"] = shared_params["map_size"]
     data_point["dt"] = shared_params["dt"]
@@ -95,101 +102,98 @@ def true_expt(params : dict):
         data_point["ds"] = data_point["T"]*shared_params["velocity_lim"][1]
     else:
         data_point["ds"] = None
-    data_point["num_models"] = mm_params["num_models"]
+    data_point["num_models"] = multimodel_params["num_models"]
     
-    data_point["alpha"] = alg_params["search"]["params"]["action_selection"]["params"]["alpha"]
-    
-    
-    
-    #save dimensions
-    if data_point["env"] == "irl_gym/Forging-v0":
-        
-        data_point = {**data_point, **true_env.get_stats()}
+    data_point["alpha"] = alg_params["params"]["action_selection"]["params"]["alpha"]
 
-        
-    elif data_point["env"] == "irl_gym/GridWorld-v0":
-        
-        #save reward
-        #save number of timesteps, max_time
-        #save reward (accum)
-
-        pass
-    elif data_point["env"] == "irl_gym/SailingBR-v0":
-        
-        #save reward
-        #save number of timesteps
-        #save number of reef collisions, max_time
-        #save reward (accum)
-        pass
-    data_point["distribution"] = [] #(model, belief)
-    
 
     ##
     ## Run Experiment
     ##
 
-done  = False
-s_prev = None
-i = 0
-while not done:
-    a = planner.evaluate(s, alg_params["search"])
-    print(a)
-    s, r, done, is_trunc, _ = true_env.step(a)
-    if s_prev is not None:
-        ds = np.linalg.norm(np.array(s["pose"][0:2])-np.array(s_prev["pose"][0:2]))
-    else:
-        ds =0
-    s_prev = deepcopy(s)
-    print("state",s)
-    print("reward",r)
-    print("|||||||||||||||||||||||||||||||")
-    true_env.render()
-    plt.pause(1)
-    i += 1
+    done  = False
+    s_prev = None
+    i = 0
+    while not done:
+        s["is_refresh"] = True
+        a = planner.evaluate(s, alg_params["search"])
+        print("ACTION ------", a)
+        s, r, done, is_trunc, _ = true_env.step(a)
+        if s_prev is not None:
+            ds = np.linalg.norm(np.array(s["pose"][0:2])-np.array(s_prev["pose"][0:2]))
+        else:
+            ds =0
+        s_prev = deepcopy(s)
+        print(true_env.get_objects())
+        print("state",s)
+        print("reward",r)
+        print("|||||||||||||||||||||||||||||||")
+        if true_env_params["render"] != "none":
+            true_env.render()
+            plt.pause(1)
+        
+        
+        if data_point["env"] == "irl_gym/Foraging-v0":            
+            data_point = {**data_point, **true_env.get_stats()}
+            print("yes")
 
-exit()
-
-    env = gym.make(params["envs"]["env"], max_episode_steps = params["envs"]["max_time"], params=deepcopy(params["envs"]["params"]))
-    s,info = env.reset()
-    params["envs"]["state"] = deepcopy(s)
-    planner = get_agent(params["algs"],params["envs"])
-
-    done = False
-    ts = 0
-    accum_reward = 0
-    min_distances = []
-    min_d = np.inf
-    while(not done):
-        a = planner.evaluate(s, params["algs"]["search"])
-        s, r,done, is_trunc, info = env.step(a)
-        done = done or is_trunc
-        ts += 1
-        accum_reward += r
-        if params["envs"]["params"]["render"] != "none":
-            env.render()
-        dists = [s["pose"][0], s["pose"][1], params["envs"]["params"]["dimensions"][0]-1-s["pose"][0], params["envs"]["params"]["dimensions"][1]-1-s["pose"][1]]
-        min_distances.append(min(dists))
-        if min(dists) < min_d:
-            min_d = min(dists)
-    
-    if ts < params["envs"]["max_time"]:
-        accum_reward += (params["envs"]["max_time"]-ts)*r
-    
-    data_point = nd.unstructure(params)
-    data_point["time"] = ts
-    data_point["r"] = accum_reward
-    if "pose" in data_point and "goal" in data_point:
-        data_point["distance"] = np.linalg.norm(np.asarray(data_point["pose"][1:2])-np.asarray(data_point["goal"]))
-    data_point["final"] = deepcopy(s)
-    if "pose" in s and "goal" in data_point:
-        data_point["final_distance"] = np.linalg.norm(np.asarray(s["pose"][1:2])-np.asarray(data_point["goal"]))
-    data_point["avg_min_dist"] = np.mean(min_distances)
-    data_point["min_dist"] = min_d
             
+        elif data_point["env"] == "irl_gym/GridWorld-v0":
+            #save reward
+            #save number of timesteps, max_time
+            #save reward (accum)
+            pass
+        
+        elif data_point["env"] == "irl_gym/SailingBR-v0":    
+            #save reward
+            #save number of timesteps
+            #save number of reef collisions, max_time
+            #save reward (accum)
+            pass
+        
+        belief = planner.env_.get_belief()
+        data_point["distribution"] = [] #(model, belief)
+        for el in belief:
+            data_point["distribution"].append((el, belief[el]))
+        
     return pd.DataFrame([data_point])
 
 import json
 
-data = json.load(open("../config/alg/aags_temp.json"))
+data = json.load(open("test_config/TEST_multi_true_foraging.json"))
 
-print(rl_expt(data))
+dp = true_expt(data)
+
+for el in dp:
+    print(dp[el])
+
+    # min_distances = []
+    # min_d = np.inf
+    # while(not done):
+    #     a = planner.evaluate(s, params["algs"]["search"])
+    #     s, r,done, is_trunc, info = env.step(a)
+    #     done = done or is_trunc
+    #     ts += 1
+    #     accum_reward += r
+    #     if params["envs"]["params"]["render"] != "none":
+    #         env.render()
+    #     dists = [s["pose"][0], s["pose"][1], params["envs"]["params"]["dimensions"][0]-1-s["pose"][0], params["envs"]["params"]["dimensions"][1]-1-s["pose"][1]]
+    #     min_distances.append(min(dists))
+    #     if min(dists) < min_d:
+    #         min_d = min(dists)
+    
+    # if ts < params["envs"]["max_time"]:
+    #     accum_reward += (params["envs"]["max_time"]-ts)*r
+    
+    # data_point = nd.unstructure(params)
+    # data_point["time"] = ts
+    # data_point["r"] = accum_reward
+    # if "pose" in data_point and "goal" in data_point:
+    #     data_point["distance"] = np.linalg.norm(np.asarray(data_point["pose"][1:2])-np.asarray(data_point["goal"]))
+    # data_point["final"] = deepcopy(s)
+    # if "pose" in s and "goal" in data_point:
+    #     data_point["final_distance"] = np.linalg.norm(np.asarray(s["pose"][1:2])-np.asarray(data_point["goal"]))
+    # data_point["avg_min_dist"] = np.mean(min_distances)
+    # data_point["min_dist"] = min_d
+            
+    

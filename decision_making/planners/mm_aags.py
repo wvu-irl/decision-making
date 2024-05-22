@@ -146,6 +146,9 @@ class MM_AAGS(gym.Env):
             self.U_.append(_str_s) 
             self.n_ += 1
             
+        self.env_.reset(options={"state": deepcopy(_s)})
+        self.env_backup_ = deepcopy(self.env_)
+            
         self.is_not_converged_ = True
         # print('lol')
         cnt = 0
@@ -154,6 +157,7 @@ class MM_AAGS(gym.Env):
             # print("cnt-------",cnt)
             # temp_params = deepcopy(self.env_params_)
             # temp_params["shared"]["state"] = deepcopy(_s)
+            self.env_ = deepcopy(self.env_backup_)
             temp_params = {"state": deepcopy(_s)}
             # temp_params["state"]["init_settings"] = True
             # print("------------------------------------")
@@ -162,6 +166,9 @@ class MM_AAGS(gym.Env):
             # print("------------------------------------")
 
             s, info = self.env_.reset(options=temp_params)
+            
+            # print("------------------------------------")
+            # print(s)
             # s = deepcopy(_s)
             
             # if _s["objects"] != s["objects"]:

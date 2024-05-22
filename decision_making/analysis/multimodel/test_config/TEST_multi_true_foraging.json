@@ -1,166 +1,113 @@
 {
-    "stitch": [
+"envs":
+    {
+        "multimodel":
         {
-            "combo": [
-                "algs",
-                "envs"
-            ]
-        }
-    ],
-    "envs": [
+            "mm_env": "irl_gym/MultiModel-v0",
+            "num_models": 2,
+            "belief": 
+            {
+                "type": "nonparametric",
+                "params": {}
+            }
+        },
+        "shared" : 
         {
-            "multimodel":
-            {
-                "mm_env": "irl_gym/MultiModel-v0",
-                "belief": 
-                {
-                    "type": "nonparametric",
-                    "params": {}
-                }
-            },
-            "shared" : 
-            {
-                "max_steps": 20,
-                "map_size": [50,50],
-                "dt": 0.11,
-                "timeout_mult": 5,
-                "velocity_lim": [0,2],
-                "env": "irl_gym/GridWorld-v0",
-                
-                "observer_local": false,
-                "render": "plot",
-                "cell_size": 20,
-                "prefix": "/plot/",
-                "save_frames": false,
-                "save_gif": false,
-                "log_level": "WARNING"
-            },
-
-            "flags" : 
-            {
-                "objects": true, 
-                "repair": true, 
-                "slip": false, 
-                "omni_drive": false, 
-                "battery": true, 
-                "obstacles": false, 
-                "obj_partially_obs": false,
-                "interaction_heading" : false,
-                "state_heading": true,
-                "kinematics": true,
-                "task": true,
-                "is_truth": true
-            },
-
-            "true_params":
-            {
-                "continuity_mode": "continuous", "mapping": {},
-                "controller": {"lin_gain": {"kp": 1, "ki": 0.0, "kd": 0.0, "db": 0.1}, "ang_gain": {"kp": 2, "ki": 0, "kd": 0, "db": 0.01}, "is_feedforward": false, "db_gain": 0.1},
-                "slip": {"value": {"var":[0, 0,0]}, "limits": {"var":[0, 1]}},
-                "battery": {"value" : {"level": 100, "decay": [0.05, 0.2, 1, 2, 0, 0]}, "limits": {"level": [0, 100], "decay": [-100, 10]}},
-                 "resource_usage": {"value": 5.0, "limits": [0, 50], "enforce": false},
-                 "objects": {"max_num": 6, "is_random": true},
-                 "repair": {"value": {"stations":{"n": 6, "is_random": false}, "p": 1, "is_directional": false, "taper": false, "repair_threshold" : 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
-                 "reward": {
-                     "value":{
-                         "battery": 0, "battery_empty": -1000, "time": -1, "distance": -2, "failed_grab": -60, "successful_grab": 2, "failed_drop": -70, "successful_drop": 100, "collision": 10, "repair": 100, "done": 1000, "stay": -100
-                     },
-                     "limits": {
-                         "battery": [-1000,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
-                     }
-                 }
-            },
-
-            "mm_params" :
-            [
-
-            ],
+            "max_steps": 5,
+            "map_size": [50,50],
+            "state": {"pose": [30,30,0]},
+            "home": [10,10],
+            "dt": 0.11,
+            "timeout_mult": 5,
+            "velocity_lim": [0,2],
+            "env": "irl_gym/Foraging-v0",
             
-            "env": "irl_gym/GridWorld-v0",
-            "default": {
-                "sample": [
-                    {
-                        "key": [
-                            "shared",
-                            "state",
-                            "pose"
-                        ],
-                        "low": [
-                            0,
-                            0,
-                            0
-                        ],
-                        "high": [
-                            49,
-                            49,
-                            7
-                        ],
-                        "num_increments": "+1"
-                    },
-                    {
-                        "key": [
-                            "shared",
-                            "home"
-                        ],
-                        "low": [
-                            0,
-                            0
-                        ],
-                        "high": [
-                            49,
-                            49
-                        ],
-                        "num_increments": "+1"
-                    }, 
-                    {
-                        "key": [
-                            "multimodel",
-                            "num_models"
-                        ],
-                        "low": 1,
-                        "high": 5,
-                        "num_increments": "+1"
-                    }
-                ]
-            }
-        }
-    ],
-    "algs": [
+            "observer_local": false,
+            "render": "plot",
+            "cell_size": 20,
+            "prefix": "/plot/",
+            "save_frames": false,
+            "save_gif": false,
+            "log_level": "WARNING"
+        },
+
+        "flags" : 
         {
-            "alg": "mm_aags",
-            "params": {
-                "diffs_const": 0.1,
-                "max_iter": 10000.0,
-                "gamma": 1,
-                "max_graph_size": 50000.0,
-                "rng_seed": 45,
-                "model_accuracy": {
-                    "epsilon": 0.2,
-                    "delta": 0.1
+            "objects": true, 
+            "repair": true, 
+            "slip": false, 
+            "omni_drive": false, 
+            "battery": true, 
+            "obstacles": false, 
+            "obj_partially_obs": false,
+            "interaction_heading" : false,
+            "state_heading": true,
+            "kinematics": true,
+            "task": true,
+            "is_truth": true
+        },
+
+        "true_params":
+        {
+            "continuity_mode": "continuous", "mapping": {},
+            "controller": {"lin_gain": {"kp": 1, "ki": 0.0, "kd": 0.0, "db": 0.1}, "ang_gain": {"kp": 2, "ki": 0, "kd": 0, "db": 0.01}, "is_feedforward": false, "db_gain": 0.1},
+            "slip": {"value": {"var":[0, 0,0]}, "limits": {"var":[0, 1]}},
+            "battery": {"value" : {"level": 100, "decay": [0.05, 0.2, 1, 2, 0, 0]}, "limits": {"level": [0, 100], "decay": [-100, 10]}},
+            "resource_usage": {"value": 5.0, "limits": [0, 50], "enforce": false},
+            "objects": {"max_num": 1, "is_random": true},
+            "repair": {"value": {"stations":{"n": 1, "is_random": false}, "p": 1, "is_directional": false, "taper": false, "repair_threshold" : 0.9}, "limits": {"repair_radius": [0, 0.5], "repair_time": [0, 4]}},
+            "reward": {
+                "value":{
+                    "battery": 0, "battery_empty": -1000, "time": -1, "distance": -2, "failed_grab": -100, "successful_grab": 50, "failed_drop": -70, "successful_drop": 100, "collision": 10, "repair": 100, "done": 1000, "stay": -100
                 },
-                "model_selection": {
-                    "function": "progressive_widening",
-                    "params": {
-                        "k": 2,
-                        "a": 0.9
-                    }    
-                },
-                "action_selection": {
-                    "function": "mm_ambiguity_aware",
-                    "params": {
-                        "alpha": 0,
-                        "action_prog_widening": {
-                            "k": 0.5,
-                            "a": 0.8
-                        }
+                "limits": {
+                    "battery": [-1000,100], "time": [-100,100], "distance": [-100,100], "grab": [-100,100], "drop": [-100,100], "collision": [-100,100], "repair": [-70,100]
+                }
+            }
+        },
+
+        "mm_params" :
+        [
+            
+        ],
+        
+        "env": "irl_gym/GridWorld-v0"
+    },
+"algs":
+    {
+        "alg": "mm_aags",
+        "params": {
+            "diffs_const": 0.1,
+            "max_iter": 10000.0,
+            "gamma": 1,
+            "max_graph_size": 50000.0,
+            "rng_seed": 45,
+            "model_accuracy": {
+                "epsilon": 0.2,
+                "delta": 0.1
+            },
+            "model_selection": {
+                "function": "progressive_widening",
+                "params": {
+                    "k": 2,
+                    "a": 0.9
+                }    
+            },
+            "action_selection": {
+                "function": "mm_ambiguity_aware",
+                "params": {
+                    "alpha": 0.5,
+                    "action_prog_widening": {
+                        "k": 0.5,
+                        "a": 0.7
                     }
                 }
-            },
-            "search": {
-                "max_samples": 1000,
-                "timeout": 5,
-                "reinit": true
             }
+        },
+        "search": {
+            "max_samples": 1000,
+            "timeout": 5,
+            "reinit": true
         }
-    ]
+    }
 }
