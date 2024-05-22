@@ -16,6 +16,8 @@ def get_agent(alg_params=None, env_params=None):
         return gbop.GBOP(alg_params, env_params)
     elif alg_params["alg"] == "uct":
         return uct.UCT(alg_params, env_params)
+    elif alg_params["alg"] == "mm_aags":
+        return mm_aags.MM_AAGS(alg_params, env_params)
     # elif alg_params["alg"] == "gbop":
     #     return gbop.GBOP(env, act_select, _performance = [0.1, 0.05], _bounds = bounds)
     

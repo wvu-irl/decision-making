@@ -222,7 +222,6 @@ def ambiguity_aware(_s,_const = 1,_params=[], _solver = None):
         
     return _solver.rng_.choice(ind), exp_max, L_exp, U_exp, [ldiff, udiff], [lexps,uexps]
 
-
 def random_action(_s : State,_const,_param,solver = None):
     a = []
     for a_t in _s.a_:

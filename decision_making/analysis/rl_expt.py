@@ -16,7 +16,7 @@ import irl_gym
 import gymnasium as gym
 
 def rl_expt(params : dict):
-
+    
     """
     Simulates and saves a single experimental trial
     
