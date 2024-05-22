@@ -9,7 +9,7 @@ import csv
 import numpy as np
 import random
 
-import gym
+import gymnasium as gym
 
 from decision_making.envs.grid_world import GridWorld
 from decision_making.envs.grid_tunnel import GridTrap
