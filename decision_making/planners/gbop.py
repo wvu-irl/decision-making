@@ -1,7 +1,6 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-import gym
 import time
 from copy import deepcopy
 import sys

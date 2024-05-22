@@ -23,7 +23,7 @@
             "env": "irl_gym/Foraging-v0",
             
             "observer_local": false,
-            "render": "plot",
+            "render": "none",
             "cell_size": 20,
             "prefix": "/plot/",
             "save_frames": false,
