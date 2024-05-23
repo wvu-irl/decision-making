@@ -59,11 +59,11 @@ def mm_progressive_widening(_s : State,_const,_param={},_solver = None):
     :return: Model to select
     """
     if _param == {}:
-        k = _const["k"]
-        a = _const["a"]
+        k = _const["k1"]
+        a = _const["a1"]
     else:
-        k = _param["k"]
-        a = _param["a"]
+        k = _param["k1"]
+        a = _param["a1"]
         
     # raise NotImplementedError("Need to fix sampling to make sure model id is conveyed properly")
         

@@ -121,11 +121,11 @@ def random_action(_s : State,_const,_param,solver = None):
     
 def progressive_widening(_s : State, _const, _param, solver = None):
     if _param == {}:
-        k = _const["k"]
-        a = _const["a"]
+        k = _const["k2"]
+        a = _const["a2"]
     else:
-        k = _param["k"]
-        a = _param["a"]
+        k = _param["k2"]
+        a = _param["a2"]
     
     if len(_s.a_[_param["m"]]) == 0:
         return True, solver.env_.get_action(_param["m"], _s.s_)

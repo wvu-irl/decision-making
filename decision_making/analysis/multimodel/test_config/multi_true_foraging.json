@@ -20,16 +20,16 @@
             },
             "shared" : 
             {
-                "max_steps": 20,
+                "max_steps": 5,
                 "map_size": [50,50],
                 "goal": [10,10],
                 "dt": 0.11,
                 "timeout_mult": 5,
                 "velocity_lim": [0,2],
-                "env": "irl_gym/GridWorld-v0",
+                "env": "irl_gym/Foraging-v0",
                 
                 "observer_local": false,
-                "render": "plot",
+                "render": "none",
                 "cell_size": 20,
                 "prefix": "/plot/",
                 "save_frames": false,
@@ -77,7 +77,6 @@
 
             ],
             
-            "env": "irl_gym/GridWorld-v0",
             "default": {
                 "sample": [
                     {
@@ -118,8 +117,8 @@
                             "multimodel",
                             "num_models"
                         ],
-                        "low": 1,
-                        "high": 5,
+                        "low": [1],
+                        "high": [5],
                         "num_increments": "+1"
                     }
                 ]
@@ -133,7 +132,9 @@
                 {
                     "combo": [
                         "alpha",
-                        "max_samples"
+                        "max_samples", 
+                        "a1",
+                        "a2"
                     ]
                 }
             ],
@@ -148,26 +149,27 @@
                     "delta": 0.1
                 },
                 "model_selection": {
-                    "function": "progressive_widening",
+                    "function1": "progressive_widening",
                     "params": {
-                        "k": 2,
-                        "a": 0.9
+                        "k1": 2,
+                        "a1": [0.5, 0.7, 0.8, 0.9]
                     }    
                 },
                 "action_selection": {
-                    "function": "mm_ambiguity_aware",
+                    "function2": "mm_ambiguity_aware",
                     "params": {
                         "alpha": [0, 0.125, 0.25, 0.5, 0.75, 0.875, 1.0],
                         "action_prog_widening": {
-                            "k": 0.5,
-                            "a": 0.8
+                            "k2": 0.5,
+                            "a2": [0.5, 0.7, 0.8, 0.9]
                         }
                     }
                 }
             },
             "search": {
+                "horizon": 5,
                 "max_samples": [100, 500, 1000, 5000],
-                "timeout": 5,
+                "timeout": 1,
                 "reinit": true
             }
         }
