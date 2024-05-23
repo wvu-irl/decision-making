@@ -114,13 +114,15 @@ def true_expt(params : dict):
     ##
 
     done  = False
+    is_trunc = False
     s_prev = None
     i = 0
-    while not done:
+    while not done and not is_trunc:
         s["is_refresh"] = True
         a = planner.evaluate(s, alg_params["search"])
         print("ACTION ------", a)
         s, r, done, is_trunc, _ = true_env.step(a)
+        # print()
         if s_prev is not None:
             ds = np.linalg.norm(np.array(s["pose"][0:2])-np.array(s_prev["pose"][0:2]))
         else:
@@ -152,19 +154,24 @@ def true_expt(params : dict):
             #save number of reef collisions, max_time
             #save reward (accum)
             pass
+        print(data_point["time"])
         
         belief = planner.env_.get_belief()
         data_point["distribution"] = [] #(model, belief)
         for el in belief:
             data_point["distribution"].append((el, belief[el]))
+            
+        i += 1
+        print(i, done, is_trunc)
+        data_point["iteration_time"] = i
         
     return pd.DataFrame([data_point])
 
-# import json
+import json
 
-# data = json.load(open("test_config/TEST_multi_true_foraging.json"))
+data = json.load(open("test_config/TEST_multi_true_foraging.json"))
 
-# dp = true_expt(data)
+dp = true_expt(data)
 
 # for el in dp:
 #     print(dp[el])
