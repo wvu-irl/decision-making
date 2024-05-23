@@ -56,8 +56,8 @@ class MM_AAGS(gym.Env):
         self.alg_params_ = _alg_params
         self.env_params_ = _env_params
         
-        self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function"]], _alg_params["action_selection"]["params"])
-        self.model_sel_ = model_selection.model_selection(model_sel_funcs[_alg_params["model_selection"]["function"]], _alg_params["model_selection"]["params"])
+        self.act_sel_ = action_selection.action_selection(act_sel_funcs[_alg_params["action_selection"]["function2"]], _alg_params["action_selection"]["params"])
+        self.model_sel_ = model_selection.model_selection(model_sel_funcs[_alg_params["model_selection"]["function1"]], _alg_params["model_selection"]["params"])
         
         self.reinit()
 

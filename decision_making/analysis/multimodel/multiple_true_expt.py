@@ -65,6 +65,8 @@ def true_expt(params : dict):
     
     if "num_models" not in multimodel_params:
         multimodel_params["num_models"] = 1
+    else:
+        multimodel_params["num_models"] = int(multimodel_params["num_models"][0])
     
     mm_params = []
     test_model_params = env_params["mm_params"]
@@ -83,7 +85,7 @@ def true_expt(params : dict):
     ##
     ## Alg processing
     ##
-    alg_params["search"]["horizon"] = shared_params["max_steps"]
+    # alg_params["search"]["horizon"] = shared_params["max_steps"]
     planner = get_agent(alg_params,test_env_params)
     
     ##
@@ -135,7 +137,7 @@ def true_expt(params : dict):
         
         if data_point["env"] == "irl_gym/Foraging-v0":            
             data_point = {**data_point, **true_env.get_stats()}
-            print("yes")
+            # print("yes")
 
             
         elif data_point["env"] == "irl_gym/GridWorld-v0":
@@ -158,14 +160,14 @@ def true_expt(params : dict):
         
     return pd.DataFrame([data_point])
 
-import json
+# import json
 
-data = json.load(open("test_config/TEST_multi_true_foraging.json"))
+# data = json.load(open("test_config/TEST_multi_true_foraging.json"))
 
-dp = true_expt(data)
+# dp = true_expt(data)
 
-for el in dp:
-    print(dp[el])
+# for el in dp:
+#     print(dp[el])
 
     # min_distances = []
     # min_d = np.inf
