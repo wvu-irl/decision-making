@@ -4,7 +4,7 @@
         "multimodel":
         {
             "mm_env": "irl_gym/MultiModel-v0",
-            "num_models": 2,
+            "num_models": [2],
             "belief": 
             {
                 "type": "nonparametric",
@@ -87,24 +87,25 @@
                 "delta": 0.1
             },
             "model_selection": {
-                "function": "progressive_widening",
+                "function1": "progressive_widening",
                 "params": {
-                    "k": 2,
-                    "a": 0.9
+                    "k1": 2,
+                    "a1": 0.9
                 }    
             },
             "action_selection": {
-                "function": "mm_ambiguity_aware",
+                "function2": "mm_ambiguity_aware",
                 "params": {
                     "alpha": 0.5,
                     "action_prog_widening": {
-                        "k": 0.5,
-                        "a": 0.7
+                        "k2": 0.5,
+                        "a2": 0.7
                     }
                 }
             }
         },
         "search": {
+            "horizon": 5,
             "max_samples": 1000,
             "timeout": 5,
             "reinit": true
