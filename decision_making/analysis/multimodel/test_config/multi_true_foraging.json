@@ -17,7 +17,7 @@
                 }
             },
             "shared": {
-                "max_steps": 5,
+                "max_steps": 100,
                 "map_size": [
                     50,
                     50
@@ -128,7 +128,7 @@
                     "value": {
                         "stations": {
                             "n": 6,
-                            "is_random": false
+                            "is_random": true
                         },
                         "p": 1,
                         "is_directional": false,
@@ -254,7 +254,8 @@
                         "alpha",
                         "max_samples",
                         "a1",
-                        "a2"
+                        "a2",
+                        "horizon"
                     ]
                 }
             ],
@@ -305,14 +306,14 @@
                 }
             },
             "search": {
-                "horizon": 5,
+                "horizon": [20, 40, 60, 80, 100],
                 "max_samples": [
                     100,
                     500,
                     1000,
                     5000
                 ],
-                "timeout": 1,
+                "timeout": 20,
                 "reinit": true
             }
         }

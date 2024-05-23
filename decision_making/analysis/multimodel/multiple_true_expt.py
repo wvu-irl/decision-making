@@ -95,6 +95,11 @@ def true_expt(params : dict):
     data_point["env"] = true_env_params["env"]
     print("env",data_point["env"])
     data_point["max_steps"] = shared_params["max_steps"]
+    data_point["horizon"] = alg_params["search"]["horizon"]
+    data_point["max_samples"] = alg_params["search"]["max_samples"]
+    data_point["search_timeout"] = alg_params["search"]["timeout"]
+    data_point["action_a_param"] = alg_params["params"]["action_selection"]["params"]["action_prog_widening"]["a2"]
+    data_point["model_a_param"] = alg_params["params"]["model_selection"]["params"]["a1"]
     data_point["map_size"] = shared_params["map_size"]
     data_point["dt"] = shared_params["dt"]
     data_point["T"] = shared_params["timeout_mult"]*shared_params["dt"]
@@ -117,9 +122,13 @@ def true_expt(params : dict):
     is_trunc = False
     s_prev = None
     i = 0
+    
+    planning_time = []
     while not done and not is_trunc:
         s["is_refresh"] = True
+        start_time = time.perf_counter()
         a = planner.evaluate(s, alg_params["search"])
+        planning_time.append(time.perf_counter()-start_time)
         print("ACTION ------", a)
         s, r, done, is_trunc, _ = true_env.step(a)
         # print()
@@ -164,6 +173,8 @@ def true_expt(params : dict):
         i += 1
         print(i, done, is_trunc)
         data_point["iteration_time"] = i
+        
+    data_point["planning_time"] = np.mean(planning_time)
         
     return pd.DataFrame([data_point])
 
