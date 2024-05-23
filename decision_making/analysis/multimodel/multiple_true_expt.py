@@ -163,6 +163,7 @@ def true_expt(params : dict):
             
         i += 1
         print(i, done, is_trunc)
+        data_point["iteration_time"] = i
         
     return pd.DataFrame([data_point])
 
