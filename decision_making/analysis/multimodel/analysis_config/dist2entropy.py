@@ -13,18 +13,20 @@ sys.path.append(parent)
 import pandas as pd
 import numpy as np
 
-path = current + "../"
-file = "true_test.csv"
+from ast import literal_eval
+
+path = current + "/../data/"
+file = "true_expt_all.csv"
 
 with open(path + file, 'r') as f:
     df = pd.read_csv(f)
     
     for index, row in df.iterrows():
-        dist = row["distribution"]
+        dist = literal_eval(row["distribution"])
         
         entropy = 0
-        for key in dist:
-            entropy += dist[key] * np.log(dist[key])
+        for el in dist: 
+            entropy += el[1] * np.log(el[1])
             
         entropy = -entropy
         
