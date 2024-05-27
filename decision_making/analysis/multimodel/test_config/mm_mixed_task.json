@@ -11,10 +11,10 @@
         {
             "multimodel": {
                 "mm_env": "irl_gym/MultiModel-v0",
-                "num_models": 2,
+                "num_models": [3],
                 "test_task": "mixed_tasks",
                 "belief": {
-                    "type": "uniform",
+                    "type": "nonparametric",
                     "params": {}
                 }
             },
@@ -242,7 +242,6 @@
                     "combo": [
                         "alpha",
                         "max_samples",
-                        "a1",
                         "a2",
                         "horizon"
                     ]
@@ -262,12 +261,7 @@
                     "function1": "progressive_widening",
                     "params": {
                         "k1": 2,
-                        "a1": [
-                            0.5,
-                            0.7,
-                            0.8,
-                            0.9
-                        ]
+                        "a1": 0.7
                     }
                 },
                 "action_selection": {
@@ -275,20 +269,17 @@
                     "params": {
                         "alpha": [
                             0,
-                            0.125,
                             0.25,
                             0.5,
                             0.75,
-                            0.875,
                             1.0
                         ],
                         "action_prog_widening": {
                             "k2": 0.5,
                             "a2": [
                                 0.5,
-                                0.7,
-                                0.8,
-                                0.9
+                                0.75,
+                                1
                             ]
                         }
                     }
@@ -297,16 +288,12 @@
             "search": {
                 "horizon": [
                     20,
-                    40,
-                    60,
-                    80,
-                    100
+                    60
                 ],
                 "max_samples": [
                     100,
                     500,
-                    1000,
-                    5000
+                    1000
                 ],
                 "timeout": 20,
                 "reinit": true

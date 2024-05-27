@@ -127,11 +127,11 @@ def mm_expt(params : dict):
     data_point["max_time"] = data_point["max_steps"]*data_point["T"]
     data_point["continuity_mode"] = true_params["continuity_mode"]
     data_point["test_task"] = multimodel_params["test_task"]
-    if mm_params["test_task"] == "separate_tasks":
+    if multimodel_params["test_task"] == "separate_tasks":
         pass
-    elif mm_params["test_task"] == "mixed_tasks":
+    elif multimodel_params["test_task"] == "mixed_tasks":
         pass
-    elif mm_params["test_task"] == "drivebase":
+    elif multimodel_params["test_task"] == "drivebase":
         data_point["truth_omni_drive"] = true_params["model"]["omni_drive"]
     if data_point["continuity_mode"] == "discrete":
         data_point["ds"] = data_point["T"]*shared_params["velocity_lim"][1]
@@ -206,11 +206,11 @@ def mm_expt(params : dict):
         
     return pd.DataFrame([data_point])
 
-import json
+# import json
 
-data = json.load(open("test_config/TEST_multi_true_foraging.json"))
+# data = json.load(open("test_config/TEST_multi_true_foraging.json"))
 
-dp = true_expt(data)
+# dp = true_expt(data)
 
 # for el in dp:
 #     print(dp[el])
