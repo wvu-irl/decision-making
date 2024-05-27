@@ -22,6 +22,7 @@ with open(path + file, 'r') as f:
     df = pd.read_csv(f)
     
     for index, row in df.iterrows():
+        #entropy
         dist = literal_eval(row["distribution"])
         
         entropy = 0
@@ -32,4 +33,14 @@ with open(path + file, 'r') as f:
         
         df.at[index, "entropy"] = entropy
         
-    df.to_csv(path + "true_test_entropy.csv")
+        #ratio of objects
+        num_o = row["num_objects"]
+        num_r = row["num_returned"]
+        
+        df.at[index, "returned_ratio"] = num_r / num_o
+        
+        # df.at[index, "failed_drop_ratio"] = row["num_failed_drops"] / num_o
+        # df.at[index, "failed_grab_ratio"] = row["num_failed_grabs"] / num_o
+        
+        
+    df.to_csv(path + "true_test_post_proc.csv")

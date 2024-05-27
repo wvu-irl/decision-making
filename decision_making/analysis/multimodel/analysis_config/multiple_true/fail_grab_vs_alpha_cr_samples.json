@@ -2,17 +2,17 @@
     "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
     "data_file" : "true_expt.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/multiple_true/",
-    "figure_file" : "foraging_t_vs_entropy_cr_alpha",
-    "cross_ref" : "alpha",
-    "x" : "entropy",
-    "y" : "time",
+    "figure_file" : "foraging_fail_grab_vs_alpha_cr_samples",
+    "cross_ref" : "max_samples",
+    "x" : "alpha",
+    "y" : "num_failed_grabs",
     "z" : null,
     "control" : null,
     "legend" : true,
     "fig":
     {
         "type" : "line",
-        "title" : "Foraging Tune vs Entropy CR Alpha",
+        "title" : "Foraging Num Failed Grabs vs Alpha CR max Samples",
         "kwargs" : null
     },
     "filter" :
@@ -25,14 +25,13 @@
                 {"col" : "model_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
                 {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
                 {"col" : "horizon", "op" : "in", "val" : [20]},
-                {"col" : "max_samples", "op" : "in", "val" : [100]},
+                {"col" : "max_samples", "op" : "in", "val" : [100, 500, 1000, 5000]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
             ]
         }
     },
     "sort": true,
     "avg" : true,
-    "smooth" : 30,
     "log_level" : "WARNING",
     "render" : false
 }

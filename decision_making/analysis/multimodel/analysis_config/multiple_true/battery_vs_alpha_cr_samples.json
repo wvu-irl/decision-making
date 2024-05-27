@@ -22,7 +22,7 @@
             "and" :
             [
                 {"col" : "model_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
-                {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
+                {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
                 {"col" : "max_samples", "op" : "in", "val" : [100, 500, 1000, 5000]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
             ]

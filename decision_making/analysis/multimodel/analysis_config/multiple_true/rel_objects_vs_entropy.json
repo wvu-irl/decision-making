@@ -2,17 +2,17 @@
     "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
     "data_file" : "true_expt.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/multiple_true/",
-    "figure_file" : "foraging_t_vs_entropy_cr_alpha",
+    "figure_file" : "foraging_rel_objects_vs_entropy_cr_alpha",
     "cross_ref" : "alpha",
     "x" : "entropy",
-    "y" : "time",
+    "y" : "returned_ratio",
     "z" : null,
     "control" : null,
     "legend" : true,
     "fig":
     {
         "type" : "line",
-        "title" : "Foraging Tune vs Entropy CR Alpha",
+        "title" : "Foraging Rel Num Objects Returned vs Entropy CR Alpha",
         "kwargs" : null
     },
     "filter" :
@@ -32,7 +32,7 @@
     },
     "sort": true,
     "avg" : true,
-    "smooth" : 30,
+    "smooth" : 50,
     "log_level" : "WARNING",
     "render" : false
 }
