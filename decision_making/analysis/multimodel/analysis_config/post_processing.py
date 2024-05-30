@@ -15,8 +15,9 @@ import numpy as np
 
 from ast import literal_eval
 
-path = current + "/../data/"
-file = "true_expt_all.csv"
+path = current + "/../data/unfiltered/"
+fn = "mm_sep_expt_t"
+file = fn + ".csv"
 
 with open(path + file, 'r') as f:
     df = pd.read_csv(f)
@@ -24,10 +25,12 @@ with open(path + file, 'r') as f:
     for index, row in df.iterrows():
         #entropy
         dist = literal_eval(row["distribution"])
-        
+        l_dist = len(dist)
         entropy = 0
         for el in dist: 
             entropy += el[1] * np.log(el[1])
+            df.at[index, "dist_el" + str(el[0])] = el[1]
+            
             
         entropy = -entropy
         
@@ -43,4 +46,4 @@ with open(path + file, 'r') as f:
         # df.at[index, "failed_grab_ratio"] = row["num_failed_grabs"] / num_o
         
         
-    df.to_csv(path + "true_test_post_proc.csv")
+    df.to_csv(path + fn + "_post_proc.csv")
