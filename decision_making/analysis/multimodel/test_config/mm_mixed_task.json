@@ -11,10 +11,10 @@
         {
             "multimodel": {
                 "mm_env": "irl_gym/MultiModel-v0",
-                "num_models": [3],
+                "num_models": [6],
                 "test_task": "mixed_tasks",
                 "belief": {
-                    "type": "nonparametric",
+                    "type": "uniform",
                     "params": {}
                 }
             },

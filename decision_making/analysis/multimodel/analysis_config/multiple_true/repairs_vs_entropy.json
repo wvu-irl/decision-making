@@ -13,7 +13,9 @@
     {
         "type" : "line",
         "title" : "Foraging Avg Repair vs Entropy CR Alpha",
-        "kwargs" : null
+        "kwargs" : null,
+        "ylabel": "Average Repair",
+        "xlabel": "Entropy"
     },
     "filter" :
     {
@@ -26,7 +28,8 @@
                 {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
                 {"col" : "horizon", "op" : "in", "val" : [20]},
                 {"col" : "max_samples", "op" : "in", "val" : [100]},
-                {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]},
+                {"col" : "num_models", "op" : "in", "val" : [1, 2, 3, 4, 5]}
             ]
         }
     },

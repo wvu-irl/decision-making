@@ -7,7 +7,14 @@
     "x" : "entropy",
     "y" : "accum_reward",
     "z" : null,
-    "control" : null,
+    "control" : "max_samples",
+    "control_kwargs":
+    {
+        "bins":
+        {
+            "as_interval" : false
+        }
+    },
     "legend" : true,
     "fig":
     {
@@ -25,7 +32,7 @@
                 {"col" : "model_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
                 {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
                 {"col" : "horizon", "op" : "in", "val" : [20]},
-                {"col" : "num_models", "op" : "in ", "val" : [2]},
+                {"col" : "max_samples", "op" : "in", "val" : [100, 500, 1000]},
                 {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
             ]
         }

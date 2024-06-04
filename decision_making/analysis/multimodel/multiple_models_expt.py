@@ -81,8 +81,17 @@ def mm_expt(params : dict):
             mm_params.append(temp)
             
     if multimodel_params["test_task"] == "separate_tasks":
-        mm_params[0]["model"]["repair"] = False
-        mm_params[1]["model"]["objects"] = False
+        num_obj_models = np.random.randint(0, multimodel_params["num_models"])
+        num_rep_models = multimodel_params["num_models"] - num_obj_models
+        i = 0
+        while i < num_obj_models:
+            mm_params[i]["model"]["repair"] = False
+            i += 1
+        while i < multimodel_params["num_models"]:
+            mm_params[i]["model"]["objects"] = False
+            i += 1
+        # mm_params[0]["model"]["repair"] = False
+        # mm_params[1]["model"]["objects"] = False
         
         for i, el in enumerate(mm_params):
             mm_params[i]["model"]["is_truth"] = False
@@ -90,8 +99,16 @@ def mm_expt(params : dict):
             
     
     elif multimodel_params["test_task"] == "mixed_tasks":
-        mm_params[0]["model"]["repair"] = False
-        mm_params[1]["model"]["objects"] = False
+        num_obj_models = np.random.randint(0, multimodel_params["num_models"])
+        num_rep_models = np.random.randint(0, multimodel_params["num_models"]-num_obj_models)
+                
+        i = 0
+        while i < num_obj_models:
+            mm_params[i]["model"]["repair"] = False
+            i += 1
+        while i < num_obj_models + num_rep_models:
+            mm_params[i]["model"]["objects"] = False
+            i += 1
         
         for i, el in enumerate(mm_params):
             mm_params[i]["model"]["is_truth"] = False
@@ -128,9 +145,17 @@ def mm_expt(params : dict):
     data_point["continuity_mode"] = true_params["continuity_mode"]
     data_point["test_task"] = multimodel_params["test_task"]
     if multimodel_params["test_task"] == "separate_tasks":
-        pass
+        data_point["num_obj_models"] = num_obj_models
+        data_point["num_rep_models"] = num_rep_models
+        data_point["p_obj_models"] = num_obj_models/multimodel_params["num_models"]
+        data_point["p_rep_models"] = num_rep_models/multimodel_params["num_models"]
     elif multimodel_params["test_task"] == "mixed_tasks":
-        pass
+        data_point["num_obj_models"] = num_obj_models
+        data_point["num_rep_models"] = num_rep_models
+        data_point["num_both_models"] = multimodel_params["num_models"] - num_obj_models - num_rep_models
+        data_point["p_obj_models"] = num_obj_models/multimodel_params["num_models"]
+        data_point["p_rep_models"] = num_rep_models/multimodel_params["num_models"]
+        data_point["p_both_models"] = data_point["num_both_models"]/multimodel_params["num_models"]
     elif multimodel_params["test_task"] == "drivebase":
         data_point["truth_omni_drive"] = true_params["model"]["omni_drive"]
     if data_point["continuity_mode"] == "discrete":
@@ -140,8 +165,13 @@ def mm_expt(params : dict):
     data_point["num_models"] = multimodel_params["num_models"]
     
     data_point["alpha"] = alg_params["params"]["action_selection"]["params"]["alpha"]
+    # belief = planner.env_.get_belief()
+    # data_point["distribution"] = [] #(model, belief)
+    # for el in belief:
+    #     data_point["distribution"].append((el, belief[el]))
+    # print(data_point)
 
-
+    # exit()
     ##
     ## Run Experiment
     ##
@@ -206,11 +236,11 @@ def mm_expt(params : dict):
         
     return pd.DataFrame([data_point])
 
-# import json
+import json
 
-# data = json.load(open("test_config/TEST_multi_true_foraging.json"))
+data = json.load(open("test_config/TEST_mm_sep_task.json"))
 
-# dp = true_expt(data)
+dp = mm_expt(data)
 
 # for el in dp:
 #     print(dp[el])

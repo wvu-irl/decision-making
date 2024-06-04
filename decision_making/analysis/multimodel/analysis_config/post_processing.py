@@ -16,7 +16,8 @@ import numpy as np
 from ast import literal_eval
 
 path = current + "/../data/unfiltered/"
-fn = "mm_sep_expt_t"
+save_path = current + "/../data/"
+fn = "mm_mix_expt"
 file = fn + ".csv"
 
 with open(path + file, 'r') as f:
@@ -29,8 +30,8 @@ with open(path + file, 'r') as f:
         entropy = 0
         for el in dist: 
             entropy += el[1] * np.log(el[1])
+            # print("dist_el" + str(el[0]))
             df.at[index, "dist_el" + str(el[0])] = el[1]
-            
             
         entropy = -entropy
         
@@ -40,10 +41,23 @@ with open(path + file, 'r') as f:
         num_o = row["num_objects"]
         num_r = row["num_returned"]
         
-        df.at[index, "returned_ratio"] = num_r / num_o
+        if num_o == 0:
+            df.at[index, "returned_ratio"] = 0
+        elif num_r > num_o:
+            df.at[index, "returned_ratio"] = 1
+        else:
+            df.at[index, "returned_ratio"] = num_r / num_o
         
         # df.at[index, "failed_drop_ratio"] = row["num_failed_drops"] / num_o
         # df.at[index, "failed_grab_ratio"] = row["num_failed_grabs"] / num_o
         
+    for index, row in df.iterrows():
+        dist0= row["dist_el0"]
+        dist1= row["dist_el1"]
+        dist2= row["dist_el2"]
         
-    df.to_csv(path + fn + "_post_proc.csv")
+        df.at[index, "ratio_all_objects"] = dist2/dist0
+        df.at[index, "ratio_all_repairs"] = dist2/dist1
+        
+        
+    df.to_csv(save_path + fn + ".csv")
