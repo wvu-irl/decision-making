@@ -149,7 +149,7 @@
                 },
                 "reward": {
                     "value": {
-                        "battery": 0,
+                        "battery": -1,
                         "battery_empty": -1000,
                         "time": -1,
                         "distance": -2,

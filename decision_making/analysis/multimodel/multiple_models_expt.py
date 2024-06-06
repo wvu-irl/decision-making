@@ -86,9 +86,15 @@ def mm_expt(params : dict):
         i = 0
         while i < num_obj_models:
             mm_params[i]["model"]["repair"] = False
+            mm_params[i]["reward"]["value"]["battery"] = 0
+            mm_params[i]["reward"]["limits"]["battery"] = [0,0]
+            mm_params[i]["reward"]["value"]["battery_empty"] = 0
             i += 1
         while i < multimodel_params["num_models"]:
             mm_params[i]["model"]["objects"] = False
+            mm_params[i]["reward"]["value"]["time"] = 0
+            mm_params[i]["reward"]["limits"]["time"] = [0,0]
+
             i += 1
         # mm_params[0]["model"]["repair"] = False
         # mm_params[1]["model"]["objects"] = False
@@ -236,11 +242,11 @@ def mm_expt(params : dict):
         
     return pd.DataFrame([data_point])
 
-import json
+# import json
 
-data = json.load(open("test_config/TEST_mm_sep_task.json"))
+# data = json.load(open("test_config/TEST_mm_sep_task.json"))
 
-dp = mm_expt(data)
+# dp = mm_expt(data)
 
 # for el in dp:
 #     print(dp[el])

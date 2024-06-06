@@ -4,7 +4,7 @@
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_sep/",
     "figure_file" : "foraging_objects_vs_p_obj_model_cr_alpha",
     "cross_ref" : "alpha",
-    "x" : "dist_el0",
+    "x" : "p_obj_models",
     "y" : "num_returned",
     "z" : null,
     "control" : "max_samples",
@@ -38,7 +38,6 @@
     },
     "sort": true,
     "avg" : true,
-    "smooth" : 500,
     "log_level" : "WARNING",
     "render" : false
 }

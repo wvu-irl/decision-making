@@ -17,7 +17,7 @@ from ast import literal_eval
 
 path = current + "/../data/unfiltered/"
 save_path = current + "/../data/"
-fn = "mm_mix_expt"
+fn = "mm_sep_expt"
 file = fn + ".csv"
 
 with open(path + file, 'r') as f:

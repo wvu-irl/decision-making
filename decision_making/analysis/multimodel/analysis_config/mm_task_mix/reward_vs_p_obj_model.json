@@ -4,7 +4,7 @@
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_mix/",
     "figure_file" : "foraging_r_vs_p_obj_model_cr_alpha",
     "cross_ref" : "alpha",
-    "x" : "ratio_all_objects",
+    "x" : "p_obj_models",
     "y" : "accum_reward",
     "z" : null,
     "control" : "max_samples",
@@ -20,8 +20,7 @@
     {
         "type" : "line",
         "title" : "Foraging Reward vs Prob Obj Model CR Alpha",
-        "kwargs" : null,
-        "log": true
+        "kwargs" : null
     },
     "filter" :
     {
@@ -40,7 +39,6 @@
     },
     "sort": true,
     "avg" : true,
-    "smooth" : 60,
     "log_level" : "WARNING",
     "render" : false
 }

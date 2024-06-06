@@ -8,7 +8,7 @@
     "y" : "returned_ratio",
     "z" : null,
     "control" : null,
-    "legend" : false,
+    "legend" : true,
     "fig":
     {
         "type" : "line",
@@ -35,7 +35,7 @@
     },
     "sort": true,
     "avg" : true,
-    "smooth" : 50,
+    "smooth" : 200,
 
     "log_level" : "WARNING",
     "render" : false
