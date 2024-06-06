@@ -102,6 +102,9 @@ class State():
     def get_action_index(self, _m, _a):
         for i in range(len(self.a_[_m])):
             # print(self.a_[_m][i].a_, _a)
+            if type(_a) is set or type(_a) is list:
+                # if self.a_[_m][i].a_ in _a:
+                print(self.a_[_m][i].a_, _a)
             if self.a_[_m][i].a_ == _a:
                 return i
         return None
