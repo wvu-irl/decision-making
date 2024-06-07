@@ -1,6 +1,6 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
-    "data_file" : "mm_sep.csv",
+    "data_file" : "mm_sep_full_expt.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_sep/",
     "figure_file" : "foraging_t_vs_p_obj_model_cr_alpha",
     "cross_ref" : "alpha",
@@ -20,7 +20,10 @@
     {
         "type" : "line",
         "title" : "Foraging Tune vs Prob Obj Model CR Alpha",
-        "kwargs" : null
+        "kwargs" : null,
+        "ylabel": "Time (s)",
+        "xlabel" : "Probability Object Model"
+
     },
     "filter" :
     {
@@ -39,6 +42,8 @@
     },
     "sort": true,
     "avg" : true,
+    "smooth" : 50,
+
     "log_level" : "WARNING",
     "render" : false
 }

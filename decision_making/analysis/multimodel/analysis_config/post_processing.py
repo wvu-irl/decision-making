@@ -17,7 +17,7 @@ from ast import literal_eval
 
 path = current + "/../data/unfiltered/"
 save_path = current + "/../data/"
-fn = "mm_sep_expt"
+fn = "mf_expt"
 file = fn + ".csv"
 
 with open(path + file, 'r') as f:
@@ -51,13 +51,13 @@ with open(path + file, 'r') as f:
         # df.at[index, "failed_drop_ratio"] = row["num_failed_drops"] / num_o
         # df.at[index, "failed_grab_ratio"] = row["num_failed_grabs"] / num_o
         
-    for index, row in df.iterrows():
-        dist0= row["dist_el0"]
-        dist1= row["dist_el1"]
-        dist2= row["dist_el2"]
+    # for index, row in df.iterrows():
+    #     dist0= row["dist_el0"]
+    #     dist1= row["dist_el1"]
+    #     dist2= row["dist_el2"]
         
-        df.at[index, "ratio_all_objects"] = dist2/dist0
-        df.at[index, "ratio_all_repairs"] = dist2/dist1
+    #     df.at[index, "ratio_all_objects"] = dist2/dist0
+    #     df.at[index, "ratio_all_repairs"] = dist2/dist1
         
         
     df.to_csv(save_path + fn + ".csv")

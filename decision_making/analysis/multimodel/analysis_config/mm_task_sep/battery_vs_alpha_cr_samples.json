@@ -1,6 +1,6 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
-    "data_file" : "mm_sep.csv",
+    "data_file" : "mm_sep_full_expt.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_sep/",
     "figure_file" : "foraging_battery_vs_alpha_cr_samples",
     "cross_ref" : "max_samples",

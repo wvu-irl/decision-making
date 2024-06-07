@@ -1,0 +1,41 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
+    "data_file" : "mm_sep_full_expt.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_sep/",
+    "figure_file" : "foraging_repair_vs_p_obj_model_cr_alpha_s",
+    "cross_ref" : "alpha",
+    "x" : "p_obj_models",
+    "y" : "avg_repair",
+    "z" : null,
+    "control" : null,
+    "legend" : true,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Foraging Avg Repair vs Prob Obj Model CR Alpha",
+        "kwargs" : null,
+        "ylabel": "Average Repair",
+        "xlabel" : "Probability Object Model"
+
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alpha", "op" : "in", "val" : [0, 0.125, 0.25, 0.5, 0.75, 0.875, 1]},
+                {"col" : "model_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
+                {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
+                {"col" : "horizon", "op" : "in", "val" : [20]},
+                {"col" : "max_samples", "op" : "in", "val" : [100]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+
+    "log_level" : "WARNING",
+    "render" : false
+}

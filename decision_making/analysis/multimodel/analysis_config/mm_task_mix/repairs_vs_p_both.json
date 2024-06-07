@@ -1,6 +1,6 @@
 {
     "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
-    "data_file" : "mm_mix.csv",
+    "data_file" : "mm_mix_uniform.csv",
     "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mm_mix/",
     "figure_file" : "foraging_repair_vs_p_both_cr_alpha",
     "cross_ref" : "alpha",
