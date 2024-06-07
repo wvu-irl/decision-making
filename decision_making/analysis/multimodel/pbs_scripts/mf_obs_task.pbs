@@ -1,13 +1,13 @@
 #!/bin/bash
  
 # Name of job:
-#PBS -N mf_task_expt
+#PBS -N mf_otask_expt
  
 # Where to write stderr:
-#PBS -e log/mf_task.err
+#PBS -e log/mf_otask.err
  
 # Where to write stdout: 
-#PBS -o log/mf_task.out
+#PBS -o log/mf_otask.out
  
 # Specify number of nodes, processors (really threads) per node, and the maximum allowed run time for the job
 # Can also specify max memory requested with something like mem=10gb
