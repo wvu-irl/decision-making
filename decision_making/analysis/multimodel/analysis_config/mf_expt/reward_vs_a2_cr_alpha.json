@@ -1,0 +1,37 @@
+{
+    "data_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/data/",
+    "data_file" : "mf_expt.csv",
+    "figure_path" : "/home/jared/decision-making/decision_making/analysis/multimodel/figs/mf_expt/",
+    "figure_file" : "foraging_r_vs_a2_cr_alpha",
+    "cross_ref" : "alpha",
+    "x" : "action_a_param",
+    "y" : "accum_reward",
+    "z" : null,
+    "control" : null,
+    "legend" : true,
+    "fig":
+    {
+        "type" : "line",
+        "title" : "Foraging Reward vs a2 CR Alpha",
+        "kwargs" : null
+    },
+    "filter" :
+    {
+        "logic" :
+        {
+            "and" :
+            [
+                {"col" : "alpha", "op" : "in", "val" : [0, 0.125, 0.25, 0.5, 0.75, 0.875, 1]},
+                {"col" : "model_a_param", "op" : "in", "val" : [0.5, 0.7, 0.8, 0.9]},
+                {"col" : "action_a_param", "op" : "in", "val" : [0.5, 0.75, 1]},
+                {"col" : "horizon", "op" : "in", "val" : [20, 60, 100]},
+                {"col" : "max_samples", "op" : "in", "val" : [100, 500, 1000]},
+                {"col" : "env", "op" : "in", "val" : ["irl_gym/Foraging-v0"]}
+            ]
+        }
+    },
+    "sort": true,
+    "avg" : true,
+    "log_level" : "WARNING",
+    "render" : false
+}

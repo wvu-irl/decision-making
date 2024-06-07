@@ -48,7 +48,7 @@
                 "slip": false,
                 "omni_drive": true,
                 "battery": true,
-                "obstacles": false,
+                "obstacles": true,
                 "obj_partially_obs": false,
                 "interaction_heading": false,
                 "state_heading": true,
@@ -89,6 +89,12 @@
                             1
                         ]
                     }
+                },
+                "obstacles": {
+                    "max_num": 6, 
+                    "max_radius": 5, 
+                    "max_sides": 6, 
+                    "is_random": true
                 },
                 "battery": {
                     "value": {

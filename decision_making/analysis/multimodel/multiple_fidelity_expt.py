@@ -57,14 +57,18 @@ def mf_expt(params : dict):
     if true_env_params["render"] != "none":
         true_env.render()
     print(s)
-    
+    true_env.render()
+    plt.pause(20)
     #because we are assuming true models. If not doing so will need flags
     shared_params["state"] = deepcopy(s)
     print(shared_params["state"])
     true_params["model"]["is_truth"] = False
+    if "obstacles" in env_params["flags"] and env_params["flags"]["obstacles"]:
+        true_params["obstacles"] = {"polygons": true_env.get_obstacles()}  
+        print(true_params["obstacles"])
     
     modes = ["full", "task", "mf"]
-    mode = np.random.choice(modes)
+    mode = "mf"#np.random.choice(modes)
     if mode == "full" or mode == "task":
         multimodel_params["num_models"] = [1]
     else:
@@ -119,7 +123,10 @@ def mf_expt(params : dict):
     ##
     # alg_params["search"]["horizon"] = shared_params["max_steps"]
     planner = get_agent(alg_params,test_env_params)
-    
+    planner.evaluate(s, alg_params["search"])
+    planner.env_.render()
+    plt.pause(10)
+    exit()
     ##
     ## Data processing
     ##
@@ -231,11 +238,9 @@ def mf_expt(params : dict):
         
     return pd.DataFrame([data_point])
 
-# import json
-
-# data = json.load(open("test_config/TEST_multi_fid_foraging.json"))
-
-# dp = mf_expt(data)
+import json
+data = json.load(open("test_config/TEST_multi_fid_foraging.json"))
+dp = mf_expt(data)
 
 # for el in dp:
 #     print(dp[el])
